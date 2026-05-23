@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 import { Inter } from 'next/font/google';
 import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa"
 
 import Tabs from "@/components/tabs";
+import Footer from "@/components/Footer";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -54,6 +56,7 @@ export default function RootLayout({
         <main>
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );
