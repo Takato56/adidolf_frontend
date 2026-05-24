@@ -2,8 +2,8 @@
 function Footer() {
     return (
         <footer className="bg-[#111827] text-gray-300 text-sm">
-            <div className="max-w-6xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div className="max-w-6xl px-4 py-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
                     <div>
                         <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">
                             About
