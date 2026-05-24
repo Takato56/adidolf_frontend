@@ -1,34 +1,43 @@
-import { Container, Row, Col, Stack, Image, Nav, NavLink } from "react-bootstrap"
+import { Container, Row, Col } from "react-bootstrap";
 
 function Footer() {
-    return(
+    return (
         <footer className="footer">
             <Container fluid>
-                <Row className="align-left">
-                    <Col xs="auto">Help</Col>
-                </Row>
-                <Row className="align-left links">
-                    <Col xs="auto">
-                        <a href="">My Account</a>
+                <Row className="py-3 footer-section">
+                    <Col xs={12} md={4}>
+                        <span className="footer-title">About</span>
+                        <div className="footer-links mt-2">
+                            <a href="#" className="footer-link">Company</a>
+                            <a href="#" className="footer-link">Our Mission Statement</a>
+                            <a href="#" className="footer-link">Careers</a>
+                        </div>
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <span className="footer-title mt-3 mt-md-0">Support</span>
+                        <div className="footer-links mt-2">
+                            <a href="#" className="footer-link">Contact Us</a>
+                            <a href="#" className="footer-link">FAQ</a>
+                        </div>
+                    </Col>
+
+                    <Col xs={12} md={4}>
+                        <span className="footer-title mt-3 mt-md-0">Legal</span>
+                        <div className="footer-links mt-2">
+                            <a href="#" className="footer-link">Terms of Service</a>
+                            <a href="#" className="footer-link">Privacy Policy</a>
+                        </div>
                     </Col>
                 </Row>
-                <Row className="align-left">
-                    <Col>About</Col>
-                </Row>
-                <Row className="align-left links">
-                    <Col xs="auto">
-                        <a href="">Company</a>
-                    </Col>
-                    <Col xs="auto">
-                        <a href="">Our Mission Statement</a>
-                    </Col>
-                    <Col xs="auto">
-                        <a href="">Careers</a>
+
+                <Row className="py-3 footer-bottom border-top-footer">
+                    <Col xs={12}>
+                        <span className="footer-muted">© 2026 Adidolf. All rights reserved.</span>
                     </Col>
                 </Row>
             </Container>
         </footer>
-    )
+    );
 }
 
 export default Footer;
