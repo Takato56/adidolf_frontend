@@ -5,9 +5,49 @@ body {
 }
 
 .footer {
-    background-color: rgb(176, 176, 176);
+  background-color: #111827;
+  color: #e5e7eb;
+  padding: 24px 0 20px;
+  font-size: 0.9rem;
 }
 
-.footer .links {
-    margin-left:10px;
+.footer-brand {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+}
+
+.footer-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-link {
+  color: #d1d5db;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.border-top-footer {
+  border-top: 1px solid rgba(148, 163, 253, 0.15) !important;
+}
+
+.footer-muted {
+  font-size: 0.75rem;
+  color: #6b7280;
 }
