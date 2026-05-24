@@ -1,41 +1,42 @@
-import { Container, Row, Col } from "react-bootstrap";
-
+// components/Footer.tsx
 function Footer() {
     return (
-        <footer className="footer">
-            <Container fluid>
-                <Row className="py-3 footer-section">
-                    <Col xs={12} md={4}>
-                        <span className="footer-title">About</span>
-                        <div className="footer-links mt-2">
-                            <a href="#" className="footer-link">Company</a>
-                            <a href="#" className="footer-link">Our Mission Statement</a>
-                            <a href="#" className="footer-link">Careers</a>
-                        </div>
-                    </Col>
-                    <Col xs={12} md={4}>
-                        <span className="footer-title mt-3 mt-md-0">Support</span>
-                        <div className="footer-links mt-2">
-                            <a href="#" className="footer-link">Contact Us</a>
-                            <a href="#" className="footer-link">FAQ</a>
-                        </div>
-                    </Col>
-
-                    <Col xs={12} md={4}>
-                        <span className="footer-title mt-3 mt-md-0">Legal</span>
-                        <div className="footer-links mt-2">
-                            <a href="#" className="footer-link">Terms of Service</a>
-                            <a href="#" className="footer-link">Privacy Policy</a>
-                        </div>
-                    </Col>
-                </Row>
-
-                <Row className="py-3 footer-bottom border-top-footer">
-                    <Col xs={12}>
-                        <span className="footer-muted">© 2026 Adidolf. All rights reserved.</span>
-                    </Col>
-                </Row>
-            </Container>
+        <footer className="bg-[#111827] text-gray-300 text-sm">
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                    <div>
+                        <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">
+                            About
+                        </h3>
+                        <ul className="flex flex-col space-y-2 margin-left-0">
+                            <li><a href="#" className="hover:text-white transition-colors">Company</a></li>
+                            <li><a href="#" className="hover:text-white transition-colors">Our Mission Statement</a></li>
+                            <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">
+                            Support
+                        </h3>
+                        <ul className="flex flex-col space-y-2">
+                            <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                            <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">
+                            Legal
+                        </h3>
+                        <ul className="flex flex-col space-y-2">
+                            <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                            <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div className="pt-4 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+                    <p>© 2026 Adidolf. All rights reserved.</p>
+                </div>
+            </div>
         </footer>
     );
 }
