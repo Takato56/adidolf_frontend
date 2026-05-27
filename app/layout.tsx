@@ -5,7 +5,6 @@ import { Inter } from 'next/font/google';
 import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa"
 
 import Tab from "@/components/tab";
-import Footer from "@/components/Footer";
 import Link from "next/link";
 
 const inter = Inter({
@@ -24,7 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={inter.className}>
+        {/* ########### SUPER COOL NAVBAR ####### */}
         <nav className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
           <Link href="/"><svg width="160" height="27" viewBox="35 129 254 49" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M191.219 129.767C204.264 129.478 215.085 139.896 215.423 153.069C215.76 166.242 205.486 177.21 192.443 177.602C179.328 177.996 168.394 167.551 168.055 154.305C167.716 141.059 178.101 130.058 191.219 129.767Z" fill="#181717"/>
@@ -41,22 +41,62 @@ export default function RootLayout({
             <path d="M288.41 147.886C288.661 148.166 288.56 157.554 288.558 158.743L266.18 158.763C265.84 158.402 265.993 149.094 265.996 147.949C273.468 147.979 280.939 147.958 288.41 147.886Z" fill="#181717"/>
           </svg></Link>
 
-          <div className={`order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 md:flex gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap ${inter.className}`}>
+          <div className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 md:flex gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap">
             <Tab label="Shop" href="/" className="justify-self-center"/>
             <Tab label="Categories" href="/categories" className="justify-self-center"/>
             <Tab label="Deals" href="/deals" className="justify-self-center"/>
           </div>
           
-          <div className={`order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm`}>
+          <div className="order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm">
             <FaSearch/>
             <FaShoppingCart/>
             <FaUser/>
           </div>
         </nav>
+
+        {/* ########### MAIN CONTENT ############ */}
         <main>
           {children}
         </main>
-        <Footer />
+
+        {/* ########### SUPER COOL FOOTER ####### */}
+        <footer className="bg-[#111827] text-gray-300 text-sm">
+          <div className="max-w-6xl px-4 py-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
+              <div>
+                <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">
+                  About
+                </h3>
+                <ul className="flex flex-col space-y-2 margin-left-0">
+                  <li><Link href="#" className="hover:text-white transition-colors">Company</Link></li>
+                  <li><Link href="#" className="hover:text-white transition-colors">Our Mission Statement</Link></li>
+                  <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">
+                  Support
+                </h3>
+                <ul className="flex flex-col space-y-2">
+                  <li><Link href="#" className="hover:text-white transition-colors">Contact Us</Link></li>
+                  <li><Link href="#" className="hover:text-white transition-colors">FAQ</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">
+                  Legal
+                </h3>
+                <ul className="flex flex-col space-y-2">
+                  <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                  <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                </ul>
+              </div>
+            </div>
+            <div className="pt-4 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+              <p>© 2026 Adidolf. All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );
