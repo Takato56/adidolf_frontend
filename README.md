@@ -1,4 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Disclaimer
+Adidolf has no official token, coin, or crypto project. Any token using our name, image, or project is unaffiliated and not endorsed by us.
 
 ## Getting Started
 
