@@ -3,3 +3,7 @@
 body {
     background-color: #f8f9ff;
 }
+@theme {
+  /* Khai báo class font-northwell bằng biến CSS variable từ layout.tsx */
+  --font-northwell: var(--font-northwell); 
+}

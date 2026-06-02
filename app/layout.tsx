@@ -3,11 +3,18 @@ import "./globals.css";
 
 import { Inter } from 'next/font/google';
 import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa"
+import localFont from "next/font/local";
 
 import Tabs from "@/components/tabs";
 
+
 const inter = Inter({
   subsets: ['latin'],
+});
+
+const northwell = localFont({
+  src: "../fonts/Northwell.ttf",
+  variable: "--font-northwell", 
 });
 
 export const metadata: Metadata = {
@@ -15,13 +22,14 @@ export const metadata: Metadata = {
   description: "Express your political beliefs with fashion.",
 };
 
-export default function RootLayout({
+
+  export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={northwell.variable}>
       <body>
         <nav className="bg-white h-14 flex items-center justify-between md:grid md:grid-cols-3 px-6 border-b border-slate-100">
           <svg width="160" height="27" viewBox="35 129 254 49" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,8 +49,8 @@ export default function RootLayout({
           
           <Tabs tabs={[
             {label: "Shop", href: "/"},
-            {label: "Categories", href: "/categories"},
-            {label: "Deals", href: "/deals"}
+            {label: "News/Deals", href: "/newarrivals"},
+            {label: "Categories", href: "/categories"}
           ]}/>
           
           <div className={`justify-self-end flex gap-7 text-[#64748B] text-sm ${inter.className}`}>

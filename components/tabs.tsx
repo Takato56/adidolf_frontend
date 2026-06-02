@@ -21,3 +21,6 @@ export default function Tabs({ tabs }: { tabs: {label: string, href: string}[] }
     </div>
   )
 }
+
+
+
