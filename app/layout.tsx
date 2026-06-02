@@ -53,7 +53,7 @@ export const metadata: Metadata = {
           <div className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 md:flex gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap">
             <Tab label="Shop" href="/" className="justify-self-center"/>
             <Tab label="Categories" href="/categories" className="justify-self-center"/>
-            <Tab label="Deals" href="/deals" className="justify-self-center"/>
+            <Tab label="New Arrivals" href="/newarrivals" className="justify-self-center"/>
           </div>
           
           <div className="order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm">
