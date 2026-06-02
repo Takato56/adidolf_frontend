@@ -57,9 +57,9 @@ export const metadata: Metadata = {
           </div>
           
           <div className="order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm">
-            <a href="/"><FaSearch/></a>
-            <a href="/"><FaShoppingCart/></a>
-            <a href="/"><FaUser/></a>
+            <Link href="#"><FaSearch/></Link>
+            <Link href="#"><FaShoppingCart/></Link>
+            <Link href="#"><FaUser/></Link>
           </div>
         </nav>
 
