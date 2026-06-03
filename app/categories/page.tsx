@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LoadingIcon from "@/components/LoadingIcon";
 export default function Categories() {
   return (
     <div>
@@ -26,31 +27,31 @@ export default function Categories() {
       <div className="pl-4 pt-1 text-[20px] md:text-[32px] md:pl-6 text-black font-northwell">
         Define Your Statement
       </div>
-      <div className="m-4 md:m-6 bg-[#E6F2FF] rounded-lg">
+      <div className="m-4 md:m-6 bg-[#f8f9ff] rounded-lg">
         <div className="mt-3 font-sans">
-          <div className="grid grid-cols-1 justify-center md:grid-cols-6 gap-2 md:gap-1 ">
-            <div className="col-span-1 md:col-span-4 aspect-[21/9.1] bg-red-500 p-6 text-white text-center rounded-lg flex items-center justify-center">
-              Cột 1
+          <div className="grid grid-cols-1 justify-center md:grid-cols-6 gap-1 md:gap-1">
+            <div className="col-span-1 md:col-span-4 aspect-21/9.1 bg-gray-200 bg-opacity-40 p-6 text-white text-center rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
 
             {/* Cột 2: Điện thoại chiếm 1 hàng (col-span-1), PC chiếm 2 phần (md:col-span-2) */}
-            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-green-500 p-6 text-white text-center rounded-lg flex items-center justify-center">
-              Cột 2
+            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
 
             {/* Cột 3 */}
-            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-blue-500 p-6 text-white text-center rounded-lg flex items-center justify-center">
-              Cột 3
+            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
 
             {/* Cột 4 */}
-            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-yellow-500 p-6 text-white text-center rounded-lg flex items-center justify-center">
-              Cột 4
+            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
 
             {/* Cột 5 */}
-            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-purple-500 p-6 text-white text-center rounded-lg flex items-center justify-center">
-              Cột 5
+            <div className="col-span-1 md:col-span-2 aspect-21/9 md:aspect-8/7 bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
           </div>
         </div>
