@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {/* ########### SUPER COOL NAVBAR ####### */}
-        <nav className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
+        <header className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
           <Link href="/">
             <svg
               width="160"
@@ -86,19 +86,19 @@ export default function RootLayout({
             </svg>
           </Link>
 
-          <div className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 md:flex gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap">
+          <nav className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap">
             <Tab label="Shop" href="/" className="justify-self-center" />
-            <Tab
-              label="Categories"
-              href="/categories"
-              className="justify-self-center"
-            />
             <Tab
               label="New Arrivals"
               href="/newarrivals"
               className="justify-self-center"
             />
-          </div>
+            <Tab
+              label="Categories"
+              href="/categories"
+              className="justify-self-center"
+            />
+          </nav>
 
           <div className="order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm">
             <Link href="#">
@@ -111,7 +111,7 @@ export default function RootLayout({
               <FaUser />
             </Link>
           </div>
-        </nav>
+        </header>
 
         {/* ########### MAIN CONTENT ############ */}
         <main>{children}</main>
