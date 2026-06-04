@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ProductCard from "@/components/ProductCard";
+
 export default function NewArrivals() {
   return (
     <div>
@@ -35,32 +37,14 @@ export default function NewArrivals() {
         </div>
         <div className="m-4 mt-3 md:m-6 font-sans">
           <div className="grid grid-cols-2 justify-center md:grid-cols-5 gap-4 ">
-            <div className="aspect-3/4 text-white text-center rounded-lg">
-              <div className="h-2/3 w-full relative bg-gray-100">
-                <img
-                  src="duong-dan-anh-san-pham.jpg"
-                  alt="Tên sản phẩm"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="h-1/3 w-full p-4 flex flex-col justify-between bg-white text-black">
-                <div>
-                  <p className="text-xs text-gray-400 text-left mt-0.5">
-                    Category
-                  </p>
-                  <h3 className="font-sans mt-2 text-left font-medium text-sm text-gray-800 line-clamp-1">
-                    Tên sản phẩm ở đây
-                  </h3>
-                </div>
-
-                <div className="font-sans flex justify-between font-bold text-red-500">
-                  <p>$99.99</p>
-                  <button className="bg-black hover:bg-gray-600 text-white font-sans px-5 rounded-2xl text-[12px] transition-colors duration-200">
-                    Shop now
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ProductCard
+              image="./coollookinglapel.jpg"
+              alt="Cool Looking Lapel"
+              category="Accessories"
+              name="Cool Looking Lapel"
+              price="$99.99"
+              shopLink="support/nuremberg"
+            />
             <div className="aspect-9/12 bg-blue-500 p-6 text-white text-center rounded-lg">
               Cột 3
             </div>
