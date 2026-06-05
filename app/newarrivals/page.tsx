@@ -2,9 +2,9 @@ import Link from "next/link";
 export default function NewArrivals() {
   return (
     <div>
-      <div className="p-4">
+      <div className="margindiv mt-3">
         <nav>
-          <ul className="flex items-center space-x-2 text-sm font-sans text-black">
+          <ul className="breadcumb">
             <li>
               <Link href="/" className="hover:font-bold hover:underline">
                 Home
@@ -19,36 +19,34 @@ export default function NewArrivals() {
         </nav>
       </div>
 
-      <div className="ml-4 pt-2 text-2xl md:text-3xl md:mx-6 mt-3 text-black font-sans ">
+      <div className="texttitle margindiv pt-4">
         <div>
-          <b>New Arrivals & Exclusive Deals </b>
-          <Link href="/categories/new">-&gt;</Link>
+          <p>New Arrivals & Exclusive Deals </p>    
+        </div>
+        <div className="subtitle pt-1">
+          Discover our latest collection
         </div>
       </div>
-      <div className="pl-4 pt-2 text-[12px] md:text-[18px] md:pl-6 text-black font-sans">
-        Discover our latest collection
-      </div>
-      <div className="m-4 md:m-6 bg-[#E6F2FF] p-5 rounded-lg">
-        <div className="mx-3 text-[18px] md:mx-6 md:text-[22px] flex justify-between">
+      <div className="margindiv mt-3 bg-[#E6F2FF] pt-3 pb-5 rounded-2xl">
+        <div className="margindiv text-[18px] md:text-[22px]">
           <b className="font-sans">Deals of the week</b>
-          <p>Ends in:</p>
         </div>
-        <div className="m-4 mt-3 md:m-6 font-sans">
-          <div className="grid grid-cols-2 justify-center md:grid-cols-5 gap-4 ">
-            <div className="aspect-3/4 text-white text-center rounded-lg">
+        <div className="margindiv mt-3 font-sans">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pb-4">
+            <div className="aspect-3/4 text-white text-center rounded-2xl overflow-hidden">
               <div className="h-2/3 w-full relative bg-gray-100">
                 <img
-                  src="duong-dan-anh-san-pham.jpg"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXv1yLIl1GP9p-ZPnujmzCDVsjhFlfAlAZkA&s"
                   alt="Tên sản phẩm"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="h-1/3 w-full p-4 flex flex-col justify-between bg-white text-black">
+              <div className="h-1/3 w-full px-3 flex flex-col justify-between bg-white text-black">
                 <div>
                   <p className="text-xs text-gray-400 text-left mt-0.5">
                     Category
                   </p>
-                  <h3 className="font-sans mt-2 text-left font-medium text-sm text-gray-800 line-clamp-1">
+                  <h3 className="font-sans text-left font-medium text-sm text-gray-800 line-clamp-1">
                     Tên sản phẩm ở đây
                   </h3>
                 </div>
@@ -63,6 +61,12 @@ export default function NewArrivals() {
             </div>
             <div className="aspect-9/12 bg-blue-500 p-6 text-white text-center rounded-lg">
               Cột 3
+            </div>
+            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg">
+              Cột 4
+            </div>
+            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg">
+              Cột 4
             </div>
             <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg">
               Cột 4

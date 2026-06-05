@@ -24,9 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} >
         {/* ########### SUPER COOL NAVBAR ####### */}
-        <header className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
+        <header className="order-1 bg-white h-20 md:h-14  items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
           <Link href="/">
             <svg
               width="160"
@@ -93,11 +93,26 @@ export default function RootLayout({
               href="/newarrivals"
               className="justify-self-center"
             />
+            <div className="group h-full text-center">
             <Tab
               label="Categories"
               href="/categories"
-              className="justify-self-center"
+              className="justify-self-center" 
+              
             />
+              <div className="hidden group-hover:block left-0 absolute w-full mt-5 before:content-[''] before:absolute before:bottom-full text-xl py-5 before:h-5 before:w-full bg-[#eceff2]">
+                <p className="text-sm mb-2">Discover our masterpieces</p>
+  
+                <div className="grid grid-cols-4 gap-y-2 text-center">
+                  <Link href="/categories">Lifestyle</Link>
+                  <Link href="/categories">Cot 1</Link>
+                  <Link href="/categories">Cot 1</Link>
+                  <Link href="/categories">Cot 1</Link>
+                  <Link href="/categories">Cot 1</Link>
+                </div>
+              </div>
+            </div>
+
           </nav>
 
           <div className="order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm">

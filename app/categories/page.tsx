@@ -1,11 +1,12 @@
 import Link from "next/link";
 import LoadingIcon from "@/components/LoadingIcon";
+import style from "./page.module.css";
 export default function Categories() {
   return (
     <div>
-      <div className="p-4">
+      <div className={style.margindiv}>
         <nav>
-          <ul className="flex items-center space-x-2 text-sm font-sans text-black">
+          <ul className="breadcumb">
             <li>
               <Link href="/" className="hover:underline">
                 Home
@@ -19,12 +20,12 @@ export default function Categories() {
           </ul>
         </nav>
       </div>
-      <div className="ml-4 pt-2 text-[25px] md:text-[37px] md:mx-6 mt-3 text-black font-sans ">
+      <div className="mx-4 pt-2 text-[25px] md:text-[37px] md:mx-15 mt-3 text-black font-sans ">
         <div>
           <b>Categories </b>
         </div>
       </div>
-      <div className="pl-4 pt-1 text-[20px] md:text-[32px] md:pl-6 text-black font-northwell">
+      <div className="mx-4 mt-1 text-[20px] md:text-[32px] md:ml-15 text-black font-northwell">
         Define Your Statement
       </div>
       <div className="m-4 md:m-6 bg-[#f8f9ff] rounded-lg">
@@ -52,6 +53,7 @@ export default function Categories() {
           </div>
         </div>
       </div>
+      <div className="mt-8"></div>
     </div>
   );
 }

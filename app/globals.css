@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
 body {
-    background-color: #f8f9ff;
+    background-color: #fbfdff;
 }
+.margindiv {
+    @apply mx-4 md:mx-6;
+}
+
+.texttitle {
+    @apply text-2xl md:text-3xl font-extrabold
+}
+.breadcumb {
+    @apply flex items-center space-x-2 text-sm font-sans text-black
+}
+.subtitle{
+    @apply text-[14px] md:text-[18px] text-black font-sans font-medium
+}
+
