@@ -36,19 +36,19 @@ export default function NewArrivals() {
           <p>Ends in:</p>
         </div>
         <div className="m-4 mt-3 md:m-6 font-sans">
-          <div className="grid grid-cols-2 justify-center md:grid-cols-5 gap-4 ">
+          <div className="flex overflow-x-auto gap-4 pb-4">
             <ProductCard
-              image="./coollookinglapel.jpg"
+              image=".././coollookinglapel.jpg"
               alt="Cool Looking Lapel"
               category="Accessories"
               name="Cool Looking Lapel"
               price="$99.99"
               shopLink="support/nuremberg"
-            />
-            <div className="aspect-9/12 bg-blue-500 p-6 text-white text-center rounded-lg">
+            />     
+            <div className="aspect-3/4 bg-blue-500 p-6 text-white text-center rounded-lg shrink-0">
               Cột 3
             </div>
-            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg">
+            <div className="aspect-3/4 bg-yellow-500 p-6 text-white text-center rounded-lg shrink-0">
               Cột 4
             </div>
           </div>
@@ -59,14 +59,14 @@ export default function NewArrivals() {
           <b className="font-sans">New Arrivals</b>
         </div>
         <div className="mx-2 mt-3 md:mx-4 font-sans">
-          <div className="grid grid-cols-2 justify-center md:grid-cols-5 gap-4 ">
-            <div className="aspect-3/4 bg-green-500 p-6 text-white text-center rounded-lg">
+          <div className="flex overflow-x-auto gap-4 pb-4">
+            <div className="aspect-3/4 bg-green-500 p-6 text-white text-center rounded-lg shrink-0 w-40">
               Cột 2
             </div>
-            <div className="aspect-9/12 bg-blue-500 p-6 text-white text-center rounded-lg">
+            <div className="aspect-9/12 bg-blue-500 p-6 text-white text-center rounded-lg shrink-0 w-40">
               Cột 3
             </div>
-            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg">
+            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg shrink-0 w-40">
               Cột 4
             </div>
           </div>
