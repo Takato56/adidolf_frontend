@@ -26,8 +26,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className} >
         {/* ########### SUPER COOL NAVBAR ####### */}
-        <header className="order-1 bg-white h-20 md:h-14  items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
-          <Link href="/">
+        <header className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
+          <Link href="/" className="inline-block w-fit">
             <svg
               width="160"
               height="27"

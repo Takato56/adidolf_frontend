@@ -48,7 +48,7 @@ export default function FAQ() {
 
       <div className="space-y-2">
         {faqItems.map((item, index) => (
-          <div key={index}>
+          <div key={index} className="w-full">
             <button
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
               className={`w-full text-left p-4 rounded-lg transition-all duration-200 flex items-center justify-between group ${

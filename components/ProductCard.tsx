@@ -18,7 +18,11 @@ export default function ProductCard({
   alt = "Product",
 }: ProductCardProps) {
   return (
+<<<<<<< HEAD
     <div className="aspect-3/4 text-white text-center overflow-hidden rounded-xl">
+=======
+    <div className="aspect-3/4 text-white text-center rounded-lg shrink-0">
+>>>>>>> a2ac9ba513a45b6401071ecd6aa73214a7b03a85
       <div className="h-2/3 w-full relative bg-gray-100">
         <img
           src={image}
