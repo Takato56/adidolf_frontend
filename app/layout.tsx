@@ -24,10 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} >
         {/* ########### SUPER COOL NAVBAR ####### */}
-        <nav className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
-          <Link href="/">
+        <header className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100">
+          <Link href="/" className="inline-block w-fit">
             <svg
               width="160"
               height="27"
@@ -86,19 +86,34 @@ export default function RootLayout({
             </svg>
           </Link>
 
-          <div className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 md:flex gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap">
+          <nav className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap">
             <Tab label="Shop" href="/" className="justify-self-center" />
-            <Tab
-              label="Categories"
-              href="/categories"
-              className="justify-self-center"
-            />
             <Tab
               label="New Arrivals"
               href="/newarrivals"
               className="justify-self-center"
             />
-          </div>
+            <div className="group h-full text-center">
+            <Tab
+              label="Categories"
+              href="/categories"
+              className="justify-self-center" 
+              
+            />
+              <div className="hidden group-hover:block left-0 absolute w-full mt-5 before:content-[''] before:absolute before:bottom-full text-xl py-5 before:h-5 before:w-full bg-[#eceff2]">
+                <p className="text-sm mb-2">Discover our masterpieces</p>
+  
+                <div className="px-5 md:px-60 grid grid-cols-4 gap-y-1 gap-x-2 text-center">
+                  <Link href="/categories">Lifestyle</Link>
+                  <Link href="/categories">Gaming</Link>
+                  <Link href="/categories">Cot 1</Link>
+                  <Link href="/categories">Cot 1</Link>
+                  <Link href="/categories">Cot 1</Link>
+                </div>
+              </div>
+            </div>
+
+          </nav>
 
           <div className="order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm">
             <Link href="#">
@@ -111,7 +126,7 @@ export default function RootLayout({
               <FaUser />
             </Link>
           </div>
-        </nav>
+        </header>
 
         {/* ########### MAIN CONTENT ############ */}
         <main>{children}</main>

@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500&display=swap');
+
+.productPage {
+  font-family: 'Outfit', sans-serif;
+}
+
+.productHero {
+  position: relative;
+  background: #f5f5f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 0.5px solid #e0e0e0;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.productHeroGhost {
+  position: absolute;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(140px, 28vw, 260px);
+  color: rgba(0,0,0,0.05);
+  pointer-events: none;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  top: -10px;
+  right: -5px;
+  user-select: none;
+}
+
+.productHero img {
+  position: relative;
+  z-index: 1;
+  width: 260px;
+  height: auto;
+  object-fit: contain;
+}
+
+.productBody {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .productBody {
+    grid-template-columns: 1fr 1fr;
+  }
+  .productHero {
+    min-height: 380px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .productBody {
+    grid-template-columns: 1.1fr 1fr;
+  }
+  .productHero {
+    min-height: 440px;
+  }
+}
+
+.productTitleCol {
+  padding: clamp(1rem, 3vw, 1.75rem) clamp(1rem, 4vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-bottom: 0.5px solid #e0e0e0;
+}
+
+@media (min-width: 640px) {
+  .productTitleCol {
+    border-bottom: none;
+    border-right: 0.5px solid #e0e0e0;
+  }
+}
+
+.productTitle {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 10vw, 80px);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+  color: #111;
+  margin: 0;
+}
+
+.accentLine {
+  width: 28px;
+  height: 3px;
+  background: #7F77DD;
+  border-radius: 2px;
+}
+
+.pillRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+}
+
+.pillBrand {
+  background: #f0efeb;
+  color: #5f5e5a;
+  border: 0.5px solid #d3d1c7;
+}
+
+.pillStock {
+  background: #EAF3DE;
+  color: #3B6D11;
+}
+
+.productPrice {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(26px, 5vw, 36px);
+  color: #111;
+  line-height: 1;
+}
+
+.productSep {
+  height: 0.5px;
+  background: #e0e0e0;
+}
+
+.productDesc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #888780;
+  margin: 0;
+}
+
+.productOptsCol {
+  padding: clamp(1rem, 3vw, 1.75rem) clamp(1rem, 4vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fieldLabel {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b4b2a9;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+}
+
+.swatches {
+  display: flex;
+  gap: 8px;
+}
+
+.swatchBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 0;
+  transition: outline 0.15s;
+}
+
+.swatchBtn.active {
+  outline: 2px solid #7F77DD;
+  outline-offset: 2px;
+}
+
+.sizeBtns {
+  display: flex;
+  gap: 6px;
+}
+
+.sizeBtn {
+  width: 44px;
+  height: 44px;
+  border: 0.5px solid #d3d1c7;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: #888780;
+  transition: all 0.12s;
+}
+
+.sizeBtn:hover {
+  border-color: #7F77DD;
+  color: #534AB7;
+}
+
+.sizeBtn.active {
+  background: #7F77DD;
+  color: #26215C;
+  border-color: #7F77DD;
+}
+
+.actionRow {
+  display: flex;
+  gap: 8px;
+}
+
+.btnCart {
+  flex: 1;
+  padding: 13px;
+  background: #534AB7;
+  color: #EEEDFE;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 0.15s;
+}
+
+.btnCart:hover {
+  background: #3C3489;
+}
+
+.btnWish {
+  padding: 13px 15px;
+  border: 0.5px solid #d3d1c7;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #888780;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.btnWish:hover {
+  border-color: #7F77DD;
+  color: #534AB7;
+}
+
+.perks {
+  border-top: 0.5px solid #e0e0e0;
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.perkRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #888780;
+}
+
+.perkCheck {
+  color: #3B6D11;
+  font-weight: 500;
+}
