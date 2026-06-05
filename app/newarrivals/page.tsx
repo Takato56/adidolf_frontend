@@ -29,11 +29,11 @@ export default function NewArrivals() {
           Discover our latest collection
         </div>
       </div>
-      <div className="margindiv mt-3 bg-[#E6F2FF] pt-3 pb-5 rounded-2xl">
-        <div className="margindiv text-[18px] md:text-[22px]">
+      <div className="margindiv mt-6 bg-[#E6F2FF] pt-3 pb-5 rounded-2xl">
+        <div className="mx-6 text-[18px] md:text-[22px]">
           <b className="font-sans">Deals of the week</b>
         </div>
-        <div className="m-4 mt-3 md:m-6 font-sans">
+        <div className="mx-6 mt-3 font-sans">
           <div className="flex overflow-x-auto gap-4 pb-4">
             <ProductCard
               image=".././coollookinglapel.jpg"
@@ -58,15 +58,20 @@ export default function NewArrivals() {
           </div>
         </div>
       </div>
-      <div className="m-6  p-5 rounded-lg">
-        <div className="mx-2 text-[18px] md:mx-4 md:mb-5 md:text-[22px]">
+      <div className="margindiv p-3 md:p-6 rounded-lg">
+        <div className="text-[18px] md:text-[22px]">
           <b className="font-sans">New Arrivals</b>
         </div>
-        <div className="mx-2 mt-3 md:mx-4 font-sans">
-          <div className="flex overflow-x-auto gap-4 pb-4">
-            <div className="aspect-3/4 bg-green-500 p-6 text-white text-center rounded-lg shrink-0 w-40">
-              Cột 2
-            </div>
+        <div className="mt-3 font-sans">
+          <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
+            <ProductCard
+              image=".././coollookinglapel.jpg"
+              alt="Cool Looking Lapel"
+              category="Accessories"
+              name="Cool Looking Lapel"
+              price="$99.99"
+              shopLink="support/nuremberg"
+            />     
             <div className="aspect-9/12 bg-blue-500 p-6 text-white text-center rounded-lg shrink-0 w-40">
               Cột 3
             </div>

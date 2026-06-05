@@ -4,7 +4,7 @@ body {
     background-color: #fbfdff;
 }
 .margindiv {
-    @apply mx-4 md:mx-6;
+    @apply mx-4 md:mx-20;
 }
 
 .texttitle {
