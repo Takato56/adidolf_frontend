@@ -33,7 +33,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="bg-black min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <form
         className="bg-white max-w-md w-full rounded-md flex flex-col items-center p-8 mb-30"
         onSubmit={onSubmit}
