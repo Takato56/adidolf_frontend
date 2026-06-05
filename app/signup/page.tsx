@@ -1,9 +1,43 @@
+"use client";
+
+import { loginUser, registerUser } from "@/lib/auth";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
+  const router = useRouter();
+
+  const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const data = new FormData(e.currentTarget);
+    const payload = {
+      email: data.get("email") as string,
+      password: data.get("password") as string,
+      full_name: data.get("full_name") as string,
+      phone: data.get("phone") as string,
+    };
+    const payload_login = {
+      email: payload.email,
+      password: payload.password,
+    };
+
+    try {
+      await registerUser(payload);
+
+      await loginUser(payload_login);
+      router.push("/");
+    } catch (e) {
+      console.error(e); // Replace with a message that the user can see later.
+    }
+  };
+
   return (
     <div className="bg-black min-h-screen flex items-center justify-center p-4">
-      <form className="bg-white max-w-md w-full rounded-md flex flex-col items-center p-8 mb-30">
+      <form
+        className="bg-white max-w-md w-full rounded-md flex flex-col items-center p-8 mb-30"
+        onSubmit={onSubmit}
+      >
         <h1 className="font-bold text-2xl md:text-3xl text-center tracking-tight">
           SIGN UP TO YOUR
           <br />
