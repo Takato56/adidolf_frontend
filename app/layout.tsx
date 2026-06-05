@@ -122,7 +122,7 @@ export default function RootLayout({
             <Link href="#">
               <FaShoppingCart />
             </Link>
-            <Link href="#">
+            <Link href="/login">
               <FaUser />
             </Link>
           </div>
