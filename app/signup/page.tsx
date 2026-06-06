@@ -35,7 +35,7 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <form
-        className="bg-white max-w-md w-full rounded-md flex flex-col items-center p-8 mb-30"
+        className="bg-white max-w-md w-full rounded-md flex flex-col items-center p-8 mb-30 outline-1 shadow-2xl"
         onSubmit={onSubmit}
       >
         <h1 className="font-bold text-2xl md:text-3xl text-center tracking-tight">
