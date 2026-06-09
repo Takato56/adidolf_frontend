@@ -36,11 +36,11 @@ export default function NewArrivals() {
         <div className="mx-6 mt-3 font-sans">
           <div className="flex overflow-x-auto gap-4 pb-4">
             <ProductCard
-              image=".././coollookinglapel.jpg"
+              image=".././coollooknglapel.jpg"
               alt="Cool Looking Lapel"
               category="Accessories"
               name="Cool Looking Lapel"
-              price="$99.99"
+              price="99.99"
               shopLink="support/nuremberg"
             />     
             <div className="aspect-3/4 bg-blue-500 p-6 text-white text-center rounded-lg shrink-0">
