@@ -36,25 +36,37 @@ export default function NewArrivals() {
         <div className="mx-6 mt-3 font-sans">
           <div className="flex overflow-x-auto gap-4 pb-4">
             <ProductCard
-              image=".././coollooknglapel.jpg"
+              image="https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM2_Front%20view.png?wid=1300&hei=1300"
               alt="Cool Looking Lapel"
               category="Accessories"
               name="Cool Looking Lapel"
               price="99.99"
               shopLink="support/nuremberg"
             />     
-            <div className="aspect-3/4 bg-blue-500 p-6 text-white text-center rounded-lg shrink-0">
-              Cột 3
-            </div>
-            <div className="aspect-3/4 bg-yellow-500 p-6 text-white text-center rounded-lg shrink-0">
-              Cột 4
-            </div>
-            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg">
-              Cột 4
-            </div>
-            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg">
-              Cột 4
-            </div>
+            <ProductCard
+              image="https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM1_Closeup%20view.png?wid=1300&hei=1300"
+              alt="Cool Looking Lapel"
+              category="Accessories"
+              name="Cool Looking Lapel"
+              price="99.99"
+              shopLink="support/nuremberg"
+            />    
+            <ProductCard
+              image="https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM2_Front%20view.png?wid=1300&hei=1300"
+              alt="Cool Looking Lapel"
+              category="Accessories"
+              name="Cool Looking Lapel"
+              price="99.99"
+              shopLink="support/nuremberg"
+            />     
+            <ProductCard
+              image="https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM1_Closeup%20view.png?wid=1300&hei=1300"
+              alt="Cool Looking Lapel"
+              category="Accessories"
+              name="Cool Looking Lapel"
+              price="99.99"
+              shopLink="support/nuremberg"
+            />    
           </div>
         </div>
       </div>
@@ -63,21 +75,23 @@ export default function NewArrivals() {
           <b className="font-sans">New Arrivals</b>
         </div>
         <div className="mt-3 font-sans">
-          <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
+          <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">   
             <ProductCard
-              image=".././coollokinglapel.jpg"
+              image="https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM2_Front%20view.png?wid=1300&hei=1300"
               alt="Cool Looking Lapel"
               category="Accessories"
               name="Cool Looking Lapel"
-              price="$99.99"
+              price="99.99"
               shopLink="support/nuremberg"
             />     
-            <div className="aspect-9/12 bg-blue-500 p-6 text-white text-center rounded-lg shrink-0 w-40">
-              Cột 3
-            </div>
-            <div className="aspect-9/12 bg-yellow-500 p-6 text-white text-center rounded-lg shrink-0 w-40">
-              Cột 4
-            </div>
+            <ProductCard
+              image="https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM1_Closeup%20view.png?wid=1300&hei=1300"
+              alt="Cool Looking Lapel"
+              category="Accessories"
+              name="Cool Looking Lapel"
+              price="99.99"
+              shopLink="support/nuremberg"
+            />    
           </div>
         </div>
       </div>

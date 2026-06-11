@@ -18,9 +18,9 @@ export default function ProductCard({
   alt = "Product",
 }: ProductCardProps) {
   return (
-    <div className="aspect-3/4 text-white text-center overflow-hidden border-gray-300 border shadow-md rounded-xl shrink-0">
+    <div className="aspect-3/4 w-48 text-white text-center overflow-hidden border-gray-300 border shadow-md rounded-xl shrink-0 flex flex-col">
       <Link href={shopLink}>
-        <div className="h-2/3 w-full relative bg-gray-100 cursor-pointer overflow-hidden">
+        <div className="flex-1 w-full relative bg-gray-100 cursor-pointer overflow-hidden">
           <img
             src={image}
             alt={alt}
