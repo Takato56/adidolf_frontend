@@ -65,7 +65,7 @@ export default function NewArrivals() {
         <div className="mt-3 font-sans">
           <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
             <ProductCard
-              image=".././coollookinglapel.jpg"
+              image=".././coollokinglapel.jpg"
               alt="Cool Looking Lapel"
               category="Accessories"
               name="Cool Looking Lapel"

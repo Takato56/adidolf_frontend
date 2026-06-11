@@ -73,7 +73,7 @@ function Footer() {
         </div>
         <div className="pt-4 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
           <p>
-            © 2026 <Link href="/support/nuremberg">Adidolf</Link>. All rights
+            © 2026 Adidolf. All rights
             reserved.
           </p>
         </div>
