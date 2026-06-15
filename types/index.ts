@@ -3,6 +3,7 @@ export interface Category {
   name: string;
   slug: string;
   imageUrl: string;
+  description: string;
   trending?: boolean;
   exclusive?: boolean;
   soldOutRate?: string; // e.g. "94%"
