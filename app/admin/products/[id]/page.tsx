@@ -127,21 +127,34 @@ export default function ProductDetailPage() {
                 key={v.id || i}
                 className="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-lg border border-gray-200"
               >
-                <span className="text-gray-900 font-medium text-sm">
-                  {v.name}
-                </span>
-                <span className="text-gray-600 text-sm">
-                  ${v.price.toFixed(2)} —{' '}
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-900 font-medium text-sm">
+                    {[v.color, v.size].filter(Boolean).join(' / ') || 'Default'}
+                  </span>
+                  {v.extra_price > 0 && (
+                    <span className="text-xs text-blue-600 font-medium">
+                      +${v.extra_price.toFixed(2)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {v.image_url && (
+                    <img
+                      src={v.image_url}
+                      alt=""
+                      className="w-6 h-6 rounded object-cover"
+                    />
+                  )}
                   <span
                     className={
                       v.stock > 5
-                        ? 'text-green-600 font-medium'
-                        : 'text-red-600 font-medium'
+                        ? 'text-green-600 font-medium text-sm'
+                        : 'text-red-600 font-medium text-sm'
                     }
                   >
                     {v.stock} in stock
                   </span>
-                </span>
+                </div>
               </div>
             ))}
           </div>

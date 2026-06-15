@@ -14,8 +14,8 @@ const defaultProducts: Product[] = [
     brand: 'Nike',
     isPublished: true,
     variants: [
-      { id: 'v1', name: 'Size M / Navy', price: 29.99, stock: 50 },
-      { id: 'v2', name: 'Size L / Black', price: 29.99, stock: 95 },
+      { id: 'v1', color: 'Navy', size: 'M', extra_price: 0, stock: 50 },
+      { id: 'v2', color: 'Black', size: 'L', extra_price: 0, stock: 95 },
     ],
     images: ['/images/tshirt.jpg'],
   },
@@ -29,8 +29,8 @@ const defaultProducts: Product[] = [
     brand: "Levi's",
     isPublished: true,
     variants: [
-      { id: 'v3', name: 'Size 32 / Dark Blue', price: 79.99, stock: 40 },
-      { id: 'v4', name: 'Size 34 / Light Blue', price: 79.99, stock: 47 },
+      { id: 'v3', color: 'Dark Blue', size: '32', extra_price: 0, stock: 40 },
+      { id: 'v4', color: 'Light Blue', size: '34', extra_price: 0, stock: 47 },
     ],
     images: ['/images/jeans.jpg'],
   },
@@ -44,7 +44,7 @@ const defaultProducts: Product[] = [
     brand: 'Adidas',
     isPublished: true,
     variants: [
-      { id: 'v5', name: 'Size L / Khaki', price: 39.99, stock: 12 },
+      { id: 'v5', color: 'Khaki', size: 'L', extra_price: 0, stock: 12 },
     ],
     images: ['/images/shorts.jpg'],
   },
@@ -58,8 +58,8 @@ const defaultProducts: Product[] = [
     brand: 'Hugo Boss',
     isPublished: false,
     variants: [
-      { id: 'v6', name: 'Size L / White', price: 89.99, stock: 3 },
-      { id: 'v7', name: 'Size XL / White', price: 89.99, stock: 0 },
+      { id: 'v6', color: 'White', size: 'L', extra_price: 0, stock: 3 },
+      { id: 'v7', color: 'White', size: 'XL', extra_price: 0, stock: 0 },
     ],
     images: ['/images/formal.jpg'],
   },
@@ -73,8 +73,8 @@ const defaultProducts: Product[] = [
     brand: 'Schott',
     isPublished: true,
     variants: [
-      { id: 'v8', name: 'Size M / Black', price: 199.99, stock: 15 },
-      { id: 'v9', name: 'Size L / Brown', price: 199.99, stock: 10 },
+      { id: 'v8', color: 'Black', size: 'M', extra_price: 0, stock: 15 },
+      { id: 'v9', color: 'Brown', size: 'L', extra_price: 10, stock: 10 },
     ],
     images: ['/images/jacket.jpg'],
   },
@@ -97,17 +97,26 @@ function migrateProduct(raw: any): Product {
     variants:
       Array.isArray(raw.variants) && raw.variants.length > 0
         ? raw.variants.map((v: any) => ({
-            id: v.id || v.name || '',
-            name: v.name || '',
-            price: typeof v.price === 'number' ? v.price : 0,
+            id: v.id || '',
+            color: v.color || undefined,
+            size: v.size || undefined,
+            extra_price:
+              typeof v.extra_price === 'number'
+                ? v.extra_price
+                : typeof v.price === 'number'
+                ? v.price - (typeof raw.price === 'number' ? raw.price : 0)
+                : 0,
             stock: typeof v.stock === 'number' ? v.stock : 0,
+            image_url: v.image_url || undefined,
           }))
         : [
             {
               id: 'default',
-              name: 'Default',
-              price: typeof raw.price === 'number' ? raw.price : 0,
+              color: undefined,
+              size: undefined,
+              extra_price: 0,
               stock: raw.stock ?? 0,
+              image_url: undefined,
             },
           ],
     images:

@@ -12,7 +12,7 @@ interface ProductFormProps {
 }
 
 function emptyVariant(): ProductVariant {
-  return { name: '', price: 0, stock: 0 };
+  return { color: '', size: '', extra_price: 0, stock: 0, image_url: '' };
 }
 
 export function ProductForm({
@@ -117,7 +117,8 @@ export function ProductForm({
       const updated = [...prev.variants];
       updated[index] = {
         ...updated[index],
-        [field]: field === 'price' || field === 'stock' ? Number(value) : value,
+        [field]:
+          field === 'extra_price' || field === 'stock' ? Number(value) : value,
       };
       return { ...prev, variants: updated };
     });
@@ -322,31 +323,45 @@ export function ProductForm({
           {formData.variants.map((variant, index) => (
             <div
               key={index}
-              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end p-4 bg-gray-50 rounded-lg border border-gray-200"
+              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-3 items-end p-4 bg-gray-50 rounded-lg border border-gray-200"
             >
               <div>
                 <label className="block text-xs text-gray-600 mb-1">
-                  Name
+                  Color
                 </label>
                 <input
                   type="text"
-                  value={variant.name}
+                  value={variant.color || ''}
                   onChange={(e) =>
-                    handleVariantChange(index, 'name', e.target.value)
+                    handleVariantChange(index, 'color', e.target.value)
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                  placeholder="e.g., Size M / Navy"
+                  placeholder="e.g., Navy"
                 />
               </div>
               <div>
                 <label className="block text-xs text-gray-600 mb-1">
-                  Price
+                  Size
+                </label>
+                <input
+                  type="text"
+                  value={variant.size || ''}
+                  onChange={(e) =>
+                    handleVariantChange(index, 'size', e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  placeholder="e.g., M"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">
+                  Extra Price
                 </label>
                 <input
                   type="number"
-                  value={variant.price}
+                  value={variant.extra_price}
                   onChange={(e) =>
-                    handleVariantChange(index, 'price', e.target.value)
+                    handleVariantChange(index, 'extra_price', e.target.value)
                   }
                   step="0.01"
                   min="0"
@@ -367,6 +382,20 @@ export function ProductForm({
                   min="0"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  value={variant.image_url || ''}
+                  onChange={(e) =>
+                    handleVariantChange(index, 'image_url', e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  placeholder="https://..."
                 />
               </div>
               <button

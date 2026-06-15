@@ -12,9 +12,11 @@ export interface Category {
 
 export interface ProductVariant {
   id?: string;
-  name: string;
-  price: number;
+  color?: string;
+  size?: string;
+  extra_price: number;
   stock: number;
+  image_url?: string;
 }
 
 export interface Product {
