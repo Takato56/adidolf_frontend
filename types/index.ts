@@ -10,15 +10,24 @@ export interface Category {
   tagline?: string;
 }
 
+export interface ProductVariant {
+  id?: string;
+  name: string;
+  price: number;
+  stock: number;
+}
+
 export interface Product {
   id: string;
   name: string;
-  sku: string;
   categorySlug: string;
+  slug: string;
+  description: string;
   price: number;
-  stock: number;
-  imageUrl: string;
-  attributes: string; // e.g. "Size: L / Noir Edition"
+  brand: string;
+  isPublished: boolean;
+  variants: ProductVariant[];
+  images: string[];
 }
 
 export interface OverviewStats {

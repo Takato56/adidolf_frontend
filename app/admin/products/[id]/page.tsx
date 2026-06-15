@@ -77,14 +77,14 @@ export default function ProductDetailPage() {
             <p className="text-gray-900 font-medium">{product.name}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">SKU</p>
-            <p className="text-gray-900 font-medium">{product.sku}</p>
-          </div>
-          <div>
             <p className="text-gray-600 text-sm">Category</p>
             <p className="text-gray-900 font-medium capitalize">
               {product.categorySlug}
             </p>
+          </div>
+          <div>
+            <p className="text-gray-600 text-sm">Slug</p>
+            <p className="text-gray-900 font-medium">{product.slug}</p>
           </div>
           <div>
             <p className="text-gray-600 text-sm">Price</p>
@@ -93,12 +93,81 @@ export default function ProductDetailPage() {
             </p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Stock</p>
-            <p className="text-gray-900 font-medium">{product.stock} units</p>
+            <p className="text-gray-600 text-sm">Brand</p>
+            <p className="text-gray-900 font-medium">{product.brand}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Attributes</p>
-            <p className="text-gray-900 font-medium">{product.attributes}</p>
+            <p className="text-gray-600 text-sm">Published</p>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                product.isPublished
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              {product.isPublished ? 'Yes' : 'No'}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <p className="text-gray-600 text-sm">Description</p>
+          <p className="text-gray-900 font-medium mt-1">
+            {product.description || '—'}
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <p className="text-gray-600 text-sm mb-2">
+            Variants ({product.variants?.length || 0})
+          </p>
+          <div className="space-y-2">
+            {(product.variants || []).map((v, i) => (
+              <div
+                key={v.id || i}
+                className="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-lg border border-gray-200"
+              >
+                <span className="text-gray-900 font-medium text-sm">
+                  {v.name}
+                </span>
+                <span className="text-gray-600 text-sm">
+                  ${v.price.toFixed(2)} —{' '}
+                  <span
+                    className={
+                      v.stock > 5
+                        ? 'text-green-600 font-medium'
+                        : 'text-red-600 font-medium'
+                    }
+                  >
+                    {v.stock} in stock
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <p className="text-gray-600 text-sm mb-2">
+            Images ({product.images?.length || 0})
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {(product.images || []).map((img, i) => (
+              <div
+                key={i}
+                className="w-20 h-20 rounded-lg border border-gray-200 bg-gray-50 overflow-hidden flex items-center justify-center"
+              >
+                {img ? (
+                  <img
+                    src={img}
+                    alt={`${product.name} ${i + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400">No image</span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>

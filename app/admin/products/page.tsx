@@ -16,8 +16,16 @@ export default function ProductsPage() {
     );
   }
 
-  const lowStockCount = products.filter((p) => p.stock < 20).length;
-  const totalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
+  const getTotalStock = (p: typeof products[number]) =>
+    Array.isArray(p.variants)
+      ? p.variants.reduce((sum, v) => sum + (v.stock || 0), 0)
+      : 0;
+
+  const lowStockCount = products.filter((p) => getTotalStock(p) < 20).length;
+  const totalValue = products.reduce(
+    (sum, p) => sum + p.price * getTotalStock(p),
+    0
+  );
 
   return (
     <div className="space-y-6">
