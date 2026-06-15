@@ -119,7 +119,7 @@ export default function RootLayout({
             <Link href="#">
               <FaSearch />
             </Link>
-            <Link href="#">
+            <Link href="/cart">
               <FaShoppingCart />
             </Link>
             <Link href="/login">
