@@ -42,3 +42,31 @@ export interface OverviewStats {
   customersTrend: number[];
   revenueTrend: number[];
 }
+
+export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'done' | 'cancelled';
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  variantId: string | null;
+  productName: string;
+  variantInfo: string | null;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  addressId: string;
+  voucherId: string;
+  status: OrderStatus;
+  subtotal: number;
+  discountAmount: number;
+  shippingFee: number;
+  totalPrice: number;
+  note: string;
+  createdAt: string; // ISO date string
+  items: OrderItem[];
+}
