@@ -10,7 +10,7 @@ import { Order } from '@/types';
 export default function OrderDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const orderId = params.id as string;
+  const orderId = parseInt(params.id as string) || 0;
   const { getOrder, updateOrder, deleteOrder, isLoaded } = useOrders();
   const [order, setOrder] = useState<Order | null>(null);
 

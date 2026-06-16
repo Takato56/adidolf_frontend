@@ -18,7 +18,6 @@ export default function OrdersPage() {
 
   const pendingCount = orders.filter((o) => o.status === 'pending').length;
   const confirmedCount = orders.filter((o) => o.status === 'confirmed').length;
-  const doneCount = orders.filter((o) => o.status === 'done').length;
   const totalRevenue = orders.reduce((sum, o) => sum + o.totalPrice, 0);
 
   return (

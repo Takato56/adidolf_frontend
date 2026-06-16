@@ -1,6 +1,6 @@
 'use client';
 
-import { Order, OrderItem, OrderStatus } from '@/types';
+import { Order, OrderStatus } from '@/types';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
@@ -28,11 +28,11 @@ export function OrderForm({
   const router = useRouter();
   const { products, isLoaded: productsLoaded } = useProducts();
 
-  // ---- Order header state ----
+  // ---- Order header state (stored as strings for input, converted to numbers on submit) ----
   const [formData, setFormData] = useState({
-    userId: order?.userId || '',
-    addressId: order?.addressId || '',
-    voucherId: order?.voucherId || '',
+    userId: order?.userId ? String(order.userId) : '',
+    addressId: order?.addressId ? String(order.addressId) : '',
+    voucherId: order?.voucherId ? String(order.voucherId) : '',
     status: order?.status || ('pending' as OrderStatus),
     discountAmount: order?.discountAmount ?? 0,
     shippingFee: order?.shippingFee ?? 0,
@@ -55,8 +55,8 @@ export function OrderForm({
   >(() => {
     if (order?.items?.length) {
       return order.items.map((it) => ({
-        productId: it.productId,
-        variantId: it.variantId,
+        productId: String(it.productId),
+        variantId: it.variantId !== null ? String(it.variantId) : null,
         productName: it.productName,
         variantInfo: it.variantInfo,
         unitPrice: it.unitPrice,
@@ -98,9 +98,10 @@ export function OrderForm({
   // ---- Validation ----
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.userId.trim()) newErrors.userId = 'User ID is required';
-    if (!formData.addressId.trim())
-      newErrors.addressId = 'Address ID is required';
+    if (!formData.userId.trim() || isNaN(Number(formData.userId)) || Number(formData.userId) <= 0)
+      newErrors.userId = 'Valid User ID is required';
+    if (!formData.addressId.trim() || isNaN(Number(formData.addressId)) || Number(formData.addressId) <= 0)
+      newErrors.addressId = 'Valid Address ID is required';
     if (formData.discountAmount < 0)
       newErrors.discountAmount = 'Discount cannot be negative';
     if (formData.shippingFee < 0)
@@ -127,7 +128,9 @@ export function OrderForm({
 
     const itemsWithIds = items.map((item, idx) => ({
       ...item,
-      id: order?.items?.[idx]?.id || `oi-${Date.now()}-${idx}`,
+      productId: parseInt(item.productId) || 0,
+      variantId: item.variantId ? (parseInt(item.variantId) || null) : null,
+      id: order?.items?.[idx]?.id || 0,
       subtotal: item.unitPrice * item.quantity,
     }));
 
@@ -137,6 +140,9 @@ export function OrderForm({
 
     onSubmit({
       ...formData,
+      userId: parseInt(formData.userId) || 0,
+      addressId: parseInt(formData.addressId) || 0,
+      voucherId: parseInt(formData.voucherId) || 0,
       createdAt: new Date(formData.createdAt).toISOString(),
       items: itemsWithIds,
       subtotal,
@@ -274,14 +280,16 @@ export function OrderForm({
               User ID *
             </label>
             <input
-              type="text"
+              type="number"
               name="userId"
               value={formData.userId}
               onChange={handleChange}
+              min="1"
+              step="1"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                 errors.userId ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="e.g. user-1"
+              placeholder="e.g. 1"
             />
             {errors.userId && (
               <p className="text-red-600 text-sm mt-1">{errors.userId}</p>
@@ -294,14 +302,16 @@ export function OrderForm({
               Address ID *
             </label>
             <input
-              type="text"
+              type="number"
               name="addressId"
               value={formData.addressId}
               onChange={handleChange}
+              min="1"
+              step="1"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                 errors.addressId ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="e.g. addr-1"
+              placeholder="e.g. 1"
             />
             {errors.addressId && (
               <p className="text-red-600 text-sm mt-1">{errors.addressId}</p>
@@ -314,12 +324,14 @@ export function OrderForm({
               Voucher ID
             </label>
             <input
-              type="text"
+              type="number"
               name="voucherId"
               value={formData.voucherId}
               onChange={handleChange}
+              min="0"
+              step="1"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
-              placeholder="e.g. voucher-save10"
+              placeholder="e.g. 0"
             />
           </div>
 

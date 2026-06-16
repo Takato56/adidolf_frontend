@@ -67,10 +67,10 @@ export function OrderTable({ orders }: OrderTableProps) {
               className="hover:bg-gray-50 transition-colors"
             >
               <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                {order.id}
+                #{order.id}
               </td>
               <td className="px-6 py-4 text-sm text-gray-600">
-                {order.userId}
+                #{order.userId}
               </td>
               <td className="px-6 py-4 text-sm">
                 <span

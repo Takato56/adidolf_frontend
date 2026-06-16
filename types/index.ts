@@ -46,9 +46,9 @@ export interface OverviewStats {
 export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'done' | 'cancelled';
 
 export interface OrderItem {
-  id: string;
-  productId: string;
-  variantId: string | null;
+  id: number;
+  productId: number;
+  variantId: number | null;
   productName: string;
   variantInfo: string | null;
   unitPrice: number;
@@ -57,10 +57,10 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: string;
-  userId: string;
-  addressId: string;
-  voucherId: string;
+  id: number;
+  userId: number;
+  addressId: number;
+  voucherId: number;
   status: OrderStatus;
   subtotal: number;
   discountAmount: number;

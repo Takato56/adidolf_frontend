@@ -5,7 +5,7 @@ import { FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
 import { useOrders } from '@/lib/hooks/useOrders';
 
 interface OrderActionsProps {
-  orderId: string;
+  orderId: number;
 }
 
 export function OrderActions({ orderId }: OrderActionsProps) {
