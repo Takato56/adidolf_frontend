@@ -45,6 +45,32 @@ export interface OverviewStats {
 
 export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'done' | 'cancelled';
 
+export type ShipmentStatus = 'preparing' | 'in_transit' | 'delivered' | 'returned';
+
+export type PaymentStatus = 'pending' | 'paid' | 'failed';
+
+export type PaymentMethod = 'COD' | 'VNPay' | 'Momo' | 'ZaloPay' | 'card';
+
+export interface Shipment {
+  shipmentId: number;
+  carrier: string;
+  trackingNumber: string | null;
+  status: ShipmentStatus;
+  shippedAt: string | null;
+  estimatedDelivery: string | null;
+  deliveredAt: string | null;
+}
+
+export interface Payment {
+  paymentId: number;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  amount: number;
+  transactionId: string | null;
+  gatewayResponse: string | null;
+  paidAt: string | null;
+}
+
 export interface OrderItem {
   id: number;
   productId: number;
@@ -69,9 +95,27 @@ export interface Order {
   note: string;
   createdAt: string; // ISO date string
   items: OrderItem[];
+  shipment?: Shipment;
+  payment?: Payment;
 }
 
 export type UserRole = 'customer' | 'admin';
+
+export type DiscountType = 'percent' | 'fixed';
+
+export interface Voucher {
+  id: number;
+  code: string;
+  discount_type: DiscountType;
+  discount_value: number;
+  max_discount: number | null;
+  min_order_amount: number | null;
+  usage_limit: number | null;
+  usage_count: number;
+  valid_from: string; // ISO date string
+  valid_to: string; // ISO date string
+  is_active: boolean;
+}
 
 export interface Address {
   id: number;

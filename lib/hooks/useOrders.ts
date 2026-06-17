@@ -1,4 +1,4 @@
-import { Order, OrderItem } from '@/types';
+import { Order, OrderItem, Shipment, Payment } from '@/types';
 import { useEffect, useRef, useState } from 'react';
 
 const STORAGE_KEY = 'admin_orders';
@@ -40,6 +40,24 @@ const defaultOrders: Order[] = [
         subtotal: 39.99,
       },
     ],
+    shipment: {
+      shipmentId: 1,
+      carrier: 'FedEx',
+      trackingNumber: 'FX-8812-3456',
+      status: 'delivered',
+      shippedAt: today + 'T12:00:00.000Z',
+      estimatedDelivery: today + 'T00:00:00.000Z',
+      deliveredAt: today + 'T16:45:00.000Z',
+    },
+    payment: {
+      paymentId: 1,
+      method: 'card',
+      status: 'paid',
+      amount: 105.97,
+      transactionId: 'TXN-98765',
+      gatewayResponse: 'Approved',
+      paidAt: today + 'T10:31:00.000Z',
+    },
   },
   {
     id: 2,
@@ -75,6 +93,28 @@ const defaultOrders: Order[] = [
         subtotal: 79.99,
       },
     ],
+    shipment: {
+      shipmentId: 2,
+      carrier: 'UPS',
+      trackingNumber: '1Z-999-888',
+      status: 'in_transit',
+      shippedAt: today + 'T15:00:00.000Z',
+      estimatedDelivery: (() => {
+        const d = new Date();
+        d.setDate(d.getDate() + 2);
+        return d.toISOString().split('T')[0];
+      })(),
+      deliveredAt: null,
+    },
+    payment: {
+      paymentId: 2,
+      method: 'VNPay',
+      status: 'paid',
+      amount: 264.98,
+      transactionId: 'VNP-45678',
+      gatewayResponse: 'Success',
+      paidAt: today + 'T14:16:00.000Z',
+    },
   },
   {
     id: 3,
@@ -100,6 +140,15 @@ const defaultOrders: Order[] = [
         subtotal: 89.99,
       },
     ],
+    payment: {
+      paymentId: 3,
+      method: 'COD',
+      status: 'pending',
+      amount: 54.98,
+      transactionId: null,
+      gatewayResponse: null,
+      paidAt: null,
+    },
   },
 ];
 
@@ -141,6 +190,8 @@ function migrateOrder(raw: any): Order {
     note: raw.note || '',
     createdAt: raw.createdAt || new Date().toISOString(),
     items: Array.isArray(raw.items) ? raw.items.map(migrateItem) : [],
+    shipment: raw.shipment ? migrateShipment(raw.shipment) : undefined,
+    payment: raw.payment ? migratePayment(raw.payment) : undefined,
   };
 }
 
@@ -159,6 +210,36 @@ function migrateItem(raw: any): OrderItem {
     unitPrice: typeof raw.unitPrice === 'number' ? raw.unitPrice : 0,
     quantity: typeof raw.quantity === 'number' ? raw.quantity : 0,
     subtotal: typeof raw.subtotal === 'number' ? raw.subtotal : 0,
+  };
+}
+
+function migrateShipment(raw: any): Shipment {
+  return {
+    shipmentId: typeof raw.shipmentId === 'number' ? raw.shipmentId : 0,
+    carrier: raw.carrier || '',
+    trackingNumber: raw.trackingNumber ?? null,
+    status: ['preparing', 'in_transit', 'delivered', 'returned'].includes(raw.status)
+      ? raw.status
+      : 'preparing',
+    shippedAt: raw.shippedAt ?? null,
+    estimatedDelivery: raw.estimatedDelivery ?? null,
+    deliveredAt: raw.deliveredAt ?? null,
+  };
+}
+
+function migratePayment(raw: any): Payment {
+  return {
+    paymentId: typeof raw.paymentId === 'number' ? raw.paymentId : 0,
+    method: ['COD', 'VNPay', 'Momo', 'ZaloPay', 'card'].includes(raw.method)
+      ? raw.method
+      : 'COD',
+    status: ['pending', 'paid', 'failed'].includes(raw.status)
+      ? raw.status
+      : 'pending',
+    amount: typeof raw.amount === 'number' ? raw.amount : 0,
+    transactionId: raw.transactionId ?? null,
+    gatewayResponse: raw.gatewayResponse ?? null,
+    paidAt: raw.paidAt ?? null,
   };
 }
 
@@ -254,6 +335,48 @@ export function useOrders() {
     return orders.find((o) => o.id === id);
   };
 
+  const updateShipment = (orderId: number, data: Partial<Shipment>) => {
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id !== orderId) return o;
+        const existing = o.shipment || {
+          shipmentId: 0,
+          carrier: '',
+          trackingNumber: null,
+          status: 'preparing' as const,
+          shippedAt: null,
+          estimatedDelivery: null,
+          deliveredAt: null,
+        };
+        return {
+          ...o,
+          shipment: { ...existing, ...data },
+        };
+      })
+    );
+  };
+
+  const updatePayment = (orderId: number, data: Partial<Payment>) => {
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id !== orderId) return o;
+        const existing = o.payment || {
+          paymentId: 0,
+          method: 'COD' as const,
+          status: 'pending' as const,
+          amount: 0,
+          transactionId: null,
+          gatewayResponse: null,
+          paidAt: null,
+        };
+        return {
+          ...o,
+          payment: { ...existing, ...data },
+        };
+      })
+    );
+  };
+
   return {
     orders,
     isLoaded,
@@ -261,5 +384,7 @@ export function useOrders() {
     updateOrder,
     deleteOrder,
     getOrder,
+    updateShipment,
+    updatePayment,
   };
 }

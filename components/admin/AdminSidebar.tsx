@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiPackage, FiGrid, FiShoppingCart, FiUsers, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
+import { FiHome, FiPackage, FiGrid, FiShoppingCart, FiUsers, FiPercent, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
 import { useState } from 'react';
 
 export function AdminSidebar() {
@@ -15,6 +15,7 @@ export function AdminSidebar() {
     { href: '/admin/categories', label: 'Categories', icon: FiGrid },
     { href: '/admin/orders', label: 'Orders', icon: FiShoppingCart },
     { href: '/admin/users', label: 'Users', icon: FiUsers },
+    { href: '/admin/vouchers', label: 'Vouchers', icon: FiPercent },
   ];
 
   const isActive = (href: string) => {
