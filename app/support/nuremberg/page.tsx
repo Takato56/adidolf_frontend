@@ -22,7 +22,7 @@ export default function Nuremberg() {
         <div className={styles.productHero}>
           <span className={styles.productHeroGhost} aria-hidden="true">SS</span>
           <img
-            src=".././coollookinglapel.jpg"
+            src=".././coollokinglapel.jpg"
             alt="Cool Looking Lapel"
           />
         </div>

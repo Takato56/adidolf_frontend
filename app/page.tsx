@@ -2,7 +2,9 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div>
-      <div className="bg-black mt-1 h-60 md:h-120"></div>
+      <div className="bg-black mt-1 h-60 md:h-120 overflow-hidden">
+        <img src="./menswear.jpg" className="w-full h-full object-cover transition-transform duration-300" />
+      </div>
       <div className="px-3 md:px-6">
         <p className="pt-3 text-xl md:pt-6 md:text-3xl">
           <b>Shop by Categories</b>
