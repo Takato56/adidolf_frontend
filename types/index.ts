@@ -70,3 +70,29 @@ export interface Order {
   createdAt: string; // ISO date string
   items: OrderItem[];
 }
+
+export type UserRole = 'customer' | 'admin';
+
+export interface Address {
+  id: number;
+  recipient_name: string;
+  phone: string;
+  province: string;
+  district: string;
+  ward: string;
+  street_detail: string;
+  is_default: number; // 0 or 1
+}
+
+export interface User {
+  id: number;
+  email: string;
+  full_name: string;
+  phone: string;
+  avatar_url: string;
+  password_hash: string;
+  role: UserRole;
+  is_active: number; // 0 or 1
+  created_at: string; // ISO date string
+  addresses: Address[];
+}
