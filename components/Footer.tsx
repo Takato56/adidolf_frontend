@@ -11,17 +11,17 @@ function Footer() {
             </h3>
             <ul className="flex flex-col space-y-2 margin-left-0">
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/about/company" className="hover:text-white transition-colors">
                   Company
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/about/mission" className="hover:text-white transition-colors">
                   Our Mission Statement
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/about/careers" className="hover:text-white transition-colors">
                   Careers
                 </Link>
               </li>
@@ -64,7 +64,7 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/legal/privacy" className="hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
               </li>
