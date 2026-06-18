@@ -19,7 +19,7 @@ export default function Nuremberg() {
     <>
       <div className={styles.productPage}>
         {/* Hero image panel */}
-        <div className={styles.productHero}>
+        <div className="{styles.productHero}, pt-2">
           <span className={styles.productHeroGhost} aria-hidden="true">SS</span>
           <img
             src=".././coollokinglapel.jpg"

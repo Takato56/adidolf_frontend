@@ -31,26 +31,25 @@ export default function Categories() {
       <div className="margindiv bg-[#f8f9ff] rounded-lg">
         <div className="mt-3 font-sans">
           <div className="grid grid-cols-2 justify-center md:grid-cols-4 gap-1 md:gap-1 md:auto-rows-fr">
-            <div className="col-span-2 md:col-span-3 row-span-2 md:row-span-1 md:aspect-24/9 overflow-hidden aspect-video bg-gray-200 bg-opacity-40 text-white text-center rounded-lg flex items-center justify-center">
-              <img src=".././menswear.jpg" className="w-full h-full object-cover transition-transform duration-300 hover:scale-110" />
+            <Link href="/categories/lifestyle" className="col-span-2 md:col-span-3 row-span-2 md:row-span-1 md:aspect-24/9 aspect-video bg-gray-200 bg-opacity-40 p-6 text-white text-center rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
+            </Link>
+
+            <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
 
-            <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 overflow-hidden rounded-lg flex items-center justify-center">
-              <img src=".././womenswear.png" className="w-full h-full object-cover transition-transform duration-300 hover:scale-110" />
+            <div className="md:col-span-2 col-span-1 row-span-1  md:aspect-auto bg-gray-200 bg-opacity-40 p-6 text-white text-center rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
 
-            <div className="md:col-span-2 col-span-1 row-span-1 overflow-hidden  md:aspect-auto bg-gray-200 bg-opacity-40 text-white text-center rounded-lg flex items-center justify-center">
-              <img src=".././accessories.jpg" className="w-full h-full object-cover transition-transform duration-300 hover:scale-110" />
+            <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
 
-            <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 overflow-hidden rounded-lg flex items-center justify-center">
-              <img src=".././miscellaneous.png" className="w-full h-full object-cover transition-transform duration-300 hover:scale-110" />
+            <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
+              <LoadingIcon size="sm" />
             </div>
-
-            <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 overflow-hidden rounded-lg flex items-center justify-center">
-              <img src=".././footwear.png" className="w-full h-full object-cover transition-transform duration-300 hover:scale-110" />
-            </div>
-
           </div>
         </div>
       </div>
