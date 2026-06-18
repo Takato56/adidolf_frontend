@@ -51,7 +51,7 @@ export default function Company() {
           appreciation for a well-structured lapel, we have something for you.
         </p>
         <p>
-          Our headquarters are in Nuremberg, Germany. We operate entirely online
+          Our headquarters are in Hanoi, Vietnam. We operate entirely online
           and ship to customers across the world, with a focus on quality
           materials, deliberate design, and a straightforward shopping experience.
         </p>

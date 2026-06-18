@@ -6,7 +6,7 @@ export async function registerUser(data: {
   full_name: string;
   phone: string;
 }) {
-  const res = await fetch(`${BASE_URL}/api/auth/register`, {
+  const res = await fetch(`${BASE_URL}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -17,7 +17,7 @@ export async function registerUser(data: {
 }
 
 export async function loginUser(data: { email: string; password: string }) {
-  const res = await fetch(`${BASE_URL}/api/auth/login`, {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -25,13 +25,19 @@ export async function loginUser(data: { email: string; password: string }) {
   if (!res.ok) throw new Error(`Login Failed (${res.status})`);
   const json = await res.json();
   sessionStorage.setItem("accessToken", json.data.accessToken);
+  sessionStorage.setItem("userName", json.data.user.full_name);
+  sessionStorage.setItem("userRole", json.data.user.role);
+  window.dispatchEvent(new Event("authchange"));
   console.log(json);
 }
 
 export async function logoutUser() {
-  await fetch(`${BASE_URL}/api/auth/logout`, {
+  await fetch(`${BASE_URL}/auth/logout`, {
     method: "POST",
   });
+  sessionStorage.removeItem("accessToken");
+  sessionStorage.removeItem("userName");
+  sessionStorage.removeItem("userRole");
 }
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
@@ -45,16 +51,20 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
   if (!res.ok) {
     // Assuming the token expired first.
-    const res_refresh = await fetch(`${BASE_URL}/api/auth/refresh`, {
+    const res_refresh = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",
     });
-    if (!res_refresh.ok)
-      // Ok well nothing we can do about it lol.
+    if (!res_refresh.ok) {
+      // Well nothing we can do now lol.
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("userName");
+      sessionStorage.removeItem("userRole");
       throw new Error(`Refresh failed ${res_refresh.status}`);
+    }
 
-    const json = await res.json();
+    const json = await res_refresh.json();
     sessionStorage.setItem("accessToken", json.data.accessToken);
-    fetchWithAuth(url, options); // Retrying...;
+    return fetchWithAuth(url, options); // Retrying......
   }
 
   return res;

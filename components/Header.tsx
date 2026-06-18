@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Tab from "@/components/tab";
+import UserIcon from "@/components/UserIcon";
 
 import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useState } from "react";
@@ -100,12 +101,12 @@ export default function Navbar() {
 
       </nav>
 
-      <div className="order-2 md:order-3 justify-self-end flex gap-7 text-[#64748B] text-sm">
+      <div className="order-2 md:order-3 items-center justify-self-end flex gap-7 text-[#64748B] text-sm">
         <button className="cursor-pointer" onClick={() => setSearchOpen(true)}>
           <FaSearch />
         </button>
         <Link href="/cart"><FaShoppingCart /></Link>
-        <Link href="/login"><FaUser /></Link>
+        <UserIcon />
       </div>
 
       <SearchBar open={searchOpen} onClose={() => setSearchOpen(false)} />
