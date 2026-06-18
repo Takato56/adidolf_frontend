@@ -7,7 +7,7 @@ export default function Product() {
   const [images] = useState([
     "https://i.pinimg.com/736x/8c/ab/89/8cab892d5b35bee91018ed6744e53679.jpg",
     "https://i.pinimg.com/736x/c0/81/13/c08113b8df8e619f39049291f312504f.jpg",
-    "https://i.pinimg.com/736x/40/d9/a7/40d9a735e0bdc92a71ac623ba2c392be.jpg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReJxXMq73kmIUEGUAKiLTKZwdnJHBL2fLCOcuusuFmZ84gmgQLFBYgnYrf&s=10",
     "https://tse2.mm.bing.net/th/id/OIP.PgWL-_pupZaymNTXBHQzOQHaIV?rs=1&pid=ImgDetMain&o=7&rm=3"
   ]);
 
@@ -15,14 +15,14 @@ export default function Product() {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.targetTouches[0].clientX;
-    touchEndX.current = e.targetTouches[0].clientX; // Reset touchEnd tránh lỗi click
-  };
+  const handleTouchStart = (e: React.TouchEvent) => {
+  touchStartX.current = e.targetTouches[0].clientX;
+  touchEndX.current = e.targetTouches[0].clientX; 
+};
 
-  const handleTouchMove = (e) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
+const handleTouchMove = (e: React.TouchEvent) => {
+  touchEndX.current = e.targetTouches[0].clientX;
+};
 
   const handleTouchEnd = () => {
     if (touchStartX.current - touchEndX.current > 50) {
@@ -110,7 +110,7 @@ export default function Product() {
           </div>
         </div>
 
-        <div className="w-full md:w-3/5 font-sans">
+        <div className="w-full md:w-3/5 font-sans rounded-2xl border-gray-200">
           <p className="text-[25px] pt-3 md:pt-0 md:text-[30px] font-bold">McLaren Racing Suit 2025</p>
           <Link href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="rounded-3xl font-semibold border border-gray-200 px-2 py-0.5 text-[13px] items-center bg-[#FF8000]">
             McLaren

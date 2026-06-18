@@ -29,7 +29,7 @@ export default function NewArrivals() {
 
 
       <div className="flex flex-row justify-center mainmarginproduct gap-4 ">
-            <div className="w-3/4 rounded-2xl px-12 py-5 bg-[#fafafa] border-gray-200">
+            <div className="w-3/4 rounded-2xl px-12 py-5 bg-[#fafafa] border-gray-200 shadow-xs">
             <p className="texttitle font-extrabold flex flex-row gap-3 ">
                 <FaMapLocationDot></FaMapLocationDot>
                 Address</p>
@@ -154,7 +154,7 @@ export default function NewArrivals() {
 </div>
     
         </div>
-        <div className="w-1/4"><div className="w-full max-w-md mx-auto bg-[#fafafa] p-6 rounded-2xl border-gray-200">
+        <div className="w-1/4"><div className="w-full max-w-md mx-auto bg-[#fafafa] p-6 rounded-2xl border-gray-200 shadow-xs">
   <h2 className="text-xl font-bold text-gray-900 uppercase tracking-wide mb-4">Order Summary</h2>
   
   <div className="mb-6">
