@@ -50,7 +50,6 @@ export default function Categories() {
             <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
               <LoadingIcon size="sm" />
             </div>
-
           </div>
         </div>
       </div>

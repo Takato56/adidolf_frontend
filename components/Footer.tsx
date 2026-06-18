@@ -11,17 +11,17 @@ function Footer() {
             </h3>
             <ul className="flex flex-col space-y-2 margin-left-0">
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/about/company" className="hover:text-white transition-colors">
                   Company
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/about/mission" className="hover:text-white transition-colors">
                   Our Mission Statement
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/about/careers" className="hover:text-white transition-colors">
                   Careers
                 </Link>
               </li>
@@ -64,7 +64,7 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link href="/legal/privacy" className="hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
               </li>
@@ -73,7 +73,7 @@ function Footer() {
         </div>
         <div className="pt-4 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
           <p>
-            © 2026 <Link href="/support/nuremberg">Adidolf</Link>. All rights
+            © 2026 Adidolf. All rights
             reserved.
           </p>
         </div>
