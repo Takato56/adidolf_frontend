@@ -18,33 +18,28 @@ export default function ProductCard({
   alt = "Product",
 }: ProductCardProps) {
   return (
-    <div className="aspect-3/4 text-white text-center overflow-hidden border-gray-300 border shadow-md rounded-xl shrink-0">
-      <div className="h-2/3 w-full relative bg-gray-100">
+    <Link href={shopLink}>
+    <div className="aspect-5/7 text-white text-center overflow-hidden font-sansborder-gray-300 border shadow-md rounded-xl shrink-0 ">
+      <div className="h-2/3 bg-gray-100 overflow-hidden">
         <img
           src={image}
           alt={alt}
-          className="w-full h-full object-cover"
+          className="w-full object-cover"
         />
       </div>
-      <div className="h-1/3 w-full px-2 md:px-4 flex text-[12px] md:text-[19px] flex-col justify-between bg-white text-black">
+      <div className="h-1/3 w-full px-2 md:px-4 flex flex-col justify-between bg-white text-black">
         <div>
-          <p className="text-xs pt-2 md:pt-3 text-gray-400 text-left">
+          <p className="text-xs pt-1 md:pt-3 text-[11px] md:text-[13px] text-gray-400 text-left">
             {category}
           </p>
-          <h3 className="font-sans text-left pt-1 pb-3 font-medium text-sm text-gray-800 line-clamp-1">
+          <p className="text-left font-semibold pt-1 text-[15px] md:text-[17px] text-gray-800 line-clamp-1 truncate block w-full">
             {name}
-          </h3>
-        </div>
-
-        <div className="font-sans pt-1 py-3 flex text-[12px] md:text-[17px] justify-between font-bold text-red-500">
-          <p>${price}</p>
-          <Link href={shopLink} >
-            <button className="bg-black hover:bg-gray-600 text-white font-sans px-6 md:py-0.5 rounded-2xl text-[12px] transition-colors duration-100">
-              Shop now
-            </button>
-          </Link>
+          </p>
+        
+          <p className="pt-1.5 md:pt-5 flex text-[13px] md:text-[15px]  justify-between font-bold text-red-500">${price}</p>     
         </div>
       </div>
     </div>
+    </Link>
   );
 }

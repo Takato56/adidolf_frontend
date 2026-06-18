@@ -21,13 +21,11 @@ export default function NewArrivals() {
         </nav>
       </div>
 
-      <div className="texttitle margindiv pt-4">
-        <div>
-          <p>New Arrivals & Exclusive Deals </p>    
-        </div>
-        <div className="subtitle pt-1">
-          Discover our latest collection
-        </div>
+      <div className="margindiv">
+          <p className="pt-4 texttitle">New Arrivals & Exclusive Deals </p>      
+        
+          <p className="pt-1 subtitle">Discover our latest collection</p>
+        
       </div>
       <div className="margindiv mt-6 bg-[#E6F2FF] pt-3 pb-5 rounded-2xl">
         <div className="mx-6 text-[18px] md:text-[22px]">
@@ -59,9 +57,7 @@ export default function NewArrivals() {
         </div>
       </div>
       <div className="margindiv p-3 md:p-6 rounded-lg">
-        <div className="text-[18px] md:text-[22px]">
-          <b className="font-sans">New Arrivals</b>
-        </div>
+          <p className="text-[18px] md:text-[22px] font-bold">New Arrivals</p>
         <div className="mt-3 font-sans">
           <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
             <ProductCard

@@ -31,9 +31,9 @@ export default function Categories() {
       <div className="margindiv bg-[#f8f9ff] rounded-lg">
         <div className="mt-3 font-sans">
           <div className="grid grid-cols-2 justify-center md:grid-cols-4 gap-1 md:gap-1 md:auto-rows-fr">
-            <div className="col-span-2 md:col-span-3 row-span-2 md:row-span-1 md:aspect-24/9 aspect-video bg-gray-200 bg-opacity-40 p-6 text-white text-center rounded-lg flex items-center justify-center">
+            <Link href="/categories/lifestyle" className="col-span-2 md:col-span-3 row-span-2 md:row-span-1 md:aspect-24/9 aspect-video bg-gray-200 bg-opacity-40 p-6 text-white text-center rounded-lg flex items-center justify-center">
               <LoadingIcon size="sm" />
-            </div>
+            </Link>
 
             <div className="aspect-8/9 md:aspect-auto bg-gray-200 bg-opacity-40 p-6 rounded-lg flex items-center justify-center">
               <LoadingIcon size="sm" />
