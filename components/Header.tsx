@@ -86,17 +86,7 @@ export default function Navbar() {
           className="justify-self-center" 
           
         />
-          <div className="hidden group-hover:block left-0 absolute w-full mt-5 before:content-[''] before:absolute before:bottom-full text-xl py-5 before:h-5 before:w-full bg-[#eceff2]">
-            <p className="text-sm mb-2">Discover our masterpieces</p>
-
-            <div className="px-5 md:px-60 grid grid-cols-4 gap-y-1 gap-x-2 text-center">
-              <Link href="/categories">Lifestyle</Link>
-              <Link href="/categories">Gaming</Link>
-              <Link href="/categories">Cot 1</Link>
-              <Link href="/categories">Cot 1</Link>
-              <Link href="/categories">Cot 1</Link>
-            </div>
-          </div>
+          
         </div>
 
       </nav>

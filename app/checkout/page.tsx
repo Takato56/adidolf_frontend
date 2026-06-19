@@ -3,12 +3,12 @@ import { FaMapLocationDot } from "react-icons/fa6";
 import { MdOutlinePayment } from "react-icons/md";
 import { FaShoppingCart, FaBoxOpen } from "react-icons/fa";
 
-export default function NewArrivals() {
+export default function Checkout() {
   return (
     <div>
       <div className="margindiv mt-3">
         <nav>
-          <ul className="checkoutbreadcumb">
+          <ul className="checkoutbreadcumb flex justify-center">
             <li>
               <Link href="/cart" className="flex flex-row gap-1.5 items-center">
                 <FaShoppingCart></FaShoppingCart>
@@ -28,8 +28,8 @@ export default function NewArrivals() {
       </div>
 
 
-      <div className="flex flex-row justify-center mainmarginproduct gap-4 ">
-            <div className="w-3/4 rounded-2xl px-12 py-5 bg-[#fafafa] border-gray-200 shadow-xs">
+      <div className="flex md:flex-row justify-center mainmarginproduct gap-4 flex-col ">
+            <div className="md:w-3/4 w-full rounded-2xl md:px-12 px-6 py-5 bg-[#fafafa] border-gray-200 shadow-xs">
             <p className="texttitle font-extrabold flex flex-row gap-3 ">
                 <FaMapLocationDot></FaMapLocationDot>
                 Address</p>
@@ -154,22 +154,23 @@ export default function NewArrivals() {
 </div>
     
         </div>
-        <div className="w-1/4"><div className="w-full max-w-md mx-auto bg-[#fafafa] p-6 rounded-2xl border-gray-200 shadow-xs">
+        <div className="md:w-1/4 w-full"><div className="w-full max-w-md mx-auto bg-[#fafafa] p-6 rounded-2xl border-gray-200 shadow-xs">
   <h2 className="text-xl font-bold text-gray-900 uppercase tracking-wide mb-4">Order Summary</h2>
   
-  <div className="mb-6">
     <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Coupon Code</label>
-    <div className="flex gap-0 border border-gray-300 rounded overflow-hidden focus-within:border-blue-500">
+    <div className="border border-gray-300 rounded overflow-hidden focus-within:border-blue-500">
+      
       <input 
         type="text" 
         placeholder="Enter coupon code" 
-        className="flex-1 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
+        className="px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
       />
-      <button type="button" className="bg-[#c92127] text-white px-6 text-sm font-bold uppercase hover:bg-red-700 transition-colors shrink-0">
+      
+      
+    </div>
+    <button type="button" className="bg-[#c92127] text-white px-6 text-sm font-bold uppercase hover:bg-red-700 transition-colors shrink-0">
         Apply
       </button>
-    </div>
-  </div>
 
   <div className="border-t-2 border-dashed border-gray-200 my-4"></div>
 
@@ -199,7 +200,7 @@ export default function NewArrivals() {
 
   <div className="border-t border-dashed border-gray-200 my-4"></div>
 
-  <button type="submit" className="w-full bg-[#c92127] text-white text-center py-4 rounded-lg font-bold uppercase tracking-wide hover:bg-red-700 transition-colors">
+  <button type="submit" className="w-full bg-[#000000] text-white text-center py-4 rounded-lg font-bold uppercase tracking-wide hover:bg-gray-400 transition-colors">
     Place Order
   </button>
 </div></div>
