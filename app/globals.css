@@ -23,6 +23,9 @@
   --color-border-strong: var(--border-strong);
   --color-border-input: var(--border-input);
   --color-border-divider: var(--border-divider);
+
+  --color-logo-fill: var(--logo-fill);
+  --color-logo-inner: var(--logo-inner);
 }
 
 /* ── Light theme (default) ── */
@@ -48,6 +51,9 @@
   --border-strong: #cbd5e1;
   --border-input: #d1d5db;
   --border-divider: #f1f5f9;
+
+  --logo-fill: #181717;
+  --logo-inner: #ffffff;
 }
 
 /* ── Dark theme ── */
@@ -73,6 +79,9 @@
   --border-strong: #475569;
   --border-input: #475569;
   --border-divider: #1e293b;
+
+  --logo-fill: #f1f5f9;
+  --logo-inner: #0f172a;
 }
 
 /* ── Smooth theme transition ── */
@@ -80,7 +89,7 @@
   *,
   *::before,
   *::after {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease;
   }
 }
 
