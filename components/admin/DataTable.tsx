@@ -15,26 +15,26 @@ export function DataTable({ columns, data, title }: DataTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
-        <thead className="bg-gray-100 border-b border-gray-200">
+        <thead className="bg-surface-secondary border-b border-border">
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
-                className="px-6 py-3 text-left text-sm font-semibold text-gray-700"
+                className="px-6 py-3 text-left text-sm font-semibold text-text-primary"
               >
                 {col.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-border-divider">
           {data.length > 0 ? (
             data.map((row, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors">
+              <tr key={index} className="hover:bg-surface-secondary transition-colors">
                 {columns.map((col) => (
                   <td
                     key={col.key}
-                    className="px-6 py-4 text-sm text-gray-900"
+                    className="px-6 py-4 text-sm text-text-primary"
                   >
                     {row[col.key]}
                   </td>
@@ -45,7 +45,7 @@ export function DataTable({ columns, data, title }: DataTableProps) {
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-6 py-8 text-center text-gray-500 text-sm"
+                className="px-6 py-8 text-center text-text-muted text-sm"
               >
                 No {title.toLowerCase()} found
               </td>

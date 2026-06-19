@@ -165,7 +165,7 @@ export function ProductForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Product Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Product Name *
           </label>
           <input
@@ -174,7 +174,7 @@ export function ProductForm({
             value={formData.name}
             onChange={handleNameChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.name ? 'border-red-500' : 'border-gray-300'
+              errors.name ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="Enter product name"
           />
@@ -185,7 +185,7 @@ export function ProductForm({
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Category *
           </label>
           <select
@@ -193,7 +193,7 @@ export function ProductForm({
             value={formData.categorySlug}
             onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.categorySlug ? 'border-red-500' : 'border-gray-300'
+              errors.categorySlug ? 'border-red-500' : 'border-border-input'
             }`}
           >
             <option value="menswear">Menswear</option>
@@ -210,7 +210,7 @@ export function ProductForm({
 
         {/* Slug */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Slug *
           </label>
           <input
@@ -219,7 +219,7 @@ export function ProductForm({
             value={formData.slug}
             onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.slug ? 'border-red-500' : 'border-gray-300'
+              errors.slug ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="product-slug"
           />
@@ -230,7 +230,7 @@ export function ProductForm({
 
         {/* Price */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Price (USD) *
           </label>
           <input
@@ -241,7 +241,7 @@ export function ProductForm({
             step="0.01"
             min="0"
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.price ? 'border-red-500' : 'border-gray-300'
+              errors.price ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="0.00"
           />
@@ -252,7 +252,7 @@ export function ProductForm({
 
         {/* Brand */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Brand *
           </label>
           <input
@@ -261,7 +261,7 @@ export function ProductForm({
             value={formData.brand}
             onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.brand ? 'border-red-500' : 'border-gray-300'
+              errors.brand ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="e.g., Nike"
           />
@@ -278,16 +278,16 @@ export function ProductForm({
               name="isPublished"
               checked={formData.isPublished}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 border-border-input rounded focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">Published</span>
+            <span className="text-sm font-medium text-text-primary">Published</span>
           </label>
         </div>
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-text-primary mb-2">
           Description *
         </label>
         <textarea
@@ -296,7 +296,7 @@ export function ProductForm({
           onChange={handleChange}
           rows={4}
           className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-            errors.description ? 'border-red-500' : 'border-gray-300'
+            errors.description ? 'border-red-500' : 'border-border-input'
           }`}
           placeholder="Enter product description"
         />
@@ -308,7 +308,7 @@ export function ProductForm({
       {/* Variants */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-text-primary">
             Variants *
           </label>
           <button
@@ -323,10 +323,10 @@ export function ProductForm({
           {formData.variants.map((variant, index) => (
             <div
               key={index}
-              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-3 items-end p-4 bg-gray-50 rounded-lg border border-gray-200"
+              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-3 items-end p-4 bg-surface-secondary rounded-lg border border-border"
             >
               <div>
-                <label className="block text-xs text-gray-600 mb-1">
+                <label className="block text-xs text-text-muted mb-1">
                   Color
                 </label>
                 <input
@@ -335,12 +335,12 @@ export function ProductForm({
                   onChange={(e) =>
                     handleVariantChange(index, 'color', e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  className="w-full px-3 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="e.g., Navy"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">
+                <label className="block text-xs text-text-muted mb-1">
                   Size
                 </label>
                 <input
@@ -349,12 +349,12 @@ export function ProductForm({
                   onChange={(e) =>
                     handleVariantChange(index, 'size', e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  className="w-full px-3 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="e.g., M"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">
+                <label className="block text-xs text-text-muted mb-1">
                   Extra Price
                 </label>
                 <input
@@ -365,12 +365,12 @@ export function ProductForm({
                   }
                   step="0.01"
                   min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  className="w-full px-3 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">
+                <label className="block text-xs text-text-muted mb-1">
                   Stock
                 </label>
                 <input
@@ -380,12 +380,12 @@ export function ProductForm({
                     handleVariantChange(index, 'stock', e.target.value)
                   }
                   min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  className="w-full px-3 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="0"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">
+                <label className="block text-xs text-text-muted mb-1">
                   Image URL
                 </label>
                 <input
@@ -394,7 +394,7 @@ export function ProductForm({
                   onChange={(e) =>
                     handleVariantChange(index, 'image_url', e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  className="w-full px-3 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                   placeholder="https://..."
                 />
               </div>
@@ -415,7 +415,7 @@ export function ProductForm({
       {/* Images */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-text-primary">
             Product Images *
           </label>
           <button
@@ -433,7 +433,7 @@ export function ProductForm({
                 type="url"
                 value={imageUrl}
                 onChange={(e) => handleImageChange(index, e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                className="flex-1 px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
                 placeholder="https://example.com/image.jpg"
               />
               <button
@@ -451,7 +451,7 @@ export function ProductForm({
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-4 pt-6 border-t border-gray-200">
+      <div className="flex gap-4 pt-6 border-t border-border">
         <button
           type="submit"
           disabled={isLoading}
@@ -466,7 +466,7 @@ export function ProductForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+          className="px-6 py-2 bg-surface-secondary text-text-primary rounded-lg hover:bg-surface-dropdown transition font-medium"
         >
           Cancel
         </button>

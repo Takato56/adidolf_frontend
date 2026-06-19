@@ -41,7 +41,7 @@ export default function CategoryDetailPage() {
   if (!isLoaded || !category) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-text-muted">Loading...</div>
       </div>
     );
   }
@@ -50,8 +50,8 @@ export default function CategoryDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Edit Category</h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-text-primary">Edit Category</h2>
+          <p className="text-text-muted text-sm mt-1">
             Update category information
           </p>
         </div>
@@ -64,31 +64,31 @@ export default function CategoryDetailPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
         <CategoryForm category={category} onSubmit={handleSubmit} />
       </div>
 
       {/* Category Preview */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Preview</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <p className="text-gray-600 text-sm">Category Name</p>
-            <p className="text-gray-900 font-medium">{category.name}</p>
+            <p className="text-text-muted text-sm">Category Name</p>
+            <p className="text-text-primary font-medium">{category.name}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Slug</p>
-            <p className="text-gray-900 font-medium">{category.slug}</p>
+            <p className="text-text-muted text-sm">Slug</p>
+            <p className="text-text-primary font-medium">{category.slug}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Image URL</p>
-            <p className="text-gray-900 font-medium truncate">
+            <p className="text-text-muted text-sm">Image URL</p>
+            <p className="text-text-primary font-medium truncate">
               {category.imageUrl || '—'}
             </p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Description</p>
-            <p className="text-gray-900 font-medium">
+            <p className="text-text-muted text-sm">Description</p>
+            <p className="text-text-primary font-medium">
               {category.description}
             </p>
           </div>

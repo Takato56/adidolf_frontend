@@ -45,13 +45,13 @@ const handleTouchMove = (e: React.TouchEvent) => {
             <li>
               <Link href="/" className="hover:underline"> Home </Link>
             </li>
-            <li className="text-gray-700 text-sm">&gt;</li>
+            <li className="text-text-muted text-sm">&gt;</li>
             <li>
               <Link href="/" className="hover:underline"> Products </Link>
             </li>
-            <li className="text-gray-700 text-sm">&gt;</li>
+            <li className="text-text-muted text-sm">&gt;</li>
             <li>
-              <span className="text-black font-medium">Ma san pham</span>
+              <span className="text-text-primary font-medium">Ma san pham</span>
             </li>
           </ul>
         </nav>
@@ -61,7 +61,7 @@ const handleTouchMove = (e: React.TouchEvent) => {
         <div className="w-full flex flex-col md:flex-row justify-start">
           <div className="flex flex-row gap-4">
           <div 
-            className="w-full md:w-3/5 aspect-3/4 overflow-hidden rounded-lg bg-gray-100 relative touch-pan-y"
+            className="w-full md:w-3/5 aspect-3/4 overflow-hidden rounded-lg bg-surface-secondary relative touch-pan-y"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -95,8 +95,8 @@ const handleTouchMove = (e: React.TouchEvent) => {
             {images.map((src, index) => (
               <div 
                 key={index}
-                className={`w-full aspect-3/4 overflow-hidden rounded-lg bg-gray-100 cursor-pointer border-2 transition-all ${
-                  activeIndex === index ? 'border-black' : 'border-transparent hover:border-gray-400'
+                className={`w-full aspect-3/4 overflow-hidden rounded-lg bg-surface-secondary cursor-pointer border-2 transition-all ${
+                  activeIndex === index ? 'border-text-primary' : 'border-transparent hover:border-border-strong'
                 }`}
                 onClick={() => setActiveIndex(index)}
               >

@@ -49,26 +49,26 @@ export default function SearchBar({
       />
 
       {/* Search bar + results */}
-      <div className="absolute top-0 left-0 w-full z-50 bg-white border-b border-slate-100">
+      <div className="absolute top-0 left-0 w-full z-50 bg-surface-elevated border-b border-border-divider">
         <div className="flex items-center gap-3 px-6 h-14">
-          <FaSearch className="text-slate-400 text-sm flex-shrink-0" />
+          <FaSearch className="text-text-muted text-sm flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for products..."
-            className="flex-1 text-sm outline-none bg-transparent"
+            className="flex-1 text-sm outline-none bg-transparent text-text-primary placeholder:text-text-muted"
           />
-          <button onClick={onClose} className="text-slate-400 hover:text-black transition-colors">
+          <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
             <FaTimes />
           </button>
         </div>
 
         {query.trim() && (
-          <div className="border-t border-slate-100">
+          <div className="border-t border-border-divider">
             {results.length === 0 ? (
-              <div className="px-6 py-4 text-sm text-slate-400">
+              <div className="px-6 py-4 text-sm text-text-muted">
                 No products found for &quot;{query}&quot;
               </div>
             ) : (
@@ -77,14 +77,14 @@ export default function SearchBar({
                   key={p.id}
                   href={p.href}
                   onClick={onClose}
-                  className="flex items-center gap-3 px-6 py-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+                  className="flex items-center gap-3 px-6 py-3 hover:bg-surface-secondary transition-colors border-b border-border-divider last:border-0"
                 >
-                  <div className="w-9 h-9 rounded-md bg-slate-100 flex-shrink-0" />
+                  <div className="w-9 h-9 rounded-md bg-surface-secondary flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-black truncate">{p.name}</p>
-                    <p className="text-xs text-slate-400">{p.category}</p>
+                    <p className="text-sm font-medium text-text-primary truncate">{p.name}</p>
+                    <p className="text-xs text-text-muted">{p.category}</p>
                   </div>
-                  <span className="text-sm font-semibold text-black">{p.price}</span>
+                  <span className="text-sm font-semibold text-text-primary">{p.price}</span>
                 </Link>
               ))
             )}

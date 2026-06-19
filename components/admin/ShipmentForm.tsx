@@ -93,10 +93,10 @@ export function ShipmentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+        <h3 className="text-lg font-semibold text-text-primary mb-1">
           Shipment Information
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-text-muted">
           {hasShipment
             ? `Shipment #${shipment.shipmentId} — ${shipment.carrier}`
             : 'No shipment assigned yet. Fill in the details below.'}
@@ -106,7 +106,7 @@ export function ShipmentForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Carrier */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Carrier *
           </label>
           <input
@@ -115,7 +115,7 @@ export function ShipmentForm({
             value={formData.carrier}
             onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.carrier ? 'border-red-500' : 'border-gray-300'
+              errors.carrier ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="e.g. FedEx, UPS, DHL"
           />
@@ -126,7 +126,7 @@ export function ShipmentForm({
 
         {/* Tracking Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Tracking Number
           </label>
           <input
@@ -134,21 +134,21 @@ export function ShipmentForm({
             name="trackingNumber"
             value={formData.trackingNumber}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
             placeholder="e.g. 1Z-999-888"
           />
         </div>
 
         {/* Status */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Status *
           </label>
           <select
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
           >
             {STATUS_OPTIONS.map((s) => (
               <option key={s.value} value={s.value}>
@@ -160,7 +160,7 @@ export function ShipmentForm({
 
         {/* Shipped At */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Shipped At
           </label>
           <input
@@ -168,13 +168,13 @@ export function ShipmentForm({
             name="shippedAt"
             value={formData.shippedAt}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
           />
         </div>
 
         {/* Estimated Delivery */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Estimated Delivery
           </label>
           <input
@@ -182,13 +182,13 @@ export function ShipmentForm({
             name="estimatedDelivery"
             value={formData.estimatedDelivery}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
           />
         </div>
 
         {/* Delivered At */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Delivered At
           </label>
           <input
@@ -196,13 +196,13 @@ export function ShipmentForm({
             name="deliveredAt"
             value={formData.deliveredAt}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
           />
         </div>
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-4 pt-4 border-t border-gray-200">
+      <div className="flex gap-4 pt-4 border-t border-border">
         <button
           type="submit"
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"

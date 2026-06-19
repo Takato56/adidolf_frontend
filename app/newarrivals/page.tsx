@@ -12,10 +12,10 @@ export default function NewArrivals() {
                 Home
               </Link>
             </li>
-            <li className="text-gray-700 text-sm">&gt;</li>
+            <li className="text-text-muted text-sm">&gt;</li>
 
             <li>
-              <span className="text-black font-medium">News</span>
+              <span className="text-text-primary font-medium">News</span>
             </li>
           </ul>
         </nav>
@@ -27,7 +27,7 @@ export default function NewArrivals() {
           <p className="pt-1 subtitle">Discover our latest collection</p>
         
       </div>
-      <div className="margindiv mt-6 bg-[#E6F2FF] pt-3 pb-5 rounded-2xl">
+      <div className="margindiv mt-6 bg-surface-accent pt-3 pb-5 rounded-2xl">
         <div className="mx-6 text-[18px] md:text-[22px]">
           <b className="font-sans">Deals of the week</b>
         </div>

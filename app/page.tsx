@@ -78,7 +78,7 @@ export default function Home() {
   return (
     <div>
       <div 
-        className="relative mt-1 h-60 md:h-[480px] w-full overflow-hidden group"
+        className="bg-surface-footer relative mt-1 h-60 md:h-120 w-full overflow-hidden group"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -90,7 +90,7 @@ export default function Home() {
           {SLIDES.map((slide) => (
             <div
               key={slide.id}
-              className={`w-full h-full flex-shrink-0 ${slide.bg} flex flex-col justify-center items-center text-white p-4 text-center`}
+              className={`w-full h-full shrink-0 ${slide.bg} flex flex-col justify-center items-center text-white p-4 text-center`}
             >
               <h1 className="text-2xl md:text-5xl font-extrabold uppercase tracking-wider mb-2">
                 {slide.text}

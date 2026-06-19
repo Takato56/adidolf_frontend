@@ -35,10 +35,10 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <form
-        className="bg-white max-w-md w-full rounded-md flex flex-col items-center p-8 mb-30 outline-1 shadow-2xl"
+        className="bg-surface-card max-w-md w-full rounded-md flex flex-col items-center p-8 mb-30 outline-1 shadow-2xl"
         onSubmit={onSubmit}
       >
-        <h1 className="font-bold text-2xl md:text-3xl text-center tracking-tight">
+        <h1 className="font-bold text-2xl md:text-3xl text-center tracking-tight text-text-primary">
           SIGN UP TO YOUR
           <br />
           ADIDOLF ACCOUNT
@@ -48,7 +48,7 @@ export default function Signup() {
           type="email"
           name="email"
           placeholder="Email Address"
-          className="border-2 p-3 mt-6 border-gray-400 rounded-md outline-none w-full"
+          className="border-2 p-3 mt-6 border-border-input rounded-md outline-none w-full bg-surface-input text-text-primary placeholder-text-muted"
         />
 
         <input
@@ -57,7 +57,7 @@ export default function Signup() {
           placeholder="Password"
           pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
           title="Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number."
-          className="border-2 p-3 mt-3 border-gray-400 rounded-md outline-none w-full"
+          className="border-2 p-3 mt-3 border-border-input rounded-md outline-none w-full bg-surface-input text-text-primary placeholder-text-muted"
         />
 
         <input
@@ -66,7 +66,7 @@ export default function Signup() {
           placeholder="Full Name"
           pattern="^[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ\s'\-]*$"
           title="Username must be between 3 and 15 characters long and can only contain letters, numbers, and underscores (no spaces)."
-          className="border-2 p-3 mt-3 border-gray-400 rounded-md outline-none w-full"
+          className="border-2 p-3 mt-3 border-border-input rounded-md outline-none w-full bg-surface-input text-text-primary placeholder-text-muted"
         />
 
         <input
@@ -75,18 +75,18 @@ export default function Signup() {
           placeholder="Phone Number"
           pattern="[0-9\-+\s()]*"
           title="Please enter a valid phone number (minimum 10 digits). You can include spaces, hyphens, and a leading + for country codes."
-          className="border-2 p-3 mt-3 border-gray-400 rounded-md outline-none w-full"
+          className="border-2 p-3 mt-3 border-border-input rounded-md outline-none w-full bg-surface-input text-text-primary placeholder-text-muted"
         />
 
         <input
           type="submit"
           value="SIGN UP"
-          className="bg-black text-white p-3 mt-6 rounded-md w-full font-bold cursor-pointer hover:bg-gray-900 transition-colors"
+          className="bg-text-primary text-surface-header p-3 mt-6 rounded-md w-full font-bold cursor-pointer hover:bg-text-secondary transition-colors"
         />
 
-        <p className="text-sm mt-6 text-center">
+        <p className="text-sm mt-6 text-text-muted text-center">
           Already have an account?{" "}
-          <Link href="/login" className="underline font-bold">
+          <Link href="/login" className="underline font-bold text-text-primary">
             LOG IN
           </Link>
         </p>

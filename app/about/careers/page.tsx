@@ -40,14 +40,14 @@ export default function Careers() {
         <p className="text-xs uppercase tracking-widest text-blue-500 font-semibold mb-2">
           About
         </p>
-        <h1 className="text-3xl font-bold text-gray-900">Careers</h1>
-        <p className="text-gray-500 text-sm mt-2">
+        <h1 className="text-3xl font-bold text-text-primary">Careers</h1>
+        <p className="text-text-muted text-sm mt-2">
           Join the team. We have {openings.length} open roles.
         </p>
       </div>
 
       {/* Culture blurb */}
-      <div className="bg-gray-50 rounded-xl p-6 mb-8 text-sm text-gray-600 leading-relaxed">
+      <div className="bg-surface-secondary rounded-xl p-6 mb-8 text-sm text-text-muted leading-relaxed">
         <p>
           Working at Adidolf means being part of a small, focused team that
           cares deeply about fashion and the people who wear it. We move
@@ -58,28 +58,28 @@ export default function Careers() {
       </div>
 
       {/* Openings */}
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <h2 className="text-lg font-semibold text-text-primary mb-4">
         Open Positions
       </h2>
       <div className="space-y-3">
         {openings.map(({ title, dept, location, type, description }) => (
           <div
             key={title}
-            className="border border-gray-100 rounded-xl p-5 bg-white hover:shadow-sm transition-shadow"
+            className="border border-border-divider rounded-xl p-5 bg-white hover:shadow-sm transition-shadow"
           >
             <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-              <p className="font-semibold text-gray-900 text-sm">{title}</p>
+              <p className="font-semibold text-text-primary text-sm">{title}</p>
               <div className="flex gap-2">
                 <span className="text-xs bg-blue-50 text-blue-600 font-medium px-2.5 py-0.5 rounded-full">
                   {dept}
                 </span>
-                <span className="text-xs bg-gray-100 text-gray-500 font-medium px-2.5 py-0.5 rounded-full">
+                <span className="text-xs bg-surface-secondary text-text-muted font-medium px-2.5 py-0.5 rounded-full">
                   {type}
                 </span>
               </div>
             </div>
-            <p className="text-xs text-gray-400 mb-2">{location}</p>
-            <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+            <p className="text-xs text-text-muted mb-2">{location}</p>
+            <p className="text-sm text-text-muted leading-relaxed">{description}</p>
             <button className="mt-4 text-xs font-semibold text-blue-600 hover:underline cursor-pointer">
               Apply →
             </button>
@@ -87,7 +87,7 @@ export default function Careers() {
         ))}
       </div>
 
-      <p className="text-xs text-gray-400 text-center mt-8">
+      <p className="text-xs text-text-muted text-center mt-8">
         Don't see a fit? Send a speculative application to careers@adidolf.com
         and tell us what you'd bring to the team.
       </p>

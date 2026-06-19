@@ -48,27 +48,27 @@ export default function TermsOfService() {
         <p className="text-xs uppercase tracking-widest text-blue-500 font-semibold mb-2">
           Legal
         </p>
-        <h1 className="text-3xl font-bold text-gray-900">Terms of Service</h1>
-        <p className="text-gray-500 text-sm mt-2">
+        <h1 className="text-3xl font-bold text-text-primary">Terms of Service</h1>
+        <p className="text-text-muted text-sm mt-2">
           Last updated: January 2025
         </p>
       </div>
 
-      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl px-5 py-4 mb-8 text-sm text-gray-700 leading-relaxed">
+      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl px-5 py-4 mb-8 text-sm text-text-primary leading-relaxed">
         Please read these Terms carefully before using Adidolf. By placing an
         order or using this site, you agree to be bound by the terms below.
       </div>
 
       <div className="space-y-6">
         {sections.map(({ title, body }) => (
-          <div key={title} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
-            <h2 className="font-semibold text-gray-900 text-sm mb-2">{title}</h2>
-            <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+          <div key={title} className="border-b border-border-divider last:border-0 pb-6 last:pb-0">
+            <h2 className="font-semibold text-text-primary text-sm mb-2">{title}</h2>
+            <p className="text-sm text-text-muted leading-relaxed">{body}</p>
           </div>
         ))}
       </div>
 
-      <p className="text-xs text-gray-400 text-center mt-10">
+      <p className="text-xs text-text-muted text-center mt-10">
         Questions about these Terms? Contact us at support@adidolf.com.
       </p>
     </div>

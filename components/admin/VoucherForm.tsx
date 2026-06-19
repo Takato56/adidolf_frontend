@@ -143,7 +143,7 @@ export function VoucherForm({
     required?: boolean;
   }) => (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-text-primary mb-2">
         {label}
         {required && ' *'}
       </label>
@@ -153,7 +153,7 @@ export function VoucherForm({
         value={(formData as any)[name]}
         onChange={handleChange}
         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-          errors[name] ? 'border-red-500' : 'border-gray-300'
+          errors[name] ? 'border-red-500' : 'border-border-input'
         }`}
         placeholder={placeholder}
       />
@@ -169,7 +169,7 @@ export function VoucherForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Code */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Voucher Code *
           </label>
           <input
@@ -188,7 +188,7 @@ export function VoucherForm({
               }
             }}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition font-mono ${
-              errors.code ? 'border-red-500' : 'border-gray-300'
+              errors.code ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="e.g. SAVE10"
           />
@@ -199,14 +199,14 @@ export function VoucherForm({
 
         {/* Discount Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Discount Type *
           </label>
           <select
             name="discount_type"
             value={formData.discount_type}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
           >
             <option value="percent">Percentage (%)</option>
             <option value="fixed">Fixed Amount ($)</option>
@@ -215,11 +215,11 @@ export function VoucherForm({
 
         {/* Discount Value */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Discount Value *
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">
               {formData.discount_type === 'percent' ? '%' : '$'}
             </span>
             <input
@@ -228,7 +228,7 @@ export function VoucherForm({
               value={formData.discount_value}
               onChange={handleChange}
               className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.discount_value ? 'border-red-500' : 'border-gray-300'
+                errors.discount_value ? 'border-red-500' : 'border-border-input'
               }`}
               placeholder="0"
               min="0"
@@ -244,11 +244,11 @@ export function VoucherForm({
 
         {/* Max Discount */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Max Discount
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">
               $
             </span>
             <input
@@ -257,7 +257,7 @@ export function VoucherForm({
               value={formData.max_discount}
               onChange={handleChange}
               className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.max_discount ? 'border-red-500' : 'border-gray-300'
+                errors.max_discount ? 'border-red-500' : 'border-border-input'
               }`}
               placeholder="No limit"
               min="0"
@@ -273,11 +273,11 @@ export function VoucherForm({
 
         {/* Min Order Amount */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Min Order Amount
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">
               $
             </span>
             <input
@@ -288,7 +288,7 @@ export function VoucherForm({
               className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                 errors.min_order_amount
                   ? 'border-red-500'
-                  : 'border-gray-300'
+                  : 'border-border-input'
               }`}
               placeholder="No minimum"
               min="0"
@@ -304,7 +304,7 @@ export function VoucherForm({
 
         {/* Usage Limit */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Usage Limit
           </label>
           <input
@@ -313,7 +313,7 @@ export function VoucherForm({
             value={formData.usage_limit}
             onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.usage_limit ? 'border-red-500' : 'border-gray-300'
+              errors.usage_limit ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="Unlimited"
             min="0"
@@ -326,7 +326,7 @@ export function VoucherForm({
         {/* Usage Count (edit only) */}
         {isEditing && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Usage Count
             </label>
             <input
@@ -334,7 +334,7 @@ export function VoucherForm({
               name="usage_count"
               value={formData.usage_count}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
               min="0"
             />
           </div>
@@ -342,7 +342,7 @@ export function VoucherForm({
 
         {/* Valid From */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Valid From *
           </label>
           <input
@@ -351,7 +351,7 @@ export function VoucherForm({
             value={formData.valid_from}
             onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.valid_from ? 'border-red-500' : 'border-gray-300'
+              errors.valid_from ? 'border-red-500' : 'border-border-input'
             }`}
           />
           {errors.valid_from && (
@@ -361,7 +361,7 @@ export function VoucherForm({
 
         {/* Valid To */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Valid To *
           </label>
           <input
@@ -370,7 +370,7 @@ export function VoucherForm({
             value={formData.valid_to}
             onChange={handleChange}
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.valid_to ? 'border-red-500' : 'border-gray-300'
+              errors.valid_to ? 'border-red-500' : 'border-border-input'
             }`}
           />
           {errors.valid_to && (
@@ -387,15 +387,15 @@ export function VoucherForm({
           checked={formData.is_active}
           onChange={handleChange}
           id="is_active"
-          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          className="w-4 h-4 text-blue-600 border-border-input rounded focus:ring-blue-500"
         />
-        <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+        <label htmlFor="is_active" className="text-sm font-medium text-text-primary">
           Active (voucher can be applied by customers)
         </label>
       </div>
 
       {/* Submit */}
-      <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
+      <div className="flex items-center gap-4 pt-4 border-t border-border">
         <button
           type="submit"
           disabled={isLoading}
@@ -410,7 +410,7 @@ export function VoucherForm({
         <button
           type="button"
           onClick={() => router.push('/admin/vouchers')}
-          className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium"
+          className="px-6 py-2.5 bg-surface-secondary text-text-primary rounded-lg hover:bg-surface-dropdown transition font-medium"
         >
           Cancel
         </button>

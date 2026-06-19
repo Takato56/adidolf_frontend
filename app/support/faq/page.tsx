@@ -64,10 +64,10 @@ export default function FAQ() {
         <p className="text-xs uppercase tracking-widest text-blue-500 font-semibold mb-2">
           Support
         </p>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-text-primary">
           Frequently Asked Questions
         </h1>
-        <p className="text-gray-500 text-sm mt-2">
+        <p className="text-text-muted text-sm mt-2">
           Everything you were afraid to ask.
         </p>
       </div>
@@ -80,10 +80,10 @@ export default function FAQ() {
               className={`w-full text-left p-4 rounded-lg transition-all duration-200 flex items-center justify-between group ${
                 openIndex === index
                   ? "bg-blue-50 border-l-4 border-blue-500"
-                  : "hover:bg-gray-50 border-l-4 border-transparent hover:border-gray-200"
+                  : "hover:bg-surface-secondary border-l-4 border-transparent hover:border-border-strong"
               }`}
             >
-              <span className="font-medium text-gray-800 group-hover:text-blue-600 pr-4">
+              <span className="font-medium text-text-primary group-hover:text-text-accent pr-4">
                 {item.question}
               </span>
               <svg
@@ -104,7 +104,7 @@ export default function FAQ() {
             </button>
 
             {openIndex === index && (
-              <div className="mx-4 mb-1 p-4 bg-blue-50 rounded-b-lg border-l-4 border-blue-200 text-gray-600 text-sm leading-relaxed">
+              <div className="mx-4 mb-1 p-4 bg-blue-50 rounded-b-lg border-l-4 border-blue-200 text-text-muted text-sm leading-relaxed">
                 {item.answer}
               </div>
             )}

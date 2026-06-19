@@ -261,7 +261,7 @@ export function OrderForm({
   if (!productsLoaded) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading products...</div>
+        <div className="text-text-muted">Loading products...</div>
       </div>
     );
   }
@@ -270,13 +270,13 @@ export function OrderForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* ---- Order Header ---- */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">
           Order Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* User ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               User ID *
             </label>
             <input
@@ -287,7 +287,7 @@ export function OrderForm({
               min="1"
               step="1"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.userId ? 'border-red-500' : 'border-gray-300'
+                errors.userId ? 'border-red-500' : 'border-border-input'
               }`}
               placeholder="e.g. 1"
             />
@@ -298,7 +298,7 @@ export function OrderForm({
 
           {/* Address ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Address ID *
             </label>
             <input
@@ -309,7 +309,7 @@ export function OrderForm({
               min="1"
               step="1"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.addressId ? 'border-red-500' : 'border-gray-300'
+                errors.addressId ? 'border-red-500' : 'border-border-input'
               }`}
               placeholder="e.g. 1"
             />
@@ -320,7 +320,7 @@ export function OrderForm({
 
           {/* Voucher ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Voucher ID
             </label>
             <input
@@ -330,21 +330,21 @@ export function OrderForm({
               onChange={handleChange}
               min="0"
               step="1"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
               placeholder="e.g. 0"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Status
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
             >
               {STATUS_OPTIONS.map((s) => (
                 <option key={s} value={s}>
@@ -356,7 +356,7 @@ export function OrderForm({
 
           {/* Discount Amount */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Discount Amount
             </label>
             <input
@@ -367,7 +367,7 @@ export function OrderForm({
               min="0"
               step="0.01"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.discountAmount ? 'border-red-500' : 'border-gray-300'
+                errors.discountAmount ? 'border-red-500' : 'border-border-input'
               }`}
             />
             {errors.discountAmount && (
@@ -379,7 +379,7 @@ export function OrderForm({
 
           {/* Shipping Fee */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Shipping Fee
             </label>
             <input
@@ -390,7 +390,7 @@ export function OrderForm({
               min="0"
               step="0.01"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.shippingFee ? 'border-red-500' : 'border-gray-300'
+                errors.shippingFee ? 'border-red-500' : 'border-border-input'
               }`}
             />
             {errors.shippingFee && (
@@ -400,7 +400,7 @@ export function OrderForm({
 
           {/* Created At */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Creation Date *
             </label>
             <input
@@ -409,7 +409,7 @@ export function OrderForm({
               value={formData.createdAt}
               onChange={handleChange}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.createdAt ? 'border-red-500' : 'border-gray-300'
+                errors.createdAt ? 'border-red-500' : 'border-border-input'
               }`}
             />
             {errors.createdAt && (
@@ -419,7 +419,7 @@ export function OrderForm({
 
           {/* Note */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Note (optional)
             </label>
             <textarea
@@ -427,7 +427,7 @@ export function OrderForm({
               value={formData.note}
               onChange={handleChange}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
+              className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
               placeholder="Any special instructions..."
             />
           </div>
@@ -437,7 +437,7 @@ export function OrderForm({
       {/* ---- Order Items ---- */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-text-primary">
             Order Items ({items.length})
           </h3>
           <button
@@ -454,10 +454,10 @@ export function OrderForm({
           {items.map((item, index) => (
             <div
               key={index}
-              className="bg-gray-50 rounded-lg border border-gray-200 p-4"
+              className="bg-surface-secondary rounded-lg border border-border p-4"
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-text-primary">
                   Item #{index + 1}
                 </span>
                 {items.length > 1 && (
@@ -475,7 +475,7 @@ export function OrderForm({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Product dropdown */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-text-muted mb-1">
                     Product *
                   </label>
                   <select
@@ -484,7 +484,7 @@ export function OrderForm({
                     className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition ${
                       errors[`item_${index}_product`]
                         ? 'border-red-500'
-                        : 'border-gray-300'
+                        : 'border-border-input'
                     }`}
                   >
                     <option value="">Select product...</option>
@@ -503,7 +503,7 @@ export function OrderForm({
 
                 {/* Variant dropdown */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-text-muted mb-1">
                     Variant
                   </label>
                   <select
@@ -511,7 +511,7 @@ export function OrderForm({
                     onChange={(e) =>
                       handleItemVariant(index, e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition"
+                    className="w-full px-3 py-2 border border-border-input rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition"
                     disabled={!item.productId}
                   >
                     <option value="">Default</option>
@@ -528,7 +528,7 @@ export function OrderForm({
 
                 {/* Quantity */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-text-muted mb-1">
                     Quantity *
                   </label>
                   <input
@@ -541,7 +541,7 @@ export function OrderForm({
                     className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition ${
                       errors[`item_${index}_quantity`]
                         ? 'border-red-500'
-                        : 'border-gray-300'
+                        : 'border-border-input'
                     }`}
                   />
                   {errors[`item_${index}_quantity`] && (
@@ -553,10 +553,10 @@ export function OrderForm({
 
                 {/* Unit Price & Subtotal */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-text-muted mb-1">
                     Unit / Subtotal
                   </label>
-                  <div className="text-sm text-gray-900 bg-white px-3 py-2 border border-gray-200 rounded-lg">
+                  <div className="text-sm text-text-primary bg-surface-elevated px-3 py-2 border border-border rounded-lg">
                     ${item.unitPrice.toFixed(2)} × {item.quantity} ={' '}
                     <span className="font-semibold">
                       ${(item.unitPrice * item.quantity).toFixed(2)}
@@ -570,30 +570,30 @@ export function OrderForm({
       </div>
 
       {/* ---- Summary ---- */}
-      <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+      <div className="bg-surface-secondary rounded-lg border border-border p-4">
         <div className="flex flex-col sm:flex-row sm:justify-between gap-2 text-sm">
           <div className="space-y-1">
-            <p className="text-gray-600">
+            <p className="text-text-muted">
               Subtotal:{' '}
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-text-primary">
                 ${computedSubtotal.toFixed(2)}
               </span>
             </p>
-            <p className="text-gray-600">
+            <p className="text-text-muted">
               Discount:{' '}
               <span className="font-medium text-red-600">
                 -${formData.discountAmount.toFixed(2)}
               </span>
             </p>
-            <p className="text-gray-600">
+            <p className="text-text-muted">
               Shipping:{' '}
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-text-primary">
                 ${formData.shippingFee.toFixed(2)}
               </span>
             </p>
           </div>
           <div className="flex items-end">
-            <p className="text-lg font-bold text-gray-900">
+            <p className="text-lg font-bold text-text-primary">
               Total: ${computedTotal.toFixed(2)}
             </p>
           </div>
@@ -601,7 +601,7 @@ export function OrderForm({
       </div>
 
       {/* ---- Actions ---- */}
-      <div className="flex gap-3 pt-4 border-t border-gray-200">
+      <div className="flex gap-3 pt-4 border-t border-border">
         <button
           type="submit"
           disabled={isLoading}
@@ -612,7 +612,7 @@ export function OrderForm({
         <button
           type="button"
           onClick={() => router.push('/admin/orders')}
-          className="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          className="px-6 py-3 bg-surface-elevated border border-border-input text-text-primary rounded-lg hover:bg-surface-secondary transition-colors font-medium"
         >
           Cancel
         </button>

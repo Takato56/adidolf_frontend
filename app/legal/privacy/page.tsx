@@ -40,13 +40,13 @@ export default function PrivacyPolicy() {
         <p className="text-xs uppercase tracking-widest text-blue-500 font-semibold mb-2">
           Legal
         </p>
-        <h1 className="text-3xl font-bold text-gray-900">Privacy Policy</h1>
-        <p className="text-gray-500 text-sm mt-2">
+        <h1 className="text-3xl font-bold text-text-primary">Privacy Policy</h1>
+        <p className="text-text-muted text-sm mt-2">
           Last updated: January 2025
         </p>
       </div>
 
-      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl px-5 py-4 mb-8 text-sm text-gray-700 leading-relaxed">
+      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl px-5 py-4 mb-8 text-sm text-text-secondary leading-relaxed">
         This policy explains what personal data Adidolf collects, how we use
         it, and your rights regarding that data. We are committed to handling
         your information responsibly and transparently.
@@ -54,14 +54,14 @@ export default function PrivacyPolicy() {
 
       <div className="space-y-6">
         {sections.map(({ title, body }) => (
-          <div key={title} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
-            <h2 className="font-semibold text-gray-900 text-sm mb-2">{title}</h2>
-            <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+          <div key={title} className="border-b border-border-divider last:border-0 pb-6 last:pb-0">
+            <h2 className="font-semibold text-text-primary text-sm mb-2">{title}</h2>
+            <p className="text-sm text-text-muted leading-relaxed">{body}</p>
           </div>
         ))}
       </div>
 
-      <p className="text-xs text-gray-400 text-center mt-10">
+      <p className="text-xs text-text-muted text-center mt-10">
         For privacy-related inquiries, contact support@adidolf.com.
       </p>
     </div>

@@ -29,14 +29,14 @@ export function AdminHeader() {
     breadcrumbs[breadcrumbs.length - 1]?.label || 'Dashboard';
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 md:ml-0">
+    <header className="bg-surface-elevated border-b border-border px-6 py-4 md:ml-0">
       <div className="flex flex-col space-y-2">
         {/* Breadcrumbs */}
-        <nav className="text-sm text-gray-600">
+        <nav className="text-sm text-text-muted">
           {breadcrumbs.map((crumb, index) => (
             <span key={index}>
               {index > 0 && <span className="mx-2">/</span>}
-              <span className={index === breadcrumbs.length - 1 ? 'text-gray-900 font-medium' : ''}>
+              <span className={index === breadcrumbs.length - 1 ? 'text-text-primary font-medium' : ''}>
                 {crumb.label}
               </span>
             </span>
@@ -44,7 +44,7 @@ export function AdminHeader() {
         </nav>
 
         {/* Page Title */}
-        <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
+        <h1 className="text-3xl font-bold text-text-primary">{pageTitle}</h1>
       </div>
     </header>
   );

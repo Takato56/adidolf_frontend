@@ -41,7 +41,7 @@ export default function UserDetailPage() {
   if (!isLoaded || !user) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-text-muted">Loading...</div>
       </div>
     );
   }
@@ -58,10 +58,10 @@ export default function UserDetailPage() {
             <FiArrowLeft size={16} />
             Back to Users
           </Link>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-text-primary">
             Edit User #{user.id}
           </h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-text-muted text-sm mt-1">
             Update user information
           </p>
         </div>
@@ -74,34 +74,34 @@ export default function UserDetailPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
         <UserForm user={user} onSubmit={handleSubmit} />
       </div>
 
       {/* User Preview */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">
           User Summary
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <p className="text-gray-600 text-sm">Full Name</p>
-            <p className="text-gray-900 font-medium">{user.full_name}</p>
+            <p className="text-text-muted text-sm">Full Name</p>
+            <p className="text-text-primary font-medium">{user.full_name}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Email</p>
-            <p className="text-gray-900 font-medium">{user.email}</p>
+            <p className="text-text-muted text-sm">Email</p>
+            <p className="text-text-primary font-medium">{user.email}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Phone</p>
-            <p className="text-gray-900 font-medium">{user.phone || '—'}</p>
+            <p className="text-text-muted text-sm">Phone</p>
+            <p className="text-text-primary font-medium">{user.phone || '—'}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Role</p>
-            <p className="text-gray-900 font-medium capitalize">{user.role}</p>
+            <p className="text-text-muted text-sm">Role</p>
+            <p className="text-text-primary font-medium capitalize">{user.role}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Status</p>
+            <p className="text-text-muted text-sm">Status</p>
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
                 user.is_active
@@ -113,21 +113,21 @@ export default function UserDetailPage() {
             </span>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Created</p>
-            <p className="text-gray-900 font-medium">
+            <p className="text-text-muted text-sm">Created</p>
+            <p className="text-text-primary font-medium">
               {new Date(user.created_at).toLocaleString()}
             </p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Addresses</p>
-            <p className="text-gray-900 font-medium">
+            <p className="text-text-muted text-sm">Addresses</p>
+            <p className="text-text-primary font-medium">
               {user.addresses.length} address
               {user.addresses.length !== 1 ? 'es' : ''}
             </p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Avatar</p>
-            <p className="text-gray-900 font-medium truncate">
+            <p className="text-text-muted text-sm">Avatar</p>
+            <p className="text-text-primary font-medium truncate">
               {user.avatar_url || '—'}
             </p>
           </div>
@@ -136,29 +136,29 @@ export default function UserDetailPage() {
 
       {/* Addresses Preview */}
       {user.addresses.length > 0 && (
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
+          <h3 className="text-lg font-semibold text-text-primary mb-4">
             Addresses
           </h3>
           <div className="space-y-4">
             {user.addresses.map((addr) => (
               <div
                 key={addr.id}
-                className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                className="border border-border rounded-lg p-4 bg-surface-secondary"
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-semibold text-gray-700">
+                  <span className="text-sm font-semibold text-text-primary">
                     {addr.recipient_name}
                   </span>
-                  <span className="text-sm text-gray-500">|</span>
-                  <span className="text-sm text-gray-600">{addr.phone}</span>
+                  <span className="text-sm text-text-muted">|</span>
+                  <span className="text-sm text-text-muted">{addr.phone}</span>
                   {addr.is_default === 1 && (
                     <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
                       Default
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-muted">
                   {addr.street_detail}, {addr.ward}, {addr.district},{' '}
                   {addr.province}
                 </p>

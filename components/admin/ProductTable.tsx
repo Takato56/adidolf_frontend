@@ -12,7 +12,7 @@ interface ProductTableProps {
 export function ProductTable({ products }: ProductTableProps) {
   if (!products || products.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-text-muted">
         No products found. <Link href="/admin/products/new" className="text-blue-600 hover:underline">Add one now</Link>.
       </div>
     );
@@ -21,32 +21,32 @@ export function ProductTable({ products }: ProductTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
-        <thead className="bg-gray-100 border-b border-gray-200">
+        <thead className="bg-surface-secondary border-b border-border">
           <tr>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Product Name
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Category
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Brand
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Price
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Stock
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Published
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-border-divider">
           {products.map((product) => {
             const totalStock = Array.isArray(product.variants)
               ? product.variants.reduce((sum, v) => sum + (v.stock || 0), 0)
@@ -54,18 +54,18 @@ export function ProductTable({ products }: ProductTableProps) {
             return (
               <tr
                 key={product.id}
-                className="hover:bg-gray-50 transition-colors"
+                className="hover:bg-surface-secondary transition-colors"
               >
-                <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                <td className="px-6 py-4 text-sm text-text-primary font-medium">
                   {product.name}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
+                <td className="px-6 py-4 text-sm text-text-muted">
                   {product.categorySlug}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
+                <td className="px-6 py-4 text-sm text-text-muted">
                   {product.brand}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                <td className="px-6 py-4 text-sm text-text-primary font-medium">
                   ${product.price.toFixed(2)}
                 </td>
                 <td className="px-6 py-4 text-sm">

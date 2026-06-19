@@ -15,13 +15,13 @@ export default function ProductView() {
                     <li>
                         <Link href="/" className="hover:underline">Home</Link>
                     </li>
-                    <li className="text-gray-700 text-sm">&gt;</li>
+                    <li className="text-text-primary text-sm">&gt;</li>
                     <li> 
                         <Link href="/categories" className="hover:underline">Categories</Link> 
                     </li>       
-                    <li className="text-gray-700 text-sm">&gt;</li>
+                    <li className="text-text-primary text-sm">&gt;</li>
                     <li>
-                        <span className="text-black font-medium">Lifestyle</span>
+                        <span className="text-text-primary font-medium">Lifestyle</span>
                     </li>
                 </ul>
             </nav>
@@ -56,7 +56,7 @@ export default function ProductView() {
         </div>
         
         {isFilterOpen && (
-            <div className={`${isFilterOpen ? "block" : "hidden"} md:hidden w-full subtitle bg-white border border-gray-300 rounded-lg mt-1 p-3 h-fit`}>
+            <div className={`${isFilterOpen ? "block" : "hidden"} md:hidden w-full subtitle bg-surface-elevated border border-border-input rounded-lg mt-1 p-3 h-fit`}>
               <div className="md:grid grid-rows-1 grid grid-cols-2 justify-center gap-1">
               
               <div>
@@ -64,7 +64,7 @@ export default function ProductView() {
                 
                  <div className="flex flex-row flex-wrap gap-2">
                   {["< 500.000VND", "500.000-1.000.000VND", "1.000.000-2.000.000VND", "> 2.000.000VND"].map((item) => (
-                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-lg p-2 text-[14px] text-gray-800 bg-white has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
+                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-border-input rounded-lg p-2 text-[14px] text-text-primary bg-surface-elevated has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
                       <input type="checkbox" name="priceRange" value={item} className="hidden" />
                       <span className="text-[12px]">{item}</span>
                     </label>
@@ -78,7 +78,7 @@ export default function ProductView() {
                 <p className="text-[16px] mb-2">Category</p>
                 <div className="flex flex-row flex-wrap gap-2">
                   {["Never gonna give you up", "Never gonna let you down", "Never gonna run around and desert you", "Never gonna make you cry", "Never gonna say goodbye", "Never gonna tell a lie and hurt you"].map((item) => (
-                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-lg px-3 py-2 text-[14px] text-gray-800 bg-white has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
+                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-border-input rounded-lg px-3 py-2 text-[14px] text-text-primary bg-surface-elevated has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
                       <input type="checkbox" name="category" value={item} className="hidden" />
                       <span className="text-[12px]">{item}</span>
                     </label>
@@ -89,7 +89,7 @@ export default function ProductView() {
                 <p className="text-[16px] mb-2">Size</p>
                   <div className="flex flex-row flex-wrap gap-2">
                     {["S", "XS", "M", "L", "XL", "2XL", "3XL"].map((item) => (
-                <label key={item} className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-lg px-3 py-2 text-[14px] text-gray-800 bg-white has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
+                <label key={item} className="flex items-center gap-2 cursor-pointer border border-border-input rounded-lg px-3 py-2 text-[14px] text-text-primary bg-surface-elevated has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
                   <input type="checkbox" className="hidden" name="size" value={item} />
                   <span className="text-[12px]">{item}</span>
                 </label>
@@ -101,7 +101,7 @@ export default function ProductView() {
         )}
         <div className="rounded-lg flex flex-row">
             
-            <div className="w-5/23 bg-white border shadow-md min-w-[160px] border-gray-300 h-fit rounded-lg p-5 mt-4 transition-all hidden md:block">
+            <div className="w-5/23 bg-surface-elevated shadow-md border min-w-40 border-border-input h-fit rounded-lg p-5 mt-4 transition-all hidden md:block">
               <div className="grid grid-rows-1 justify-center gap-8">
               
               <div>
@@ -109,7 +109,7 @@ export default function ProductView() {
                 
                  <div className="flex flex-row flex-wrap gap-2">
                   {["< 500.000VND", "500.000-1.000.000VND", "1.000.000-2.000.000VND", "> 2.000.000VND"].map((item) => (
-                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-lg p-2 text-[14px] text-gray-800 bg-white has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
+                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-border-input rounded-lg p-2 text-[14px] text-text-primary bg-surface-elevated has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
                       <input type="checkbox" name="priceRange" value={item} className="hidden" />
                       <span className="font-[16px]">{item}</span>
                     </label>
@@ -123,7 +123,7 @@ export default function ProductView() {
                 <p className="text-[20px] font-bold mb-3">Category</p>
                 <div className="flex flex-row flex-wrap gap-2">
                   {["We're no strangers to love", "You know the rules and so do I", "A full commitment's what I'm thinking of", "You wouldn't get this from any other guy"," I just wanna tell you how I'm feeling", "Gotta make you understand","Never gonna give you up", "Never gonna let you down", "Never gonna run around and desert you", "Never gonna make you cry", "Never gonna say goodbye", "Never gonna tell a lie and hurt you"].map((item) => (
-                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
+                    <label key={item} className="flex items-center gap-2 cursor-pointer border border-border-input rounded-lg px-3 py-2 text-sm text-text-primary bg-surface-elevated has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
                       <input type="checkbox" className="hidden" />
                       <span className="text-[16px]">{item}</span>
                     </label>
@@ -134,7 +134,7 @@ export default function ProductView() {
                 <p className="text-[20px] font-bold mb-2">Size</p>
                   <div className="flex flex-row flex-wrap gap-2">
                     {["S", "XS", "M", "L", "XL", "2XL", "3XL"].map((item) => (
-                <label key={item} className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
+                <label key={item} className="flex items-center gap-2 cursor-pointer border border-border-input rounded-lg px-3 py-2 text-sm text-text-primary bg-surface-elevated has-[:checked]:bg-black has-[:checked]:text-white has-[:checked]:border-black select-none">
                   <input type="checkbox" className="hidden" />
                   <span className="text-[16px]">{item}</span>
                 </label>

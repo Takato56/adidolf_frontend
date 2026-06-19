@@ -15,7 +15,7 @@ function formatDate(iso: string): string {
 export function VoucherTable({ vouchers }: VoucherTableProps) {
   if (!vouchers || vouchers.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-text-muted">
         No vouchers found.{' '}
         <Link
           href="/admin/vouchers/new"
@@ -31,7 +31,7 @@ export function VoucherTable({ vouchers }: VoucherTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
-        <thead className="bg-gray-100 border-b border-gray-200">
+        <thead className="bg-surface-secondary border-b border-border">
           <tr>
             <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
               Code
@@ -57,18 +57,18 @@ export function VoucherTable({ vouchers }: VoucherTableProps) {
             <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
               Status
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-border-divider">
           {vouchers.map((voucher) => (
             <tr
               key={voucher.id}
-              className="hover:bg-gray-50 transition-colors"
+              className="hover:bg-surface-secondary transition-colors"
             >
-              <td className="px-6 py-4 text-sm text-gray-900 font-mono font-medium">
+              <td className="px-6 py-4 text-sm text-text-primary font-mono font-medium">
                 {voucher.code}
               </td>
               <td className="px-6 py-4 text-sm">
@@ -82,22 +82,22 @@ export function VoucherTable({ vouchers }: VoucherTableProps) {
                   {voucher.discount_type === 'percent' ? 'Percent' : 'Fixed'}
                 </span>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+              <td className="px-6 py-4 text-sm text-text-primary font-medium">
                 {voucher.discount_type === 'percent'
                   ? `${voucher.discount_value}%`
                   : `$${voucher.discount_value.toFixed(2)}`}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 {voucher.max_discount !== null
                   ? `$${voucher.max_discount.toFixed(2)}`
                   : '—'}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 {voucher.min_order_amount !== null
                   ? `$${voucher.min_order_amount.toFixed(2)}`
                   : '—'}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 <span className={voucher.usage_limit !== null && voucher.usage_count >= voucher.usage_limit ? 'text-red-600 font-medium' : ''}>
                   {voucher.usage_count}
                   {voucher.usage_limit !== null
@@ -105,9 +105,9 @@ export function VoucherTable({ vouchers }: VoucherTableProps) {
                     : ''}
                 </span>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 <div>{formatDate(voucher.valid_from)}</div>
-                <div className="text-gray-400">to {formatDate(voucher.valid_to)}</div>
+                <div className="text-text-muted">to {formatDate(voucher.valid_to)}</div>
               </td>
               <td className="px-6 py-4 text-sm">
                 {(() => {

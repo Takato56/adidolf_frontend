@@ -4,15 +4,17 @@ import Link from "next/link";
 import Tab from "@/components/tab";
 import UserIcon from "@/components/UserIcon";
 
-import { FaSearch, FaShoppingCart, FaUser } from "react-icons/fa";
+import { FaSearch, FaShoppingCart, FaUser, FaSun, FaMoon } from "react-icons/fa";
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
+import { useTheme } from "@/lib/ThemeContext";
 
 export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="order-1 bg-white h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-slate-100 relative">
+    <header className="order-1 bg-surface-header h-20 md:h-14 items-center grid grid-cols-2 md:grid-cols-3 px-6 border-b border-border-divider relative">
       <Link href="/" className="inline-block w-fit">
         <svg
           width="160"
@@ -72,7 +74,7 @@ export default function Navbar() {
         </svg>
       </Link>
 
-      <nav className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 gap-8 text-sm text-[#64748B] font-medium whitespace-nowrap">
+      <nav className="order-3 md:order-2 col-span-2 md:col-span-1 md:justify-self-center grid grid-cols-3 gap-8 text-sm text-text-nav font-medium whitespace-nowrap">
         <Tab label="Shop" href="/" className="justify-self-center" />
         <Tab
           label="New Arrivals"
@@ -86,16 +88,33 @@ export default function Navbar() {
           className="justify-self-center" 
           
         />
-          
+          <div className="hidden group-hover:block left-0 absolute w-full mt-5 before:content-[''] before:absolute before:bottom-full text-xl py-5 before:h-5 before:w-full bg-surface-dropdown">
+            <p className="text-sm mb-2">Discover our masterpieces</p>
+
+            <div className="px-5 md:px-60 grid grid-cols-4 gap-y-1 gap-x-2 text-center">
+              <Link href="/categories">Lifestyle</Link>
+              <Link href="/categories">Gaming</Link>
+              <Link href="/categories">Cot 1</Link>
+              <Link href="/categories">Cot 1</Link>
+              <Link href="/categories">Cot 1</Link>
+            </div>
+          </div>
         </div>
 
       </nav>
 
-      <div className="order-2 md:order-3 items-center justify-self-end flex gap-7 text-[#64748B] text-sm">
+      <div className="order-2 md:order-3 items-center justify-self-end flex gap-7 text-text-nav text-sm">
         <button className="cursor-pointer" onClick={() => setSearchOpen(true)}>
           <FaSearch />
         </button>
         <Link href="/cart"><FaShoppingCart /></Link>
+        <button
+          onClick={toggleTheme}
+          className="cursor-pointer"
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {theme === "dark" ? <FaSun /> : <FaMoon />}
+        </button>
         <UserIcon />
       </div>
 

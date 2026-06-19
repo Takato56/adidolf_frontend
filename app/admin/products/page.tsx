@@ -11,7 +11,7 @@ export default function ProductsPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading products...</div>
+        <div className="text-text-muted">Loading products...</div>
       </div>
     );
   }
@@ -32,15 +32,15 @@ export default function ProductsPage() {
       {/* Header with Actions */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-text-primary">
             Product Inventory
           </h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-text-muted text-sm mt-1">
             Manage and organize your product catalog
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2 bg-surface-elevated border border-border-input rounded-lg text-text-primary hover:bg-surface-secondary transition-colors">
             <FiDownload size={18} />
             Export
           </button>
@@ -56,20 +56,20 @@ export default function ProductsPage() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">Total Products</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">Total Products</p>
+          <p className="text-2xl font-bold text-text-primary mt-2">
             {products.length}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">Low Stock</p>
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">Low Stock</p>
           <p className="text-2xl font-bold text-orange-600 mt-2">
             {lowStockCount}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">Total Value</p>
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">Total Value</p>
           <p className="text-2xl font-bold text-green-600 mt-2">
             ${totalValue.toLocaleString()}
           </p>
@@ -77,7 +77,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border">
         <ProductTable products={products} />
       </div>
     </div>

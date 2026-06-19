@@ -11,7 +11,7 @@ interface CategoryTableProps {
 export function CategoryTable({ categories }: CategoryTableProps) {
   if (!categories || categories.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-text-muted">
         No categories found.{' '}
         <Link
           href="/admin/categories/new"
@@ -27,35 +27,35 @@ export function CategoryTable({ categories }: CategoryTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
-        <thead className="bg-gray-100 border-b border-gray-200">
+        <thead className="bg-surface-secondary border-b border-border">
           <tr>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Category Name
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Slug
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Image URL
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Description
             </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+            <th className="px-6 py-3 text-left text-sm font-semibold text-text-primary">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-border-divider">
           {categories.map((category) => (
             <tr
               key={category.id}
-              className="hover:bg-gray-50 transition-colors"
+              className="hover:bg-surface-secondary transition-colors"
             >
-              <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+              <td className="px-6 py-4 text-sm text-text-primary font-medium">
                 {category.name}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 {category.slug}
               </td>
               <td className="px-6 py-4 text-sm text-gray-600 max-w-[200px] truncate">

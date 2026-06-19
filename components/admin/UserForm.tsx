@@ -177,13 +177,13 @@ export function UserForm({
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* ---- User Details ---- */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">
           User Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Email *
             </label>
             <input
@@ -192,7 +192,7 @@ export function UserForm({
               value={formData.email}
               onChange={handleChange}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+                errors.email ? 'border-red-500' : 'border-border-input'
               }`}
               placeholder="user@example.com"
             />
@@ -203,7 +203,7 @@ export function UserForm({
 
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Full Name *
             </label>
             <input
@@ -212,7 +212,7 @@ export function UserForm({
               value={formData.full_name}
               onChange={handleChange}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.full_name ? 'border-red-500' : 'border-gray-300'
+                errors.full_name ? 'border-red-500' : 'border-border-input'
               }`}
               placeholder="John Doe"
             />
@@ -223,7 +223,7 @@ export function UserForm({
 
           {/* Phone */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Phone *
             </label>
             <input
@@ -232,7 +232,7 @@ export function UserForm({
               value={formData.phone}
               onChange={handleChange}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
+                errors.phone ? 'border-red-500' : 'border-border-input'
               }`}
               placeholder="+84 123 456 789"
             />
@@ -243,7 +243,7 @@ export function UserForm({
 
           {/* Avatar URL */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Avatar URL
             </label>
             <input
@@ -251,7 +251,7 @@ export function UserForm({
               name="avatar_url"
               value={formData.avatar_url}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
               placeholder="https://example.com/avatar.jpg"
             />
           </div>
@@ -259,7 +259,7 @@ export function UserForm({
           {/* Password (only on create) */}
           {!isEditing && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-text-primary mb-2">
                 Password *
               </label>
               <input
@@ -268,7 +268,7 @@ export function UserForm({
                 value={formData.password}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
+                  errors.password ? 'border-red-500' : 'border-border-input'
                 }`}
                 placeholder="Enter password"
               />
@@ -280,14 +280,14 @@ export function UserForm({
 
           {/* Role */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Role *
             </label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+              className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
             >
               <option value="customer">Customer</option>
               <option value="admin">Admin</option>
@@ -296,7 +296,7 @@ export function UserForm({
 
           {/* Active Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Status
             </label>
             <div className="flex items-center gap-4 pt-2">
@@ -311,16 +311,16 @@ export function UserForm({
                       is_active: e.target.checked ? 1 : 0,
                     }))
                   }
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-border-input rounded focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Active</span>
+                <span className="text-sm text-text-primary">Active</span>
               </label>
             </div>
           </div>
 
           {/* Created At */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-text-primary mb-2">
               Creation Date *
             </label>
             <input
@@ -329,7 +329,7 @@ export function UserForm({
               value={formData.created_at.slice(0, 16)}
               onChange={handleChange}
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.created_at ? 'border-red-500' : 'border-gray-300'
+                errors.created_at ? 'border-red-500' : 'border-border-input'
               }`}
             />
             {errors.created_at && (
@@ -340,9 +340,9 @@ export function UserForm({
       </div>
 
       {/* ---- Addresses ---- */}
-      <div className="border-t border-gray-200 pt-6">
+      <div className="border-t border-border pt-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-text-primary">
             Addresses ({addresses.length})
           </h3>
           <button
@@ -358,10 +358,10 @@ export function UserForm({
         {addresses.map((addr, index) => (
           <div
             key={index}
-            className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
+            className="border border-border rounded-lg p-4 mb-4 bg-gray-50"
           >
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-gray-700">
+              <h4 className="text-sm font-semibold text-text-primary">
                 Address #{index + 1}
                 {addr.is_default === 1 && (
                   <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">
@@ -370,7 +370,7 @@ export function UserForm({
                 )}
               </h4>
               <div className="flex items-center gap-3">
-                <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer">
+                <label className="flex items-center gap-1 text-xs text-text-muted cursor-pointer">
                   <input
                     type="radio"
                     name="default_address"
@@ -394,7 +394,7 @@ export function UserForm({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Recipient Name */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-text-muted mb-1">
                   Recipient Name *
                 </label>
                 <input
@@ -406,7 +406,7 @@ export function UserForm({
                   className={`w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                     errors[`addr_${index}_recipient_name`]
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-border-input'
                   }`}
                   placeholder="John Doe"
                 />
@@ -419,7 +419,7 @@ export function UserForm({
 
               {/* Phone */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-text-muted mb-1">
                   Phone *
                 </label>
                 <input
@@ -431,7 +431,7 @@ export function UserForm({
                   className={`w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                     errors[`addr_${index}_phone`]
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-border-input'
                   }`}
                   placeholder="+84 123 456 789"
                 />
@@ -444,7 +444,7 @@ export function UserForm({
 
               {/* Province */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-text-muted mb-1">
                   Province *
                 </label>
                 <input
@@ -456,7 +456,7 @@ export function UserForm({
                   className={`w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                     errors[`addr_${index}_province`]
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-border-input'
                   }`}
                   placeholder="Hồ Chí Minh"
                 />
@@ -469,7 +469,7 @@ export function UserForm({
 
               {/* District */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-text-muted mb-1">
                   District *
                 </label>
                 <input
@@ -481,7 +481,7 @@ export function UserForm({
                   className={`w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                     errors[`addr_${index}_district`]
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-border-input'
                   }`}
                   placeholder="Quận 1"
                 />
@@ -494,7 +494,7 @@ export function UserForm({
 
               {/* Ward */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-text-muted mb-1">
                   Ward *
                 </label>
                 <input
@@ -506,7 +506,7 @@ export function UserForm({
                   className={`w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                     errors[`addr_${index}_ward`]
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-border-input'
                   }`}
                   placeholder="Bến Nghé"
                 />
@@ -519,7 +519,7 @@ export function UserForm({
 
               {/* Street Detail */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
+                <label className="block text-xs font-medium text-text-muted mb-1">
                   Street Detail *
                 </label>
                 <input
@@ -531,7 +531,7 @@ export function UserForm({
                   className={`w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
                     errors[`addr_${index}_street_detail`]
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-border-input'
                   }`}
                   placeholder="123 Nguyễn Huệ"
                 />
@@ -547,7 +547,7 @@ export function UserForm({
       </div>
 
       {/* ---- Form Actions ---- */}
-      <div className="flex gap-4 pt-6 border-t border-gray-200">
+      <div className="flex gap-4 pt-6 border-t border-border">
         <button
           type="submit"
           disabled={isLoading}
@@ -562,7 +562,7 @@ export function UserForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+          className="px-6 py-2 bg-surface-secondary text-text-primary rounded-lg hover:bg-surface-dropdown transition font-medium"
         >
           Cancel
         </button>

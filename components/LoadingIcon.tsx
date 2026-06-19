@@ -30,13 +30,13 @@ export default function LoadingIcon({
       <AiOutlineLoading3Quarters
         className={`${sizeMap[size]} animate-spin text-blue-500`}
       />
-      {message && <p className="text-sm text-gray-600">{message}</p>}
+      {message && <p className="text-sm text-text-muted">{message}</p>}
     </div>
   );
 
   if (fullPage) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-surface-elevated bg-opacity-50 z-50">
         {spinner}
       </div>
     );

@@ -85,7 +85,7 @@ export function CategoryForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Category Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-text-primary mb-2">
           Category Name *
         </label>
         <input
@@ -93,8 +93,8 @@ export function CategoryForm({
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-            errors.name ? 'border-red-500' : 'border-gray-300'
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-surface-input text-text-primary ${
+            errors.name ? 'border-red-500' : 'border-border-input'
           }`}
           placeholder="Enter category name"
         />
@@ -105,7 +105,7 @@ export function CategoryForm({
 
       {/* Slug */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-text-primary mb-2">
           Slug *
         </label>
         <div className="flex gap-2">
@@ -114,15 +114,15 @@ export function CategoryForm({
             name="slug"
             value={formData.slug}
             onChange={handleChange}
-            className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.slug ? 'border-red-500' : 'border-gray-300'
+            className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-surface-input text-text-primary ${
+              errors.slug ? 'border-red-500' : 'border-border-input'
             }`}
             placeholder="e.g., menswear"
           />
           <button
             type="button"
             onClick={generateSlug}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium"
+            className="px-4 py-2 bg-surface-secondary text-text-primary rounded-lg hover:bg-surface-dropdown transition text-sm font-medium"
           >
             Generate
           </button>
@@ -134,7 +134,7 @@ export function CategoryForm({
 
       {/* Image URL */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-text-primary mb-2">
           Image URL
         </label>
         <input
@@ -142,14 +142,14 @@ export function CategoryForm({
           name="imageUrl"
           value={formData.imageUrl}
           onChange={handleChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+          className="w-full px-4 py-2 border border-border-input rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-surface-input text-text-primary"
           placeholder="https://example.com/image.jpg"
         />
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-text-primary mb-2">
           Description *
         </label>
         <textarea
@@ -157,8 +157,8 @@ export function CategoryForm({
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-            errors.description ? 'border-red-500' : 'border-gray-300'
+          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-surface-input text-text-primary ${
+            errors.description ? 'border-red-500' : 'border-border-input'
           }`}
           placeholder="Describe the category..."
         />
@@ -168,11 +168,11 @@ export function CategoryForm({
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-4 pt-6 border-t border-gray-200">
+      <div className="flex gap-4 pt-6 border-t border-border">
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-text-muted disabled:cursor-not-allowed font-medium"
         >
           {isLoading
             ? 'Saving...'
@@ -183,7 +183,7 @@ export function CategoryForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+          className="px-6 py-2 bg-surface-secondary text-text-primary rounded-lg hover:bg-surface-dropdown transition font-medium"
         >
           Cancel
         </button>

@@ -19,20 +19,20 @@ export default function ProductCard({
 }: ProductCardProps) {
   return (
     <Link href={shopLink}>
-    <div className="aspect-80/140  md:h-110 h-70 text-white text-center overflow-hidden font-sansborder-gray-300 border shadow-md rounded-xl shrink-0 ">
-      <div className="md:h-3/4 h-28/40 bg-gray-100 overflow-hidden">
+    <div className="aspect-4/7 md:h-110 h-70 text-text-primary text-center overflow-hidden font-sans border-border-strong border shadow-md rounded-xl shrink-0 ">
+      <div className="md:h-3/4 h-7/10 bg-surface-secondary overflow-hidden">
         <img
           src={image}
           alt={alt}
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="md:h-1/4 h-12/40 w-full px-2 md:px-4 flex flex-col justify-between bg-white text-black">
+      <div className="md:h-1/4 h-3/10 w-full px-2 md:px-4 flex flex-col justify-between bg-surface-card text-text-primary">
         <div>
-          <p className="text-xs pt-1 md:pt-3 text-[11px] md:text-[13px] text-gray-400 text-left">
+          <p className="text-xs pt-1 md:pt-3 text-[11px] md:text-[13px] text-text-muted text-left">
             {category}
           </p>
-          <p className="text-left font-semibold pt-1 text-[15px] md:text-[17px] text-gray-800 line-clamp-1 truncate block w-full">
+          <p className="text-left font-semibold pt-1 text-[15px] md:text-[17px] text-text-secondary line-clamp-1 truncate block w-full">
             {name}
           </p>
         

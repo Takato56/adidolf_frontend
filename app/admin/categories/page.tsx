@@ -11,7 +11,7 @@ export default function CategoriesPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading categories...</div>
+        <div className="text-text-muted">Loading categories...</div>
       </div>
     );
   }
@@ -21,8 +21,8 @@ export default function CategoriesPage() {
       {/* Header with Actions */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Categories</h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-text-primary">Categories</h2>
+          <p className="text-text-muted text-sm mt-1">
             Manage product categories
           </p>
         </div>
@@ -39,16 +39,16 @@ export default function CategoriesPage() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">
             Total Categories
           </p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">
+          <p className="text-2xl font-bold text-text-primary mt-2">
             {categories.length}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">
             Categories With Images
           </p>
           <p className="text-2xl font-bold text-blue-600 mt-2">
@@ -58,7 +58,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories Table */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border">
         <CategoryTable categories={categories} />
       </div>
     </div>

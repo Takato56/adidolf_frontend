@@ -41,7 +41,7 @@ export default function ProductDetailPage() {
   if (!isLoaded || !product) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-text-muted">Loading...</div>
       </div>
     );
   }
@@ -50,8 +50,8 @@ export default function ProductDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Edit Product</h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-text-primary">Edit Product</h2>
+          <p className="text-text-muted text-sm mt-1">
             Update product information
           </p>
         </div>
@@ -64,45 +64,45 @@ export default function ProductDetailPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
         <ProductForm product={product} onSubmit={handleSubmit} />
       </div>
 
       {/* Product Preview */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Preview</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <p className="text-gray-600 text-sm">Product Name</p>
-            <p className="text-gray-900 font-medium">{product.name}</p>
+            <p className="text-text-muted text-sm">Product Name</p>
+            <p className="text-text-primary font-medium">{product.name}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Category</p>
-            <p className="text-gray-900 font-medium capitalize">
+            <p className="text-text-muted text-sm">Category</p>
+            <p className="text-text-primary font-medium capitalize">
               {product.categorySlug}
             </p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Slug</p>
-            <p className="text-gray-900 font-medium">{product.slug}</p>
+            <p className="text-text-muted text-sm">Slug</p>
+            <p className="text-text-primary font-medium">{product.slug}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Price</p>
-            <p className="text-gray-900 font-medium">
+            <p className="text-text-muted text-sm">Price</p>
+            <p className="text-text-primary font-medium">
               ${product.price.toFixed(2)}
             </p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Brand</p>
-            <p className="text-gray-900 font-medium">{product.brand}</p>
+            <p className="text-text-muted text-sm">Brand</p>
+            <p className="text-text-primary font-medium">{product.brand}</p>
           </div>
           <div>
-            <p className="text-gray-600 text-sm">Published</p>
+            <p className="text-text-muted text-sm">Published</p>
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
                 product.isPublished
                   ? 'bg-green-100 text-green-800'
-                  : 'bg-gray-100 text-gray-600'
+                  : 'bg-surface-secondary text-text-muted'
               }`}
             >
               {product.isPublished ? 'Yes' : 'No'}
@@ -111,24 +111,24 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="mt-6">
-          <p className="text-gray-600 text-sm">Description</p>
-          <p className="text-gray-900 font-medium mt-1">
+          <p className="text-text-muted text-sm">Description</p>
+          <p className="text-text-primary font-medium mt-1">
             {product.description || '—'}
           </p>
         </div>
 
         <div className="mt-6">
-          <p className="text-gray-600 text-sm mb-2">
+          <p className="text-text-muted text-sm mb-2">
             Variants ({product.variants?.length || 0})
           </p>
           <div className="space-y-2">
             {(product.variants || []).map((v, i) => (
               <div
                 key={v.id || i}
-                className="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center justify-between px-4 py-2 bg-surface-secondary rounded-lg border border-border"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-gray-900 font-medium text-sm">
+                  <span className="text-text-primary font-medium text-sm">
                     {[v.color, v.size].filter(Boolean).join(' / ') || 'Default'}
                   </span>
                   {v.extra_price > 0 && (
@@ -161,14 +161,14 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="mt-6">
-          <p className="text-gray-600 text-sm mb-2">
+          <p className="text-text-muted text-sm mb-2">
             Images ({product.images?.length || 0})
           </p>
           <div className="flex flex-wrap gap-3">
             {(product.images || []).map((img, i) => (
               <div
                 key={i}
-                className="w-20 h-20 rounded-lg border border-gray-200 bg-gray-50 overflow-hidden flex items-center justify-center"
+                className="w-20 h-20 rounded-lg border border-border bg-surface-secondary overflow-hidden flex items-center justify-center"
               >
                 {img ? (
                   <img
@@ -177,7 +177,7 @@ export default function ProductDetailPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-xs text-gray-400">No image</span>
+                  <span className="text-xs text-text-muted">No image</span>
                 )}
               </div>
             ))}

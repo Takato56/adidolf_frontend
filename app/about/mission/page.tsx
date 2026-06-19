@@ -24,39 +24,39 @@ export default function MissionStatement() {
         <p className="text-xs uppercase tracking-widest text-blue-500 font-semibold mb-2">
           About
         </p>
-        <h1 className="text-3xl font-bold text-gray-900">Our Mission Statement</h1>
-        <p className="text-gray-500 text-sm mt-2">
+        <h1 className="text-3xl font-bold text-text-primary">Our Mission Statement</h1>
+        <p className="text-text-muted text-sm mt-2">
           What we're here to do.
         </p>
       </div>
 
       {/* The statement */}
       <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl p-6 mb-10">
-        <p className="text-gray-800 text-base leading-relaxed italic">
+        <p className="text-text-secondary text-base leading-relaxed italic">
           "To provide fashion that means something — to people who want to mean
           something — at a price point that reflects the craft behind what
           we make."
         </p>
-        <p className="text-xs text-gray-400 mt-3">— Adidolf, est. 2019</p>
+        <p className="text-xs text-text-muted mt-3">— Adidolf, est. 2019</p>
       </div>
 
       {/* Values */}
-      <h2 className="text-lg font-semibold text-gray-900 mb-5">Our Values</h2>
+      <h2 className="text-lg font-semibold text-text-primary mb-5">Our Values</h2>
       <div className="space-y-1">
         {values.map(({ title, body }) => (
           <div
             key={title}
-            className="border-b border-gray-100 last:border-0 py-4"
+            className="border-b border-border-divider last:border-0 py-4"
           >
-            <p className="font-semibold text-gray-900 text-sm mb-1">{title}</p>
-            <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+            <p className="font-semibold text-text-primary text-sm mb-1">{title}</p>
+            <p className="text-sm text-text-muted leading-relaxed">{body}</p>
           </div>
         ))}
       </div>
 
       {/* Closing */}
       <div className="mt-10 text-center">
-        <p className="text-sm text-gray-400 leading-relaxed">
+        <p className="text-sm text-text-muted leading-relaxed">
           Adidolf is headquartered in Hanoi, Vietnam. We ship worldwide
           and are committed to growing a brand that our customers are proud to wear.
         </p>

@@ -11,7 +11,7 @@ export default function UsersPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading users...</div>
+        <div className="text-text-muted">Loading users...</div>
       </div>
     );
   }
@@ -21,8 +21,8 @@ export default function UsersPage() {
       {/* Header with Actions */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Users</h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <h2 className="text-2xl font-bold text-text-primary">Users</h2>
+          <p className="text-text-muted text-sm mt-1">
             Manage and view registered users
           </p>
         </div>
@@ -39,20 +39,20 @@ export default function UsersPage() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">Total Users</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">Total Users</p>
+          <p className="text-2xl font-bold text-text-primary mt-2">
             {users.length}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">Active Users</p>
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">Active Users</p>
           <p className="text-2xl font-bold text-green-600 mt-2">
             {users.filter((u) => u.is_active).length}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
-          <p className="text-gray-600 text-sm font-medium">Admin Users</p>
+        <div className="bg-surface-elevated rounded-lg shadow-md p-4 border border-border">
+          <p className="text-text-muted text-sm font-medium">Admin Users</p>
           <p className="text-2xl font-bold text-purple-600 mt-2">
             {users.filter((u) => u.role === 'admin').length}
           </p>
@@ -60,7 +60,7 @@ export default function UsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border">
         <UserTable users={users} />
       </div>
     </div>

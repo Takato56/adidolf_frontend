@@ -11,7 +11,7 @@ interface UserTableProps {
 export function UserTable({ users }: UserTableProps) {
   if (!users || users.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-text-muted">
         No users found.{' '}
         <Link
           href="/admin/users/new"
@@ -27,7 +27,7 @@ export function UserTable({ users }: UserTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
-        <thead className="bg-gray-100 border-b border-gray-200">
+        <thead className="bg-surface-secondary border-b border-border">
           <tr>
             <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
               ID
@@ -58,22 +58,22 @@ export function UserTable({ users }: UserTableProps) {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-border-divider">
           {users.map((user) => (
             <tr
               key={user.id}
-              className="hover:bg-gray-50 transition-colors"
+              className="hover:bg-surface-secondary transition-colors"
             >
-              <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+              <td className="px-6 py-4 text-sm text-text-primary font-medium">
                 #{user.id}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+              <td className="px-6 py-4 text-sm text-text-primary font-medium">
                 {user.full_name}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 {user.email}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 {user.phone || '—'}
               </td>
               <td className="px-6 py-4 text-sm">
@@ -98,11 +98,11 @@ export function UserTable({ users }: UserTableProps) {
                   {user.is_active ? 'Active' : 'Inactive'}
                 </span>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 {user.addresses.length} address
                 {user.addresses.length !== 1 ? 'es' : ''}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
+              <td className="px-6 py-4 text-sm text-text-muted">
                 {new Date(user.created_at).toLocaleDateString()}
               </td>
               <td className="px-6 py-4 text-sm">

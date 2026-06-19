@@ -60,13 +60,13 @@ export default function CartPage() {
   const freeShippingLeft = SHIPPING_THRESHOLD - subtotal;
 
   return (
-    <div className="min-h-screen bg-[#fbfdff]">
+    <div className="min-h-screen bg-surface">
       {/* ── Page header ── */}
-      <div className="border-b border-slate-100 px-4 md:px-20 py-6 flex items-center justify-between">
+      <div className="border-b border-border-divider px-4 md:px-20 py-6 flex items-center justify-between">
         <h1 className="text-2xl md:text-3xl font-extrabold">Your Cart</h1>
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm text-slate-400 hover:text-black transition-colors"
+          className="flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors"
         >
           <FaArrowLeft className="text-xs" />
           Continue shopping
@@ -81,15 +81,15 @@ export default function CartPage() {
           <div className="space-y-4">
             {/* Free shipping progress */}
             {freeShippingLeft > 0 && (
-              <div className="bg-slate-50 rounded-lg px-4 py-3 text-sm text-slate-600">
+              <div className="bg-surface-secondary rounded-lg px-4 py-3 text-sm text-text-muted">
                 Spend{" "}
-                <span className="font-semibold text-black">
+                <span className="font-semibold text-text-primary">
                   ${freeShippingLeft.toFixed(2)}
                 </span>{" "}
                 more for free shipping.
-                <div className="mt-2 h-1 bg-slate-200 rounded-full overflow-hidden">
+                <div className="mt-2 h-1 bg-border rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-black rounded-full transition-all duration-300"
+                    className="h-full bg-text-primary rounded-full transition-all duration-300"
                     style={{
                       width: `${Math.min(
                         100,
@@ -118,21 +118,21 @@ export default function CartPage() {
           </div>
 
           {/* ── Order summary ── */}
-          <div className="bg-white border border-slate-100 rounded-xl p-6 space-y-4 sticky top-4">
-            <h2 className="text-lg font-extrabold">Order Summary</h2>
+          <div className="bg-surface-card border border-border rounded-xl p-6 space-y-4 sticky top-4">
+            <h2 className="text-lg font-extrabold text-text-primary">Order Summary</h2>
 
-            <div className="space-y-2 text-sm text-slate-600">
+            <div className="space-y-2 text-sm text-text-muted">
               <div className="flex justify-between">
                 <span>
                   Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)
                 </span>
-                <span className="font-medium text-black">
+                <span className="font-medium text-text-primary">
                   ${subtotal.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-medium text-black">
+                <span className="font-medium text-text-primary">
                   {shipping === 0 ? (
                     <span className="text-green-600">Free</span>
                   ) : (
@@ -142,19 +142,19 @@ export default function CartPage() {
               </div>
             </div>
 
-            <div className="border-t border-slate-100 pt-4 flex justify-between font-extrabold text-base">
+            <div className="border-t border-border-divider pt-4 flex justify-between font-extrabold text-base text-text-primary">
               <span>Total</span>
               <span>${total.toFixed(2)}</span>
             </div>
 
             <Link
               href="/checkout"
-              className="block w-full bg-black text-white text-sm font-semibold text-center py-3 rounded-lg hover:bg-neutral-800 transition-colors"
+              className="block w-full bg-text-primary text-surface-header text-sm font-semibold text-center py-3 rounded-lg hover:bg-text-secondary transition-colors"
             >
               Proceed to Checkout
             </Link>
 
-            <p className="text-xs text-slate-400 text-center">
+            <p className="text-xs text-text-muted text-center">
               Taxes calculated at checkout
             </p>
           </div>
@@ -176,7 +176,7 @@ function CartRow({
   onRemove: (id: number) => void;
 }) {
   return (
-    <div className="flex gap-4 bg-white border border-slate-100 rounded-xl p-4 hover:shadow-sm transition-shadow">
+    <div className="flex gap-4 bg-surface-card border border-border rounded-xl p-4 hover:shadow-sm transition-shadow">
       {/* Image placeholder */}
       <div
         className="w-24 h-24 rounded-lg flex-shrink-0"
@@ -187,31 +187,31 @@ function CartRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="font-semibold text-sm text-black leading-tight">
+            <p className="font-semibold text-sm text-text-primary leading-tight">
               {item.name}
             </p>
-            <p className="text-xs text-slate-400 mt-0.5">{item.category}</p>
+            <p className="text-xs text-text-muted mt-0.5">{item.category}</p>
           </div>
-          <p className="font-extrabold text-sm whitespace-nowrap">
+          <p className="font-extrabold text-sm text-text-primary whitespace-nowrap">
             ${(item.price * item.quantity).toFixed(2)}
           </p>
         </div>
 
         <div className="flex items-center gap-2 mt-2">
-          <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+          <span className="text-xs bg-surface-secondary text-text-muted px-2 py-0.5 rounded">
             {item.size}
           </span>
-          <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+          <span className="text-xs bg-surface-secondary text-text-muted px-2 py-0.5 rounded">
             {item.color}
           </span>
         </div>
 
         <div className="flex items-center justify-between mt-3">
           {/* Quantity */}
-          <div className="flex items-center gap-2 border border-slate-200 rounded-lg px-2 py-1">
+          <div className="flex items-center gap-2 border border-border rounded-lg px-2 py-1">
             <button
               onClick={() => onUpdateQty(item.id, -1)}
-              className="text-slate-400 hover:text-black transition-colors p-0.5"
+              className="text-text-muted hover:text-text-primary transition-colors p-0.5"
             >
               <FaMinus className="text-[10px]" />
             </button>
@@ -220,7 +220,7 @@ function CartRow({
             </span>
             <button
               onClick={() => onUpdateQty(item.id, 1)}
-              className="text-slate-400 hover:text-black transition-colors p-0.5"
+              className="text-text-muted hover:text-text-primary transition-colors p-0.5"
             >
               <FaPlus className="text-[10px]" />
             </button>
@@ -229,7 +229,7 @@ function CartRow({
           {/* Remove */}
           <button
             onClick={() => onRemove(item.id)}
-            className="text-slate-300 hover:text-red-400 transition-colors text-xs flex items-center gap-1.5"
+            className="text-text-muted hover:text-red-400 transition-colors text-xs flex items-center gap-1.5"
           >
             <FaTrash />
             Remove
@@ -245,9 +245,9 @@ function CartRow({
 function EmptyCart() {
   return (
     <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-      <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-5">
+      <div className="w-16 h-16 rounded-full bg-surface-secondary flex items-center justify-center mb-5">
         <svg
-          className="w-7 h-7 text-slate-300"
+          className="w-7 h-7 text-text-muted"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -261,7 +261,7 @@ function EmptyCart() {
         </svg>
       </div>
       <h2 className="text-xl font-extrabold mb-2">Your cart is empty</h2>
-      <p className="text-sm text-slate-400 mb-6">
+      <p className="text-sm text-text-muted mb-6">
         Looks like you haven't added anything yet.
       </p>
       <Link

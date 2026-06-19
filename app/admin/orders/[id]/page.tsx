@@ -98,7 +98,7 @@ export default function OrderDetailPage() {
   if (!isLoaded || !order) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-text-muted">Loading...</div>
       </div>
     );
   }
@@ -107,10 +107,10 @@ export default function OrderDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-text-primary">
             Edit Order #{order.id}
           </h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-text-muted text-sm mt-1">
             Update order information
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="flex gap-0 -mb-px">
           {TABS.map((tab) => (
             <button
@@ -133,7 +133,7 @@ export default function OrderDetailPage() {
               className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.key
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-text-muted hover:text-text-primary hover:border-border-input'
               }`}
             >
               {tab.label}
@@ -143,7 +143,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className="bg-surface-elevated rounded-lg shadow-md border border-border p-6">
         {activeTab === 'details' && (
           <OrderForm order={order} onSubmit={handleOrderSubmit} />
         )}

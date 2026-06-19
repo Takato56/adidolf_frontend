@@ -1,8 +1,96 @@
 @import "tailwindcss";
 
-body {
-    background-color: #fbfdff;
+/* ── Theme tokens ── */
+@theme {
+  --color-surface: var(--surface);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-card: var(--surface-card);
+  --color-surface-header: var(--surface-header);
+  --color-surface-footer: var(--surface-footer);
+  --color-surface-dropdown: var(--surface-dropdown);
+  --color-surface-input: var(--surface-input);
+  --color-surface-accent: var(--surface-accent);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
+  --color-text-accent: var(--text-accent);
+  --color-text-nav: var(--text-nav);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-input: var(--border-input);
+  --color-border-divider: var(--border-divider);
 }
+
+/* ── Light theme (default) ── */
+:root {
+  --surface: #fbfdff;
+  --surface-secondary: #f8f9ff;
+  --surface-elevated: #ffffff;
+  --surface-card: #ffffff;
+  --surface-header: #ffffff;
+  --surface-footer: #111827;
+  --surface-dropdown: #eceff2;
+  --surface-input: #ffffff;
+  --surface-accent: #e6f2ff;
+
+  --text-primary: #0f172a;
+  --text-secondary: #374151;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+  --text-accent: #2563eb;
+  --text-nav: #64748b;
+
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-input: #d1d5db;
+  --border-divider: #f1f5f9;
+}
+
+/* ── Dark theme ── */
+.dark {
+  --surface: #0f172a;
+  --surface-secondary: #1e293b;
+  --surface-elevated: #1e293b;
+  --surface-card: #1e293b;
+  --surface-header: #0f172a;
+  --surface-footer: #020617;
+  --surface-dropdown: #1e293b;
+  --surface-input: #1e293b;
+  --surface-accent: #1e3a5f;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
+  --text-accent: #60a5fa;
+  --text-nav: #94a3b8;
+
+  --border: #334155;
+  --border-strong: #475569;
+  --border-input: #475569;
+  --border-divider: #1e293b;
+}
+
+/* ── Smooth theme transition ── */
+@media (prefers-reduced-motion: no-preference) {
+  *,
+  *::before,
+  *::after {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+}
+
+/* ── Base ── */
+body {
+    background-color: var(--surface);
+    color: var(--text-primary);
+}
+
+/* ── Utility classes ── */
 .margindiv {
     @apply mx-4 md:mx-20;
 }
@@ -11,13 +99,13 @@ body {
     @apply text-2xl md:text-3xl font-extrabold
 }
 .breadcumb {
-    @apply flex items-center space-x-2 text-sm font-sans text-black
+    @apply flex items-center space-x-2 text-sm font-sans text-text-primary
 }
 .checkoutbreadcumb {
-    @apply flex justify-center items-center space-x-2 text-[20px] md:text-[30px] font-sans text-black font-bold
+    @apply flex justify-center items-center space-x-2 text-[20px] md:text-[30px] font-sans text-text-primary font-bold
 }
 .subtitle{
-    @apply text-[14px] md:text-[18px] text-black font-sans font-medium
+    @apply text-[14px] md:text-[18px] text-text-primary font-sans font-medium
 }
 .mainmargindiv {
     @apply mx-6 md:mx-12;

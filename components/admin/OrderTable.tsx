@@ -32,7 +32,7 @@ interface OrderTableProps {
 export function OrderTable({ orders }: OrderTableProps) {
   if (!orders || orders.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-text-muted">
         No orders found.{' '}
         <Link
           href="/admin/orders/new"
@@ -48,7 +48,7 @@ export function OrderTable({ orders }: OrderTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
-        <thead className="bg-gray-100 border-b border-gray-200">
+        <thead className="bg-surface-secondary border-b border-border">
           <tr>
             <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
               Order ID
@@ -79,13 +79,13 @@ export function OrderTable({ orders }: OrderTableProps) {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-border-divider">
           {orders.map((order) => (
             <tr
               key={order.id}
-              className="hover:bg-gray-50 transition-colors"
+              className="hover:bg-surface-secondary transition-colors"
             >
-              <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+              <td className="px-6 py-4 text-sm text-text-primary font-medium">
                 #{order.id}
               </td>
               <td className="px-6 py-4 text-sm text-gray-600">
@@ -112,7 +112,7 @@ export function OrderTable({ orders }: OrderTableProps) {
                       : order.shipment.status.charAt(0).toUpperCase() + order.shipment.status.slice(1)}
                   </span>
                 ) : (
-                  <span className="text-gray-400">—</span>
+                  <span className="text-text-muted">—</span>
                 )}
               </td>
               <td className="px-6 py-4 text-sm">
@@ -125,7 +125,7 @@ export function OrderTable({ orders }: OrderTableProps) {
                     {order.payment.status.charAt(0).toUpperCase() + order.payment.status.slice(1)}
                   </span>
                 ) : (
-                  <span className="text-gray-400">—</span>
+                  <span className="text-text-muted">—</span>
                 )}
               </td>
               <td className="px-6 py-4 text-sm text-gray-600">

@@ -125,7 +125,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-sm text-gray-400">Loading your profile...</p>
+        <p className="text-sm text-text-muted">Loading your profile...</p>
       </div>
     );
   }
@@ -144,9 +144,9 @@ export default function ProfilePage() {
                 Home
               </Link>
             </li>
-            <li className="text-gray-700 text-sm">&gt;</li>
+            <li className="text-text-primary text-sm">&gt;</li>
             <li>
-              <span className="text-black font-medium">Profile</span>
+              <span className="text-text-primary font-medium">Profile</span>
             </li>
           </ul>
         </nav>
@@ -160,8 +160,8 @@ export default function ProfilePage() {
       </div>
 
       <div className="margindiv mt-6 mb-10">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 max-w-2xl p-6 md:p-8">
-          <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
+        <div className="bg-surface-elevated rounded-lg shadow-sm border border-border-divider max-w-2xl p-6 md:p-8">
+          <div className="flex items-center gap-4 pb-6 border-b border-border-divider">
             <div className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">
               <FaUser size={20} />
             </div>
@@ -169,7 +169,7 @@ export default function ProfilePage() {
               <p className="font-bold text-lg truncate">{profile.full_name}</p>
               <div className="flex items-center gap-2 mt-1">
                 {profile.email && (
-                  <p className="text-sm text-gray-500 truncate">{profile.email}</p>
+                  <p className="text-sm text-text-muted truncate">{profile.email}</p>
                 )}
                 {isAdmin && (
                   <span className="text-xs bg-black text-white font-medium px-2 py-0.5 rounded-full">
@@ -187,11 +187,11 @@ export default function ProfilePage() {
           {!editing ? (
             <div className="mt-6 space-y-4">
               <div>
-                <p className="text-xs text-gray-400">Full name</p>
+                <p className="text-xs text-text-muted">Full name</p>
                 <p className="text-sm font-medium mt-0.5">{profile.full_name}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-400">Phone number</p>
+                <p className="text-xs text-text-muted">Phone number</p>
                 <p className="text-sm font-medium mt-0.5">
                   {profile.phone || "—"}
                 </p>
@@ -215,7 +215,7 @@ export default function ProfilePage() {
           ) : (
             <form onSubmit={handleSave} className="mt-6 space-y-4">
               <div>
-                <label className="text-xs text-gray-400" htmlFor="full_name">
+                <label className="text-xs text-text-muted" htmlFor="full_name">
                   Full name
                 </label>
                 <input
@@ -226,12 +226,12 @@ export default function ProfilePage() {
                   pattern="^[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ\s'\-]*$"
                   title="Name can only contain letters, spaces, hyphens, and apostrophes."
                   required
-                  className="border-2 p-3 mt-1 border-gray-300 rounded-md outline-none w-full"
+                  className="border-2 p-3 mt-1 border-border-input rounded-md outline-none w-full"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-gray-400" htmlFor="phone">
+                <label className="text-xs text-text-muted" htmlFor="phone">
                   Phone number
                 </label>
                 <input
@@ -241,7 +241,7 @@ export default function ProfilePage() {
                   onChange={(e) => setPhone(e.target.value)}
                   pattern="[0-9\-+\s()]*"
                   title="Please enter a valid phone number (minimum 10 digits). You can include spaces, hyphens, and a leading + for country codes."
-                  className="border-2 p-3 mt-1 border-gray-300 rounded-md outline-none w-full"
+                  className="border-2 p-3 mt-1 border-border-input rounded-md outline-none w-full"
                 />
               </div>
 
@@ -257,7 +257,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={handleCancelEdit}
                   disabled={saving}
-                  className="text-gray-500 px-5 py-2.5 rounded-md font-bold text-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="text-text-muted px-5 py-2.5 rounded-md font-bold text-sm cursor-pointer hover:bg-surface-secondary transition-colors"
                 >
                   Cancel
                 </button>

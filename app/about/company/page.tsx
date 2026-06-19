@@ -32,14 +32,14 @@ export default function Company() {
         <p className="text-xs uppercase tracking-widest text-blue-500 font-semibold mb-2">
           About
         </p>
-        <h1 className="text-3xl font-bold text-gray-900">Company</h1>
-        <p className="text-gray-500 text-sm mt-2">
+        <h1 className="text-3xl font-bold text-text-primary">Company</h1>
+        <p className="text-text-muted text-sm mt-2">
           Who we are and where we came from.
         </p>
       </div>
 
       {/* Who we are */}
-      <div className="mb-10 space-y-4 text-gray-600 text-sm leading-relaxed">
+      <div className="mb-10 space-y-4 text-text-muted text-sm leading-relaxed">
         <p>
           Adidolf is a fashion-forward e-commerce platform built on the premise
           that clothing can carry a message — and that the message doesn't
@@ -66,29 +66,29 @@ export default function Company() {
         ].map(({ stat, label }) => (
           <div
             key={label}
-            className="text-center border border-gray-100 rounded-xl py-5 px-3 bg-white hover:shadow-sm transition-shadow"
+            className="text-center border border-border-divider rounded-xl py-5 px-3 bg-white hover:shadow-sm transition-shadow"
           >
-            <p className="text-2xl font-bold text-gray-900">{stat}</p>
-            <p className="text-xs text-gray-400 mt-1">{label}</p>
+            <p className="text-2xl font-bold text-text-primary">{stat}</p>
+            <p className="text-xs text-text-muted mt-1">{label}</p>
           </div>
         ))}
       </div>
 
       {/* Timeline */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">History</h2>
+        <h2 className="text-lg font-semibold text-text-primary mb-6">History</h2>
         <div className="space-y-0">
           {milestones.map(({ year, event }, i) => (
             <div key={year} className="flex gap-5">
               <div className="flex flex-col items-center">
                 <div className="w-2.5 h-2.5 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
                 {i < milestones.length - 1 && (
-                  <div className="w-px flex-1 bg-gray-100 my-1" />
+                  <div className="w-px flex-1 bg-surface-secondary my-1" />
                 )}
               </div>
               <div className="pb-6">
                 <p className="text-xs font-semibold text-blue-500 mb-1">{year}</p>
-                <p className="text-sm text-gray-600 leading-relaxed">{event}</p>
+                <p className="text-sm text-text-muted leading-relaxed">{event}</p>
               </div>
             </div>
           ))}
