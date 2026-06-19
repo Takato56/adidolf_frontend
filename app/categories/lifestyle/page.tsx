@@ -99,9 +99,9 @@ export default function ProductView() {
         </div>
       </div>
         )}
-        <div className="rounded-lg flex justify-between">
+        <div className="rounded-lg flex flex-row">
             
-            <div className="w-2/4 bg-white border min-w-[175px] border-gray-300 h-fit rounded-lg p-5 mt-4 transition-all hidden md:block">
+            <div className="w-5/23 bg-white border shadow-md min-w-[160px] border-gray-300 h-fit rounded-lg p-5 mt-4 transition-all hidden md:block">
               <div className="grid grid-rows-1 justify-center gap-8">
               
               <div>
@@ -148,7 +148,7 @@ export default function ProductView() {
       </div>
           
             <div className="mt-4 md:ml-6">
-              <div className="gap-2 md:gap-3.5 grid grid-cols-2  w-full md:grid md:grid-cols-4">
+              <div className="gap-3.5 md:gap-4 grid grid-cols-2  w-full md:grid md:grid-cols-4">
                 
                 <ProductCard
                   image="https://aceracegear.com/wp-content/uploads/2025/04/m-ln-2025-1.jpg"

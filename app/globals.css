@@ -4,7 +4,7 @@ body {
     background-color: #fbfdff;
 }
 .margindiv {
-    @apply mx-3.5 md:mx-20;
+    @apply mx-4 md:mx-20;
 }
 
 .texttitle {
@@ -14,7 +14,7 @@ body {
     @apply flex items-center space-x-2 text-sm font-sans text-black
 }
 .checkoutbreadcumb {
-    @apply flex justify-center items-center space-x-2 text-[30px] font-sans text-black font-bold
+    @apply flex justify-center items-center space-x-2 text-[20px] md:text-[30px] font-sans text-black font-bold
 }
 .subtitle{
     @apply text-[14px] md:text-[18px] text-black font-sans font-medium

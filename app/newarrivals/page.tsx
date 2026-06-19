@@ -5,7 +5,7 @@ export default function NewArrivals() {
   return (
     <div>
       <div className="margindiv mt-3">
-        <nav>
+        <nav className="hidden md:block">
           <ul className="breadcumb">
             <li>
               <Link href="/" className="hover:font-bold hover:underline">

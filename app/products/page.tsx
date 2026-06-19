@@ -58,8 +58,8 @@ const handleTouchMove = (e: React.TouchEvent) => {
       </div>
 
       <div className="mainmarginproduct md:flex mt-10">
-        <div className="w-full flex flex-col md:flex-row gap-4 items-start">
-          
+        <div className="w-full flex flex-col md:flex-row justify-start">
+          <div className="flex flex-row gap-4">
           <div 
             className="w-full md:w-3/5 aspect-3/4 overflow-hidden rounded-lg bg-gray-100 relative touch-pan-y"
             onTouchStart={handleTouchStart}
@@ -91,7 +91,7 @@ const handleTouchMove = (e: React.TouchEvent) => {
             </div>
           </div>
             
-          <div className="md:w-[14.5%] flex-col gap-2 hidden md:flex">
+          <div className="md:w-[14.4%] flex-col gap-2 hidden md:flex">
             {images.map((src, index) => (
               <div 
                 key={index}
@@ -108,9 +108,10 @@ const handleTouchMove = (e: React.TouchEvent) => {
               </div>
             ))}
           </div>
+          </div>
         </div>
 
-        <div className="w-full md:w-3/5 font-sans rounded-2xl border-gray-200">
+        <div className="w-full md:w-25/50 shadow-xs  p-4 font-sans rounded-2xl border-gray-200">
           <p className="text-[25px] pt-3 md:pt-0 md:text-[30px] font-bold">McLaren Racing Suit 2025</p>
           <Link href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="rounded-3xl font-semibold border border-gray-200 px-2 py-0.5 text-[13px] items-center bg-[#FF8000]">
             McLaren
