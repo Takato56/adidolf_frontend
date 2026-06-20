@@ -66,7 +66,7 @@ export default function Company() {
         ].map(({ stat, label }) => (
           <div
             key={label}
-            className="text-center border border-border-divider rounded-xl py-5 px-3 bg-white hover:shadow-sm transition-shadow"
+            className="text-center border border-border-divider rounded-xl py-5 px-3 bg-surface-card hover:shadow-sm transition-shadow"
           >
             <p className="text-2xl font-bold text-text-primary">{stat}</p>
             <p className="text-xs text-text-muted mt-1">{label}</p>

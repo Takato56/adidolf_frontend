@@ -42,11 +42,11 @@ export default function PrivacyPolicy() {
         </p>
         <h1 className="text-3xl font-bold text-text-primary">Privacy Policy</h1>
         <p className="text-text-muted text-sm mt-2">
-          Last updated: January 2025
+          Last updated: June 2026
         </p>
       </div>
 
-      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl px-5 py-4 mb-8 text-sm text-text-secondary leading-relaxed">
+      <div className="bg-surface-accent border-l-4 border-blue-500 rounded-r-xl px-5 py-4 mb-8 text-sm text-text-secondary leading-relaxed">
         This policy explains what personal data Adidolf collects, how we use
         it, and your rights regarding that data. We are committed to handling
         your information responsibly and transparently.

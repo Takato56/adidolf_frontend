@@ -31,7 +31,7 @@ export default function MissionStatement() {
       </div>
 
       {/* The statement */}
-      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl p-6 mb-10">
+      <div className="bg-surface-accent border-l-4 border-blue-500 rounded-r-xl p-6 mb-10">
         <p className="text-text-secondary text-base leading-relaxed italic">
           "To provide fashion that means something — to people who want to mean
           something — at a price point that reflects the craft behind what

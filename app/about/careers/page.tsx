@@ -65,7 +65,7 @@ export default function Careers() {
         {openings.map(({ title, dept, location, type, description }) => (
           <div
             key={title}
-            className="border border-border-divider rounded-xl p-5 bg-white hover:shadow-sm transition-shadow"
+            className="border border-border-divider rounded-xl p-5 bg-surface-elevated hover:shadow-sm transition-shadow"
           >
             <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
               <p className="font-semibold text-text-primary text-sm">{title}</p>

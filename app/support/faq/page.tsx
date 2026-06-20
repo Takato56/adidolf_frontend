@@ -79,7 +79,7 @@ export default function FAQ() {
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
               className={`w-full text-left p-4 rounded-lg transition-all duration-200 flex items-center justify-between group ${
                 openIndex === index
-                  ? "bg-blue-50 border-l-4 border-blue-500"
+                  ? "bg-surface-card border-l-4 border-blue-500"
                   : "hover:bg-surface-secondary border-l-4 border-transparent hover:border-border-strong"
               }`}
             >
@@ -87,7 +87,7 @@ export default function FAQ() {
                 {item.question}
               </span>
               <svg
-                className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 text-gray-400 ${
+                className={`w-4 h-4 shrink-0 transition-transform duration-200 text-text-muted ${
                   openIndex === index ? "rotate-180 text-blue-500" : ""
                 }`}
                 fill="none"
@@ -104,7 +104,7 @@ export default function FAQ() {
             </button>
 
             {openIndex === index && (
-              <div className="mx-4 mb-1 p-4 bg-blue-50 rounded-b-lg border-l-4 border-blue-200 text-text-muted text-sm leading-relaxed">
+              <div className="mx-4 mb-1 p-4 bg-surface rounded-b-lg border-l-4 border-blue-200 text-text-muted text-sm leading-relaxed">
                 {item.answer}
               </div>
             )}
