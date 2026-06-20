@@ -3,8 +3,8 @@ import Link from "next/link";
 function Footer() {
   return (
     <footer className="bg-surface-footer text-text-muted text-sm">
-      <div className="max-w-6xl px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
+      <div className="max-w-6xl px-4 pt-8 pb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xs uppercase tracking-widest text-text-muted font-semibold mb-3">
               About
@@ -71,7 +71,9 @@ function Footer() {
             </ul>
           </div>
         </div>
-        <div className="pt-4 border-t border-border-strong flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-text-muted">
+      </div>
+      <div className="border-t border-border-strong">
+        <div className="max-w-6xl px-4 pt-4 pb-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-text-muted">
           <p>
             © 2026 Adidolf. All rights
             reserved.
