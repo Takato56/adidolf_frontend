@@ -21,7 +21,7 @@ export default function NewArrivals() {
         </nav>
       </div>
 
-      <div className="margindiv">
+      <div className="margindiv mt-6">
           <p className="pt-4 texttitle">New Arrivals & Exclusive Deals </p>      
         
           <p className="pt-1 subtitle">Discover our latest collection</p>

@@ -19,7 +19,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   return (
     <Link href={shopLink}>
-    <div className="aspect-80/140  md:h-110 h-70 text-white text-center overflow-hidden font-sansborder-gray-300 border shadow-md rounded-xl shrink-0 ">
+    <div className="aspect-90/140 max-w-[400px] text-white text-center overflow-hidden font-sansborder-gray-300 border shadow-md rounded-xl shrink-0 font-sans">
       <div className="md:h-3/4 h-28/40 bg-gray-100 overflow-hidden">
         <img
           src={image}
@@ -27,16 +27,16 @@ export default function ProductCard({
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="md:h-1/4 h-12/40 w-full px-2 md:px-4 flex flex-col justify-between bg-white text-black">
+      <div className="md:h-1/4 h-12/40 w-full px-1.5 md:px-4 flex flex-col justify-between bg-white text-black">
         <div>
-          <p className="text-xs pt-1 md:pt-3 text-[11px] md:text-[13px] text-gray-400 text-left">
+          <p className="text-xs pt-1 md:pt-2.5 text-[10px] md:text-[13px] text-gray-400 text-left">
             {category}
           </p>
-          <p className="text-left font-semibold pt-1 text-[15px] md:text-[17px] text-gray-800 line-clamp-1 truncate block w-full">
+          <p className="text-left font-bold pt-0.5 text-[14px] md:text-[18px] text-gray-800 line-clamp-1 truncate block w-full">
             {name}
           </p>
         
-          <p className="pt-1.5 md:pt-5 flex text-[13px] md:text-[15px]  justify-between font-bold text-red-500">${price}</p>     
+          <p className="mt-1 md:mt-2.5 flex text-[13px] md:text-[18px]  justify-between font-bold text-red-500">${price}</p>     
         </div>
       </div>
     </div>

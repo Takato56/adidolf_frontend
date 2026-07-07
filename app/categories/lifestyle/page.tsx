@@ -71,9 +71,6 @@ export default function ProductView() {
                   ))}
                 </div>
               </div>
-              <div>
-
-              </div>
               <div className="w-full mt-3">
                 <p className="text-[16px] mb-2">Category</p>
                 <div className="flex flex-row flex-wrap gap-2">
@@ -99,9 +96,9 @@ export default function ProductView() {
         </div>
       </div>
         )}
-        <div className="rounded-lg flex flex-row">
+        <div className="rounded-lg flex flex-row items-start">
             
-            <div className="w-5/23 bg-white border shadow-md min-w-[160px] border-gray-300 h-fit rounded-lg p-5 mt-4 transition-all hidden md:block">
+            <div className="w-full md:w-1/4 lg:w-1/5 bg-white border shadow-md min-w-[240px] border-gray-300 h-fit rounded-lg p-5 mt-4 transition-all hidden md:block">
               <div className="grid grid-rows-1 justify-center gap-8">
               
               <div>
@@ -147,8 +144,8 @@ export default function ProductView() {
         </div>
       </div>
           
-            <div className="mt-4 md:ml-6">
-              <div className="gap-3.5 md:gap-4 grid grid-cols-2  w-full md:grid md:grid-cols-4">
+            <div className="mt-4 md:ml-6 flex-1">
+              <div className="gap-3 md:gap-4 grid grid-cols-2 w-full md:grid md:grid-cols-3 lg:grid-cols-4">
                 
                 <ProductCard
                   image="https://aceracegear.com/wp-content/uploads/2025/04/m-ln-2025-1.jpg"
@@ -205,7 +202,7 @@ export default function ProductView() {
                   name="Cool Looking Lapel"
                   price="$99.99"
                   shopLink="support/nuremberg"
-                />                  
+                />          
                 <ProductCard
                   image="https://aceracegear.com/wp-content/uploads/2025/04/m-ln-2025-1.jpg"
                   alt="McLaren 2025 Racingsuit"
