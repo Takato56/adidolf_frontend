@@ -20,15 +20,15 @@ export default function Categories() {
           </ul>
         </nav>
       </div>
-      <div className="texttitle margindiv pt-4">
-        <div>
+      <div className="texttitle margindiv mt-6">
+        <div className="pt-4">
           <p>Categories </p>
         </div>
         <div className="subtitle pt-1">
           Define Your Statement
         </div>
       </div>
-      <div className="margindiv bg-[#f8f9ff] rounded-lg">
+      <div className="margindiv bg-[#f8f9ff] rounded-lg mt-6">
         <div className="mt-3 font-sans">
           <div className="grid grid-cols-2 justify-center md:grid-cols-4 gap-1 md:gap-1 md:auto-rows-fr">
             <Link href="/categories/lifestyle" className="col-span-2 md:col-span-3 row-span-2 md:row-span-1 md:aspect-24/9 aspect-video bg-gray-200 bg-opacity-40 p-6 text-white text-center rounded-lg flex items-center justify-center">

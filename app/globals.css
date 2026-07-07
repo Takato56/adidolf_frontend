@@ -20,7 +20,7 @@ body {
     @apply text-[14px] md:text-[18px] text-black font-sans font-medium
 }
 .mainmargindiv {
-    @apply mx-6 md:mx-12;
+    @apply mx-6 md:mx-30
 }
 
 .mainmarginproduct {
