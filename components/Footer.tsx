@@ -11,17 +11,17 @@ function Footer() {
             </h3>
             <ul className="flex flex-col space-y-2 margin-left-0">
               <li>
-                <Link href="/about/company" className="hover:text-text-inverse transition-colors">
+                <Link href="/about/company" className="hover:text-white transition-colors">
                   Company
                 </Link>
               </li>
               <li>
-                <Link href="/about/mission" className="hover:text-text-inverse transition-colors">
+                <Link href="/about/mission" className="hover:text-white transition-colors">
                   Our Mission Statement
                 </Link>
               </li>
               <li>
-                <Link href="/about/careers" className="hover:text-text-inverse transition-colors">
+                <Link href="/about/careers" className="hover:text-white transition-colors">
                   Careers
                 </Link>
               </li>
@@ -35,7 +35,7 @@ function Footer() {
               <li>
                 <Link
                   href="/support/contact-us"
-                  className="hover:text-text-inverse transition-colors"
+                  className="hover:text-white transition-colors"
                 >
                   Contact Us
                 </Link>
@@ -43,7 +43,7 @@ function Footer() {
               <li>
                 <Link
                   href="/support/faq"
-                  className="hover:text-text-inverse transition-colors"
+                  className="hover:text-white transition-colors"
                 >
                   FAQ
                 </Link>
@@ -58,13 +58,13 @@ function Footer() {
               <li>
                 <Link
                   href="/legal/terms-of-service"
-                  className="hover:text-text-inverse transition-colors"
+                  className="hover:text-white transition-colors"
                 >
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/legal/privacy" className="hover:text-text-inverse transition-colors">
+                <Link href="/legal/privacy" className="hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
               </li>
