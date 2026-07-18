@@ -14,6 +14,8 @@ export default function ProductDetailPage() {
   const { getProduct, updateProduct, deleteProduct, isLoaded } =
     useProducts();
   const [product, setProduct] = useState<Product | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoaded) {
@@ -26,15 +28,32 @@ export default function ProductDetailPage() {
     }
   }, [isLoaded, productId, getProduct, router]);
 
-  const handleSubmit = (data: any) => {
-    updateProduct(productId, data);
-    router.push('/admin/products');
+  const handleSubmit = async (data: any) => {
+    setActionError(null);
+    setIsSubmitting(true);
+    try {
+      await updateProduct(productId, data);
+      router.push('/admin/products');
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Failed to update product'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      deleteProduct(productId);
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+
+    setActionError(null);
+    try {
+      await deleteProduct(productId);
       router.push('/admin/products');
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Failed to delete product'
+      );
     }
   };
 
@@ -64,8 +83,14 @@ export default function ProductDetailPage() {
         </button>
       </div>
 
+      {actionError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {actionError}
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <ProductForm product={product} onSubmit={handleSubmit} />
+        <ProductForm product={product} onSubmit={handleSubmit} isLoading={isSubmitting} />
       </div>
 
       {/* Product Preview */}

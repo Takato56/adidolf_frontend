@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaUser } from "react-icons/fa";
 import { fetchWithAuth, logoutUser } from "@/lib/auth";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -13,6 +12,7 @@ interface Profile {
   email: string;
   phone: string;
   role: string;
+  created_at?: string;
 }
 
 function getStoredSession() {
@@ -24,18 +24,30 @@ function getStoredSession() {
   return { name, role };
 }
 
+function getInitials(name?: string | null) {
+  if (!name || typeof name !== "string") return "?";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? "?";
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function formatMemberSince(dateString?: string) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+  });
+}
+
 export default function ProfilePage() {
   const router = useRouter();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Editable field state, seeded once profile loads
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
 
   useEffect(() => {
     const session = getStoredSession();
@@ -50,15 +62,22 @@ export default function ProfilePage() {
     async function loadProfile() {
       try {
         const res = await fetchWithAuth(`${BASE_URL}/user/me`);
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
         const json = await res.json();
-        const user = json.data;
-        setProfile(user);
-        setFullName(user.full_name);
-        setPhone(user.phone ?? "");
+        const data = json.data ?? {};
+        setProfile({
+          full_name: data.full_name || sessionName,
+          email: data.email ?? "",
+          phone: data.phone ?? "",
+          role: data.role || sessionRole,
+          created_at: data.created_at,
+        });
       } catch (err) {
         console.error(err);
         // Fall back to what we already have in session storage so the
-        // page still renders something useful even if /users/me isn't
+        // page still renders something useful even if /user/me isn't
         // reachable.
         setProfile({
           full_name: sessionName,
@@ -66,7 +85,6 @@ export default function ProfilePage() {
           phone: "",
           role: sessionRole,
         });
-        setFullName(sessionName);
         setError("Couldn't load all of your account details.");
       } finally {
         setLoading(false);
@@ -76,46 +94,6 @@ export default function ProfilePage() {
     loadProfile();
   }, [router]);
 
-  async function handleSave(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!profile) return;
-
-    setSaving(true);
-    setError(null);
-
-    try {
-      // NOTE: there's no controller/route wired up for this yet — user.model.ts
-      // has an `update` method but user.controller.ts only exports `getProfile`.
-      // This call will 404 until you add an update handler + route for it.
-      const res = await fetchWithAuth(`${BASE_URL}/user/me`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ full_name: fullName, phone }),
-      });
-      const json = await res.json();
-      const updated = json.data;
-
-      setProfile(updated);
-      sessionStorage.setItem("userName", updated.full_name);
-      window.dispatchEvent(new Event("authchange"));
-      setEditing(false);
-    } catch (err) {
-      console.error(err);
-      setError("Couldn't save your changes. Please try again.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function handleCancelEdit() {
-    if (profile) {
-      setFullName(profile.full_name);
-      setPhone(profile.phone ?? "");
-    }
-    setEditing(false);
-    setError(null);
-  }
-
   async function handleLogout() {
     await logoutUser();
     window.dispatchEvent(new Event("authchange"));
@@ -124,8 +102,24 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-sm text-gray-400">Loading your profile...</p>
+      <div>
+        <div className="margindiv mt-6 mb-10">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-pulse">
+            <div className="h-28 md:h-40 bg-gray-200 relative">
+              <div className="absolute -bottom-10 md:-bottom-12 left-6 md:left-10 w-20 h-20 md:w-24 md:h-24 rounded-full bg-gray-300 ring-4 ring-white" />
+            </div>
+            <div className="pt-14 md:pt-16 px-6 md:px-10 pb-8 md:pb-10">
+              <div className="h-5 w-48 bg-gray-200 rounded" />
+              <div className="h-3 w-32 bg-gray-100 rounded mt-2" />
+              <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <div className="h-16 bg-gray-100 rounded-xl" />
+                <div className="h-16 bg-gray-100 rounded-xl" />
+                <div className="h-16 bg-gray-100 rounded-xl" />
+                <div className="h-16 bg-gray-100 rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -133,6 +127,7 @@ export default function ProfilePage() {
   if (!profile) return null;
 
   const isAdmin = profile.role === "admin";
+  const memberSince = formatMemberSince(profile.created_at);
 
   return (
     <div>
@@ -156,114 +151,88 @@ export default function ProfilePage() {
         <div>
           <p>My Profile</p>
         </div>
-        <div className="subtitle pt-1">Manage your account</div>
+        <div className="subtitle pt-1">View your account details</div>
       </div>
 
       <div className="margindiv mt-6 mb-10">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 max-w-2xl p-6 md:p-8">
-          <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-            <div className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">
-              <FaUser size={20} />
-            </div>
-            <div className="min-w-0">
-              <p className="font-bold text-lg truncate">{profile.full_name}</p>
-              <div className="flex items-center gap-2 mt-1">
-                {profile.email && (
-                  <p className="text-sm text-gray-500 truncate">{profile.email}</p>
-                )}
-                {isAdmin && (
-                  <span className="text-xs bg-black text-white font-medium px-2 py-0.5 rounded-full">
-                    Admin
-                  </span>
-                )}
-              </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* Cover + avatar */}
+          <div className="h-28 md:h-40 bg-black relative">
+            <div
+              className={`absolute -bottom-10 md:-bottom-12 left-6 md:left-10 w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold uppercase ring-4 ring-white ${
+                isAdmin ? "bg-black text-white" : "bg-gray-100 text-black"
+              }`}
+              aria-hidden="true"
+            >
+              {getInitials(profile.full_name)}
             </div>
           </div>
 
-          {error && (
-            <p className="text-sm text-red-500 mt-4">{error}</p>
-          )}
-
-          {!editing ? (
-            <div className="mt-6 space-y-4">
-              <div>
-                <p className="text-xs text-gray-400">Full name</p>
-                <p className="text-sm font-medium mt-0.5">{profile.full_name}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Phone number</p>
-                <p className="text-sm font-medium mt-0.5">
-                  {profile.phone || "—"}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-4">
-                <button
-                  onClick={() => setEditing(true)}
-                  className="bg-black text-white px-5 py-2.5 rounded-md font-bold text-sm cursor-pointer hover:bg-gray-900 transition-colors"
-                >
-                  Edit profile
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="text-red-500 px-5 py-2.5 rounded-md font-bold text-sm cursor-pointer hover:bg-red-50 transition-colors"
-                >
-                  Log out
-                </button>
-              </div>
+          <div className="pt-14 md:pt-16 px-6 md:px-10 pb-8 md:pb-10">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="font-bold text-xl md:text-2xl truncate">
+                {profile.full_name}
+              </p>
+              {isAdmin && (
+                <span className="text-xs bg-black text-white font-medium px-2 py-0.5 rounded-full shrink-0">
+                  Admin
+                </span>
+              )}
             </div>
-          ) : (
-            <form onSubmit={handleSave} className="mt-6 space-y-4">
-              <div>
-                <label className="text-xs text-gray-400" htmlFor="full_name">
-                  Full name
-                </label>
-                <input
-                  id="full_name"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  pattern="^[a-zA-ZÀ-ÿ][a-zA-ZÀ-ÿ\s'\-]*$"
-                  title="Name can only contain letters, spaces, hyphens, and apostrophes."
-                  required
-                  className="border-2 p-3 mt-1 border-gray-300 rounded-md outline-none w-full"
-                />
-              </div>
+            {profile.email && (
+              <p className="text-sm text-gray-500 truncate mt-1">
+                {profile.email}
+              </p>
+            )}
+            {memberSince && (
+              <p className="text-xs text-gray-400 mt-1">
+                Member since {memberSince}
+              </p>
+            )}
 
-              <div>
-                <label className="text-xs text-gray-400" htmlFor="phone">
-                  Phone number
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  pattern="[0-9\-+\s()]*"
-                  title="Please enter a valid phone number (minimum 10 digits). You can include spaces, hyphens, and a leading + for country codes."
-                  className="border-2 p-3 mt-1 border-gray-300 rounded-md outline-none w-full"
-                />
+            {error && (
+              <div className="flex items-start gap-2 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg px-4 py-3 mt-6">
+                <span aria-hidden="true">⚠</span>
+                <p>{error}</p>
               </div>
+            )}
 
-              <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="bg-black text-white px-5 py-2.5 rounded-md font-bold text-sm cursor-pointer hover:bg-gray-900 transition-colors disabled:opacity-50"
-                >
-                  {saving ? "Saving..." : "Save changes"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  disabled={saving}
-                  className="text-gray-500 px-5 py-2.5 rounded-md font-bold text-sm cursor-pointer hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
+            <dl className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              <div className="border border-gray-100 rounded-xl p-4 md:p-5 bg-gray-50/60">
+                <dt className="text-xs text-gray-400">Full name</dt>
+                <dd className="text-sm font-medium mt-1.5 truncate">
+                  {profile.full_name}
+                </dd>
               </div>
-            </form>
-          )}
+              <div className="border border-gray-100 rounded-xl p-4 md:p-5 bg-gray-50/60">
+                <dt className="text-xs text-gray-400">Phone number</dt>
+                <dd className="text-sm font-medium mt-1.5 truncate">
+                  {profile.phone || "—"}
+                </dd>
+              </div>
+              <div className="border border-gray-100 rounded-xl p-4 md:p-5 bg-gray-50/60">
+                <dt className="text-xs text-gray-400">Email</dt>
+                <dd className="text-sm font-medium mt-1.5 truncate">
+                  {profile.email || "—"}
+                </dd>
+              </div>
+              <div className="border border-gray-100 rounded-xl p-4 md:p-5 bg-gray-50/60">
+                <dt className="text-xs text-gray-400">Account type</dt>
+                <dd className="text-sm font-medium mt-1.5 capitalize truncate">
+                  {profile.role}
+                </dd>
+              </div>
+            </dl>
+
+            <div className="flex flex-wrap gap-3 pt-8">
+              <button
+                onClick={handleLogout}
+                className="text-red-500 px-5 py-2.5 rounded-md font-bold text-sm cursor-pointer hover:bg-red-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400"
+              >
+                Log out
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

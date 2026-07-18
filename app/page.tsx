@@ -1,9 +1,22 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { mockTrending } from "@/data/HomepageData"; // Import từ file data đã chia riêng
+import { useProducts } from "@/lib/hooks/useProducts";
+import { toProductCardData } from "@/lib/adapters/productDisplay";
+import { USE_MOCK_DATA } from "@/lib/config";
+
+// Hardcoded, not persisted anywhere (no localStorage involved), so it can't
+// go stale like lib/hooks/useCategories.ts's localStorage-backed data did.
+const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+  lifestyle: "https://loremflickr.com/640/480/lifestyle?lock=10",
+  menswear: "https://loremflickr.com/640/480/menswear,fashion?lock=11",
+  womenswear: "https://loremflickr.com/640/480/womenswear,fashion?lock=12",
+  accessories: "https://loremflickr.com/640/480/accessories,fashion?lock=13",
+  footwear: "https://loremflickr.com/640/480/shoes,footwear?lock=14",
+};
 
 const SLIDES = [
   { id: 1, bg: "bg-neutral-900", text: "Summer Collection 2026", sub: "Up to 50% Off" },
@@ -19,6 +32,44 @@ export default function Home() {
   const [mobileIndex, setMobileIndex] = useState(0);
   const mobileTouchStartX = useRef<number>(0);
   const mobileTouchEndX = useRef<number>(0);
+
+  // Trending Now: real backend catalogue by default, or mock data if
+  // USE_MOCK_DATA is flipped on in lib/config.ts.
+  const { products, isLoaded, error } = useProducts();
+  const trending = USE_MOCK_DATA
+    ? mockTrending
+    : products.filter((p) => p.isPublished).slice(0, 8).map(toProductCardData);
+
+  // Shop by Categories tiles: random image from a random published product
+  // in each category, falling back to a hardcoded (non-persisted) image.
+  // Computed in an effect (client-only, after products have loaded) to
+  // avoid any SSR/hydration timing race with Math.random().
+  const [categoryImages, setCategoryImages] = useState<Record<string, string | null>>({});
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const pickRandom = <T,>(items: T[]): T | undefined =>
+      items.length > 0 ? items[Math.floor(Math.random() * items.length)] : undefined;
+
+    const slugs = ["lifestyle", "menswear", "womenswear"];
+    const next: Record<string, string | null> = {};
+
+    slugs.forEach((slug) => {
+      const categoryProducts = products.filter(
+        (p) => p.isPublished && p.categorySlug === slug && p.images?.some(Boolean)
+      );
+      const chosen = pickRandom(categoryProducts);
+      const real = chosen ? pickRandom(chosen.images.filter(Boolean)) : undefined;
+      next[slug] = real ?? CATEGORY_FALLBACK_IMAGES[slug] ?? null;
+    });
+
+    setCategoryImages(next);
+  }, [isLoaded, products]);
+
+  const lifestyleImage = categoryImages["lifestyle"] ?? null;
+  const menswearImage = categoryImages["menswear"] ?? null;
+  const womenswearImage = categoryImages["womenswear"] ?? null;
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev === SLIDES.length - 1 ? 0 : prev + 1));
@@ -79,13 +130,13 @@ export default function Home() {
   return (
     <div>
       {/* Slider Banner */}
-      <div 
+      <div
         className="relative mt-1 h-60 md:h-[480px] w-full overflow-hidden group"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div 
+        <div
           className="flex h-full w-full transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
@@ -148,14 +199,35 @@ export default function Home() {
 
       <div className="mainmargindiv mt-7 bg-blue-20">
         <div className="hidden md:flex flex-row w-full justify-center gap-5">
-          <Link href="/categories/lifestyle" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 shadow-md"></Link>
-          <div className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10"> A</div>
-          <div className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10"> A</div>
+          <Link href="/shop?category=lifestyle" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 shadow-md relative overflow-hidden">
+            {lifestyleImage && (
+              <img src={lifestyleImage} alt="Lifestyle" className="absolute inset-0 w-full h-full object-cover" />
+            )}
+            <span className="absolute bottom-3 left-3 z-10 font-semibold text-black bg-white/70 px-2 py-1 rounded text-sm">
+              Lifestyle
+            </span>
+          </Link>
+          <Link href="/shop?category=menswear" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 relative overflow-hidden">
+            {menswearImage && (
+              <img src={menswearImage} alt="Menswear" className="absolute inset-0 w-full h-full object-cover" />
+            )}
+            <span className="absolute bottom-3 left-3 z-10 font-semibold text-black bg-white/70 px-2 py-1 rounded text-sm">
+              Menswear
+            </span>
+          </Link>
+          <Link href="/shop?category=womenswear" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 relative overflow-hidden">
+            {womenswearImage && (
+              <img src={womenswearImage} alt="Womenswear" className="absolute inset-0 w-full h-full object-cover" />
+            )}
+            <span className="absolute bottom-3 left-3 z-10 font-semibold text-black bg-white/70 px-2 py-1 rounded text-sm">
+              Womenswear
+            </span>
+          </Link>
         </div>
 
         {/* Categories Mobile Slider */}
         <div className="md:hidden w-full overflow-hidden relative">
-          <div 
+          <div
             className="flex w-full transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${mobileIndex * 100}%)` }}
             onTouchStart={handleMobileTouchStart}
@@ -163,19 +235,43 @@ export default function Home() {
             onTouchEnd={handleMobileTouchEnd}
           >
             <div className="w-full flex-shrink-0 px-1">
-              <div className="border rounded-lg aspect-video bg-neutral-800 flex items-center justify-center text-white">
-                Slide Mobile 1
-              </div>
+              <Link
+                href="/shop?category=lifestyle"
+                className="border rounded-lg aspect-video bg-neutral-800 flex items-center justify-center text-white relative overflow-hidden"
+              >
+                {lifestyleImage && (
+                  <img src={lifestyleImage} alt="Lifestyle" className="absolute inset-0 w-full h-full object-cover" />
+                )}
+                <span className="absolute bottom-3 left-3 z-10 font-semibold text-black bg-white/70 px-2 py-1 rounded text-sm">
+                  Lifestyle
+                </span>
+              </Link>
             </div>
             <div className="w-full flex-shrink-0 px-1">
-              <div className="border rounded-lg aspect-video bg-neutral-700 flex items-center justify-center text-white">
-                Slide Mobile 2
-              </div>
+              <Link
+                href="/shop?category=menswear"
+                className="border rounded-lg aspect-video bg-neutral-700 flex items-center justify-center text-white relative overflow-hidden"
+              >
+                {menswearImage && (
+                  <img src={menswearImage} alt="Menswear" className="absolute inset-0 w-full h-full object-cover" />
+                )}
+                <span className="absolute bottom-3 left-3 z-10 font-semibold text-black bg-white/70 px-2 py-1 rounded text-sm">
+                  Menswear
+                </span>
+              </Link>
             </div>
             <div className="w-full flex-shrink-0 px-1">
-              <div className="border rounded-lg aspect-video bg-neutral-600 flex items-center justify-center text-white">
-                Slide Mobile 3
-              </div>
+              <Link
+                href="/shop?category=womenswear"
+                className="border rounded-lg aspect-video bg-neutral-600 flex items-center justify-center text-white relative overflow-hidden"
+              >
+                {womenswearImage && (
+                  <img src={womenswearImage} alt="Womenswear" className="absolute inset-0 w-full h-full object-cover" />
+                )}
+                <span className="absolute bottom-3 left-3 z-10 font-semibold text-black bg-white/70 px-2 py-1 rounded text-sm">
+                  Womenswear
+                </span>
+              </Link>
             </div>
           </div>
 
@@ -204,20 +300,31 @@ export default function Home() {
       </div>
 
       {/* Trending Now Section */}
-      <div className="mainmargindiv mt-7"> 
+      <div className="mainmargindiv mt-7">
         <div className="mt-3 font-sans">
+          {!USE_MOCK_DATA && !isLoaded && (
+            <p className="text-sm text-gray-400">Loading products...</p>
+          )}
+          {!USE_MOCK_DATA && isLoaded && error && (
+            <p className="text-sm text-red-500">Couldn't load products: {error}</p>
+          )}
+          {!USE_MOCK_DATA && isLoaded && !error && trending.length === 0 && (
+            <p className="text-sm text-gray-400">No products published yet.</p>
+          )}
           <div className="flex overflow-x-auto gap-4 pb-4">
-            {mockTrending.map((product, index) => (
-              <ProductCard
-                key={`trending-${index}`}
-                image={product.image}
-                alt={product.alt}
-                category={product.category}
-                name={product.name}
-                price={product.price}
-                shopLink={product.shopLink}
-              />
-            ))}
+            {(USE_MOCK_DATA || isLoaded) &&
+              trending.map((product, index) => (
+                <div key={`trending-${index}`} className="shrink-0 w-[260px] sm:w-[320px] md:w-[370px]">
+                  <ProductCard
+                    image={product.image}
+                    alt={product.alt}
+                    category={product.category}
+                    name={product.name}
+                    price={product.price}
+                    shopLink={product.shopLink}
+                  />
+                </div>
+              ))}
           </div>
         </div>
       </div>

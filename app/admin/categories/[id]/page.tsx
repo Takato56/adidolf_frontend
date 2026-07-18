@@ -4,16 +4,16 @@ import { CategoryForm } from '@/components/admin/CategoryForm';
 import { useCategories } from '@/lib/hooks/useCategories';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FiTrash2 } from 'react-icons/fi';
 import { Category } from '@/types';
 
 export default function CategoryDetailPage() {
   const router = useRouter();
   const params = useParams();
   const categoryId = params.id as string;
-  const { getCategory, updateCategory, deleteCategory, isLoaded } =
-    useCategories();
+  const { getCategory, updateCategory, isLoaded } = useCategories();
   const [category, setCategory] = useState<Category | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoaded) {
@@ -26,15 +26,18 @@ export default function CategoryDetailPage() {
     }
   }, [isLoaded, categoryId, getCategory, router]);
 
-  const handleSubmit = (data: any) => {
-    updateCategory(categoryId, data);
-    router.push('/admin/categories');
-  };
-
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      deleteCategory(categoryId);
+  const handleSubmit = async (data: any) => {
+    setActionError(null);
+    setIsSubmitting(true);
+    try {
+      await updateCategory(categoryId, data);
       router.push('/admin/categories');
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Failed to update category'
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -48,24 +51,21 @@ export default function CategoryDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Edit Category</h2>
-          <p className="text-gray-600 text-sm mt-1">
-            Update category information
-          </p>
-        </div>
-        <button
-          onClick={handleDelete}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-        >
-          <FiTrash2 size={18} />
-          Delete Category
-        </button>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900">Edit Category</h2>
+        <p className="text-gray-600 text-sm mt-1">
+          Update category information
+        </p>
       </div>
 
+      {actionError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {actionError}
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <CategoryForm category={category} onSubmit={handleSubmit} />
+        <CategoryForm category={category} onSubmit={handleSubmit} isLoading={isSubmitting} />
       </div>
 
       {/* Category Preview */}

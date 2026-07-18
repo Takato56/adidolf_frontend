@@ -3,14 +3,27 @@
 import { ProductForm } from '@/components/admin/ProductForm';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function NewProductPage() {
   const router = useRouter();
   const { addProduct, isLoaded } = useProducts();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = (data: any) => {
-    addProduct(data);
-    router.push('/admin/products');
+  const handleSubmit = async (data: any) => {
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      await addProduct(data);
+      router.push('/admin/products');
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : 'Failed to create product'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isLoaded) {
@@ -30,8 +43,14 @@ export default function NewProductPage() {
         </p>
       </div>
 
+      {submitError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {submitError}
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <ProductForm onSubmit={handleSubmit} />
+        <ProductForm onSubmit={handleSubmit} isLoading={isSubmitting} />
       </div>
     </div>
   );

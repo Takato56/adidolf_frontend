@@ -1,23 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
-import { useCategories } from '@/lib/hooks/useCategories';
+import { FiEdit2, FiEye } from 'react-icons/fi';
 
 interface CategoryActionsProps {
   categoryId: string;
 }
 
+// Categories can't be deleted: products reference categories via a
+// category_id foreign key, so the database rejects the delete outright
+// whenever any product (even a soft-deleted/unpublished one) still points
+// at it. Rather than surface that as a dead-end error every time, deletion
+// is just not offered here.
 export function CategoryActions({ categoryId }: CategoryActionsProps) {
-  const { deleteCategory } = useCategories();
-
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      deleteCategory(categoryId);
-      window.location.reload();
-    }
-  };
-
   return (
     <div className="flex items-center space-x-3">
       <Link
@@ -34,13 +29,6 @@ export function CategoryActions({ categoryId }: CategoryActionsProps) {
       >
         <FiEdit2 size={18} />
       </Link>
-      <button
-        onClick={handleDelete}
-        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-        title="Delete"
-      >
-        <FiTrash2 size={18} />
-      </button>
     </div>
   );
 }

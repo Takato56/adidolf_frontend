@@ -7,36 +7,40 @@ export interface Product {
   alt?: string;
 }
 
+// TODO: thay các image placeholder này bằng ảnh sản phẩm thật.
+// Đang dùng LoremFlickr với tag riêng cho từng loại sản phẩm + ?lock=N
+// để ảnh vừa đúng chủ đề fashion vừa không trùng ảnh với nhau
+// (và không trùng với các lock đã dùng ở HomepageData.ts / HomepageCategories.ts / HeroSlides.ts).
 export const mockDeals: Product[] = [
   {
-    image: "https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM2_Front%20view.png?wid=1300&hei=1300",
-    alt: "Cool Looking Lapel",
+    image: "https://loremflickr.com/800/800/hat,fashion?lock=31",
+    alt: "Deal Product 1",
     category: "Accessories",
-    name: "Cool Looking Lapel 1",
+    name: "Deal Product 1",
     price: "99.99",
     shopLink: "support/nuremberg",
   },
   {
-    image: "https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM1_Closeup%20view.png?wid=1300&hei=1300",
-    alt: "Cool Looking Lapel",
+    image: "https://loremflickr.com/800/800/tie,fashion?lock=35",
+    alt: "Deal Product 2",
     category: "Accessories",
-    name: "Cool Looking Lapel 2",
+    name: "Deal Product 2",
     price: "99.99",
     shopLink: "support/nuremberg",
   },
   {
-    image: "https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM2_Front%20view.png?wid=1300&hei=1300",
-    alt: "Cool Looking Lapel",
+    image: "https://loremflickr.com/800/800/belt,fashion?lock=33",
+    alt: "Deal Product 3",
     category: "Accessories",
-    name: "Cool Looking Lapel 3",
+    name: "Deal Product 3",
     price: "99.99",
     shopLink: "support/nuremberg",
   },
   {
-    image: "https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM1_Closeup%20view.png?wid=1300&hei=1300",
-    alt: "Cool Looking Lapel",
+    image: "https://loremflickr.com/800/800/backpack,fashion?lock=34",
+    alt: "Deal Product 4",
     category: "Accessories",
-    name: "Cool Looking Lapel 4",
+    name: "Deal Product 4",
     price: "99.99",
     shopLink: "support/nuremberg",
   },
@@ -44,18 +48,18 @@ export const mockDeals: Product[] = [
 
 export const mockNewArrivals: Product[] = [
   {
-    image: "https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM2_Front%20view.png?wid=1300&hei=1300",
-    alt: "Cool Looking Lapel",
+    image: "https://loremflickr.com/800/800/coat,fashion?lock=41",
+    alt: "New Arrival 1",
     category: "Accessories",
-    name: "New Lapel 1",
+    name: "New Arrival 1",
     price: "99.99",
     shopLink: "support/nuremberg",
   },
   {
-    image: "https://fr.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-sac-multipass--M2A078_PM1_Closeup%20view.png?wid=1300&hei=1300",
-    alt: "Cool Looking Lapel",
+    image: "https://loremflickr.com/800/800/boots,fashion?lock=42",
+    alt: "New Arrival 2",
     category: "Accessories",
-    name: "New Lapel 2",
+    name: "New Arrival 2",
     price: "99.99",
     shopLink: "support/nuremberg",
   },

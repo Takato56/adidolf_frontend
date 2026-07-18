@@ -4,6 +4,7 @@ import { Product, ProductVariant } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useCategories } from '@/lib/hooks/useCategories';
 
 interface ProductFormProps {
   product?: Product;
@@ -21,9 +22,10 @@ export function ProductForm({
   isLoading = false,
 }: ProductFormProps) {
   const router = useRouter();
+  const { categories, isLoaded: categoriesLoaded } = useCategories();
   const [formData, setFormData] = useState<Omit<Product, 'id'>>({
     name: product?.name || '',
-    categorySlug: product?.categorySlug || 'menswear',
+    categorySlug: product?.categorySlug || '',
     slug: product?.slug || '',
     description: product?.description || '',
     price: product?.price || 0,
@@ -192,15 +194,25 @@ export function ProductForm({
             name="categorySlug"
             value={formData.categorySlug}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
+            disabled={!categoriesLoaded}
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed ${
               errors.categorySlug ? 'border-red-500' : 'border-gray-300'
             }`}
           >
-            <option value="menswear">Menswear</option>
-            <option value="womenswear">Womenswear</option>
-            <option value="accessories">Accessories</option>
-            <option value="footwear">Footwear</option>
+            <option value="" disabled>
+              {categoriesLoaded ? 'Select a category' : 'Loading categories...'}
+            </option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.slug}>
+                {category.name}
+              </option>
+            ))}
           </select>
+          {categoriesLoaded && categories.length === 0 && (
+            <p className="text-amber-600 text-sm mt-1">
+              No categories exist yet — create one first.
+            </p>
+          )}
           {errors.categorySlug && (
             <p className="text-red-600 text-sm mt-1">
               {errors.categorySlug}

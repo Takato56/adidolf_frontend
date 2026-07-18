@@ -3,14 +3,27 @@
 import { CategoryForm } from '@/components/admin/CategoryForm';
 import { useCategories } from '@/lib/hooks/useCategories';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function NewCategoryPage() {
   const router = useRouter();
   const { addCategory, isLoaded } = useCategories();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = (data: any) => {
-    addCategory(data);
-    router.push('/admin/categories');
+  const handleSubmit = async (data: any) => {
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      await addCategory(data);
+      router.push('/admin/categories');
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : 'Failed to create category'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isLoaded) {
@@ -32,8 +45,14 @@ export default function NewCategoryPage() {
         </p>
       </div>
 
+      {submitError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {submitError}
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <CategoryForm onSubmit={handleSubmit} />
+        <CategoryForm onSubmit={handleSubmit} isLoading={isSubmitting} />
       </div>
     </div>
   );
