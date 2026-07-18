@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FiShoppingCart, FiHeart, FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -45,7 +45,7 @@ const MOCK_PRODUCT_IMAGES = [
   "https://tse2.mm.bing.net/th/id/OIP.PgWL-_pupZaymNTXBHQzOQHaIV?rs=1&pid=ImgDetMain&o=7&rm=3",
 ];
 
-export default function ProductPage() {
+function ProductPageContent() {
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug");
 
@@ -412,5 +412,15 @@ export default function ProductPage() {
 
       <div className="mt-10"></div>
     </div>
+  );
+}
+
+// useSearchParams() requires a Suspense boundary in the App Router, or
+// `next build` fails during static generation.
+export default function ProductPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductPageContent />
+    </Suspense>
   );
 }

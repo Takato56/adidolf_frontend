@@ -17,18 +17,14 @@ export function UserForm({
   isLoading = false,
 }: UserFormProps) {
   const router = useRouter();
-  const isEditing = !!user;
 
   const [formData, setFormData] = useState({
     email: user?.email || '',
     full_name: user?.full_name || '',
     phone: user?.phone || '',
     avatar_url: user?.avatar_url || '',
-    password: '',
     role: user?.role || ('customer' as UserRole),
     is_active: user?.is_active ?? 1,
-    created_at: user?.created_at || new Date().toISOString(),
-    password_hash: user?.password_hash || '',
   });
 
   const [addresses, setAddresses] = useState<Partial<Address>[]>(() => {
@@ -50,10 +46,6 @@ export function UserForm({
     }
     if (!formData.full_name.trim()) newErrors.full_name = 'Full name is required';
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    if (!isEditing && !formData.password.trim()) {
-      newErrors.password = 'Password is required for new users';
-    }
-    if (!formData.created_at.trim()) newErrors.created_at = 'Creation date is required';
 
     // Validate addresses
     for (let i = 0; i < addresses.length; i++) {
@@ -86,18 +78,13 @@ export function UserForm({
     e.preventDefault();
     if (!validateForm()) return;
 
-    const data: any = {
+    onSubmit({
       ...formData,
-      password_hash: isEditing
-        ? user.password_hash
-        : formData.password, // In production this would be hashed server-side
       addresses: addresses.map((a) => ({
         ...a,
         is_default: a.is_default ?? 0,
       })),
-    };
-    delete data.password;
-    onSubmit(data);
+    });
   };
 
   const handleChange = (
@@ -256,28 +243,6 @@ export function UserForm({
             />
           </div>
 
-          {/* Password (only on create) */}
-          {!isEditing && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password *
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Enter password"
-              />
-              {errors.password && (
-                <p className="text-red-600 text-sm mt-1">{errors.password}</p>
-              )}
-            </div>
-          )}
-
           {/* Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -316,25 +281,6 @@ export function UserForm({
                 <span className="text-sm text-gray-700">Active</span>
               </label>
             </div>
-          </div>
-
-          {/* Created At */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Creation Date *
-            </label>
-            <input
-              type="datetime-local"
-              name="created_at"
-              value={formData.created_at.slice(0, 16)}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-                errors.created_at ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.created_at && (
-              <p className="text-red-600 text-sm mt-1">{errors.created_at}</p>
-            )}
           </div>
         </div>
       </div>
@@ -553,11 +499,7 @@ export function UserForm({
           disabled={isLoading}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
         >
-          {isLoading
-            ? 'Saving...'
-            : isEditing
-            ? 'Update User'
-            : 'Create User'}
+          {isLoading ? 'Saving...' : 'Update User'}
         </button>
         <button
           type="button"

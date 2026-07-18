@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductView from "@/components/ProductView";
 import { useProducts } from "@/lib/hooks/useProducts";
@@ -8,7 +9,7 @@ import { useProducts } from "@/lib/hooks/useProducts";
 // driven by the `category` query param (?category=<slug>) as the *initial*
 // sidebar filter selection — from there, all filtering (category, price,
 // size) happens inside ProductView against the real product data.
-export default function ShopPage() {
+function ShopContent() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get("category");
   const search = searchParams.get("search");
@@ -35,5 +36,15 @@ export default function ShopPage() {
       isLoading={!isLoaded}
       initialCategoryFilter={categorySlug}
     />
+  );
+}
+
+// useSearchParams() requires a Suspense boundary in the App Router, or
+// `next build` fails during static generation.
+export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopContent />
+    </Suspense>
   );
 }

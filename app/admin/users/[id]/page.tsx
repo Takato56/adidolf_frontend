@@ -12,36 +12,79 @@ export default function UserDetailPage() {
   const router = useRouter();
   const params = useParams();
   const userId = parseInt(params.id as string) || 0;
-  const { getUser, updateUser, deleteUser, isLoaded } = useUsers();
+  const { updateUser, deleteUser, fetchUser } = useUsers();
+
   const [user, setUser] = useState<User | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isLoaded) {
-      const found = getUser(userId);
-      if (found) {
-        setUser(found);
-      } else {
-        router.push('/admin/users');
-      }
-    }
-  }, [isLoaded, userId, getUser, router]);
+    let cancelled = false;
+    fetchUser(userId)
+      .then((found) => {
+        if (!cancelled) setUser(found);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setLoadError(err instanceof Error ? err.message : 'Failed to load user');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, fetchUser]);
 
-  const handleSubmit = (data: any) => {
-    updateUser(userId, data);
-    router.push('/admin/users');
-  };
-
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      deleteUser(userId);
+  const handleSubmit = async (data: any) => {
+    setActionError(null);
+    setIsSubmitting(true);
+    try {
+      await updateUser(userId, data);
       router.push('/admin/users');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to update user');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (!isLoaded || !user) {
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+
+    setActionError(null);
+    try {
+      await deleteUser(userId);
+      router.push('/admin/users');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to delete user');
+    }
+  };
+
+  if (!isLoaded) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  if (loadError || !user) {
+    return (
+      <div className="space-y-4">
+        <Link
+          href="/admin/users"
+          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+        >
+          <FiArrowLeft size={16} />
+          Back to Users
+        </Link>
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {loadError || 'User not found'}
+        </div>
       </div>
     );
   }
@@ -74,8 +117,14 @@ export default function UserDetailPage() {
         </button>
       </div>
 
+      {actionError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {actionError}
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <UserForm user={user} onSubmit={handleSubmit} />
+        <UserForm user={user} onSubmit={handleSubmit} isLoading={isSubmitting} />
       </div>
 
       {/* User Preview */}
@@ -159,8 +208,9 @@ export default function UserDetailPage() {
                   )}
                 </div>
                 <p className="text-sm text-gray-600">
-                  {addr.street_detail}, {addr.ward}, {addr.district},{' '}
-                  {addr.province}
+                  {[addr.street_detail, addr.ward, addr.district, addr.province]
+                    .filter(Boolean)
+                    .join(', ')}
                 </p>
               </div>
             ))}
