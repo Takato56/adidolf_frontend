@@ -3,61 +3,25 @@
 import { useState } from "react";
 import Link from "next/link";
 import { FaTrash, FaMinus, FaPlus, FaArrowLeft } from "react-icons/fa";
-
-// Mock Data
-
-interface CartItem {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  quantity: number;
-  size: string;
-  color: string;
-  image: string;
-}
-
-const INITIAL_ITEMS: CartItem[] = [
-  {
-    id: 1,
-    name: "Suspiciously Branded Shirt",
-    category: "Politics",
-    price: 4900000000000000000000.0,
-    quantity: 2,
-    size: "L",
-    color: "Black",
-    image: "#1a1a1a",
-  }
-];
+import { useCart, CartItem } from "@/lib/hooks/useCart";
 
 const SHIPPING_THRESHOLD = 200;
 const SHIPPING_FEE = 15;
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function CartPage() {
-  const [items, setItems] = useState<CartItem[]>(INITIAL_ITEMS);
+  const { items, isLoaded, removeItem, updateQuantity, subtotal } = useCart();
 
-  function updateQty(id: number, delta: number) {
-    setItems((prev) =>
-      prev
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  }
-
-  function removeItem(id: number) {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  }
-
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   const total = subtotal + shipping;
   const freeShippingLeft = SHIPPING_THRESHOLD - subtotal;
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-[#fbfdff] flex items-center justify-center">
+        <p className="text-slate-400">Loading your cart...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fbfdff]">
@@ -109,9 +73,11 @@ export default function CartPage() {
             {/* Items */}
             {items.map((item) => (
               <CartRow
-                key={item.id}
+                key={item.key}
                 item={item}
-                onUpdateQty={updateQty}
+                onUpdateQty={(key, delta) =>
+                  updateQuantity(key, item.quantity + delta)
+                }
                 onRemove={removeItem}
               />
             ))}
@@ -121,7 +87,7 @@ export default function CartPage() {
           <div className="bg-white border border-slate-100 rounded-xl p-6 space-y-4 sticky top-4">
             <h2 className="text-lg font-extrabold">Order Summary</h2>
 
-            <div className="space-y-2 text-sm text-slate-600">
+            <div className="space-y-2 text-sm text-slate-600 border-t border-slate-100 pt-4">
               <div className="flex justify-between">
                 <span>
                   Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)
@@ -155,7 +121,7 @@ export default function CartPage() {
             </Link>
 
             <p className="text-xs text-slate-400 text-center">
-              Taxes calculated at checkout
+              Coupon codes can be applied at checkout
             </p>
           </div>
         </div>
@@ -172,45 +138,54 @@ function CartRow({
   onRemove,
 }: {
   item: CartItem;
-  onUpdateQty: (id: number, delta: number) => void;
-  onRemove: (id: number) => void;
+  onUpdateQty: (key: string, delta: number) => void;
+  onRemove: (key: string) => void;
 }) {
   return (
     <div className="flex gap-4 bg-white border border-slate-100 rounded-xl p-4 hover:shadow-sm transition-shadow">
-      {/* Image placeholder */}
-      <div
-        className="w-24 h-24 rounded-lg flex-shrink-0"
-        style={{ backgroundColor: item.image }}
-      />
+      <div className="w-24 h-24 rounded-lg flex-shrink-0 bg-slate-100 overflow-hidden">
+        {item.image && (
+          <img
+            src={item.image}
+            alt={item.name}
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
 
-      {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="font-semibold text-sm text-black leading-tight">
+            <Link
+              href={`/products?slug=${encodeURIComponent(item.slug)}`}
+              className="font-semibold text-sm text-black leading-tight hover:underline"
+            >
               {item.name}
-            </p>
-            <p className="text-xs text-slate-400 mt-0.5">{item.category}</p>
+            </Link>
           </div>
           <p className="font-extrabold text-sm whitespace-nowrap">
-            ${(item.price * item.quantity).toFixed(2)}
+            ${(item.unitPrice * item.quantity).toFixed(2)}
           </p>
         </div>
 
         <div className="flex items-center gap-2 mt-2">
-          <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-            {item.size}
-          </span>
-          <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-            {item.color}
-          </span>
+          {item.size && (
+            <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+              {item.size}
+            </span>
+          )}
+          {item.color && (
+            <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+              {item.color}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center justify-between mt-3">
           {/* Quantity */}
           <div className="flex items-center gap-2 border border-slate-200 rounded-lg px-2 py-1">
             <button
-              onClick={() => onUpdateQty(item.id, -1)}
+              onClick={() => onUpdateQty(item.key, -1)}
               className="text-slate-400 hover:text-black transition-colors p-0.5"
             >
               <FaMinus className="text-[10px]" />
@@ -219,8 +194,9 @@ function CartRow({
               {item.quantity}
             </span>
             <button
-              onClick={() => onUpdateQty(item.id, 1)}
-              className="text-slate-400 hover:text-black transition-colors p-0.5"
+              onClick={() => onUpdateQty(item.key, 1)}
+              disabled={item.stock !== undefined && item.quantity >= item.stock}
+              className="text-slate-400 hover:text-black transition-colors p-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <FaPlus className="text-[10px]" />
             </button>
@@ -228,7 +204,7 @@ function CartRow({
 
           {/* Remove */}
           <button
-            onClick={() => onRemove(item.id)}
+            onClick={() => onRemove(item.key)}
             className="text-slate-300 hover:text-red-400 transition-colors text-xs flex items-center gap-1.5"
           >
             <FaTrash />

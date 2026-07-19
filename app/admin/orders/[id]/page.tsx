@@ -6,8 +6,9 @@ import { PaymentForm } from '@/components/admin/PaymentForm';
 import { useOrders } from '@/lib/hooks/useOrders';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiTrash2, FiArrowLeft } from 'react-icons/fi';
 import { Order, Shipment, Payment } from '@/types';
+import Link from 'next/link';
 
 const TABS = [
   { key: 'details', label: 'Order Details' },
@@ -21,84 +22,110 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const params = useParams();
   const orderId = parseInt(params.id as string) || 0;
-  const { getOrder, updateOrder, deleteOrder, updateShipment, updatePayment, isLoaded } = useOrders();
+  const { updateOrder, deleteOrder, updateShipment, updatePayment, fetchOrder } =
+    useOrders();
+
   const [order, setOrder] = useState<Order | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('details');
 
+  const [isSubmittingDetails, setIsSubmittingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
+  const [shipmentError, setShipmentError] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [shipmentSaved, setShipmentSaved] = useState(false);
+  const [paymentSaved, setPaymentSaved] = useState(false);
+
   useEffect(() => {
-    if (isLoaded) {
-      const found = getOrder(orderId);
-      if (found) {
-        setOrder(found);
-      } else {
-        router.push('/admin/orders');
-      }
-    }
-  }, [isLoaded, orderId, getOrder, router]);
+    let cancelled = false;
+    fetchOrder(orderId)
+      .then((found) => {
+        if (!cancelled) setOrder(found);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setLoadError(err instanceof Error ? err.message : 'Failed to load order');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId, fetchOrder]);
 
-  const handleOrderSubmit = (data: any) => {
-    updateOrder(orderId, data);
-    router.push('/admin/orders');
-  };
-
-  const handleShipmentSubmit = (data: Partial<Shipment>) => {
-    updateShipment(orderId, data);
-    // Refresh order state after update
-    setOrder((prev) =>
-      prev
-        ? {
-            ...prev,
-            shipment: {
-              ...(prev.shipment || {
-                shipmentId: 0,
-                carrier: '',
-                trackingNumber: null,
-                status: 'preparing' as const,
-                shippedAt: null,
-                estimatedDelivery: null,
-                deliveredAt: null,
-              }),
-              ...data,
-            },
-          }
-        : null
-    );
-  };
-
-  const handlePaymentSubmit = (data: Partial<Payment>) => {
-    updatePayment(orderId, data);
-    setOrder((prev) =>
-      prev
-        ? {
-            ...prev,
-            payment: {
-              ...(prev.payment || {
-                paymentId: 0,
-                method: 'COD' as const,
-                status: 'pending' as const,
-                amount: 0,
-                transactionId: null,
-                gatewayResponse: null,
-                paidAt: null,
-              }),
-              ...data,
-            },
-          }
-        : null
-    );
-  };
-
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this order?')) {
-      deleteOrder(orderId);
+  const handleOrderSubmit = async (data: any) => {
+    setDetailsError(null);
+    setIsSubmittingDetails(true);
+    try {
+      await updateOrder(orderId, data);
       router.push('/admin/orders');
+    } catch (err) {
+      setDetailsError(err instanceof Error ? err.message : 'Failed to update order');
+    } finally {
+      setIsSubmittingDetails(false);
     }
   };
 
-  if (!isLoaded || !order) {
+  const handleShipmentSubmit = async (data: Partial<Shipment>) => {
+    setShipmentError(null);
+    setShipmentSaved(false);
+    try {
+      const updated = await updateShipment(orderId, data);
+      setOrder((prev) => (prev ? { ...prev, shipment: updated } : prev));
+      setShipmentSaved(true);
+    } catch (err) {
+      setShipmentError(err instanceof Error ? err.message : 'Failed to save shipment');
+    }
+  };
+
+  const handlePaymentSubmit = async (data: Partial<Payment>) => {
+    setPaymentError(null);
+    setPaymentSaved(false);
+    try {
+      const updated = await updatePayment(orderId, data);
+      setOrder((prev) => (prev ? { ...prev, payment: updated } : prev));
+      setPaymentSaved(true);
+    } catch (err) {
+      setPaymentError(err instanceof Error ? err.message : 'Failed to save payment');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this order?')) return;
+
+    setDetailsError(null);
+    try {
+      await deleteOrder(orderId);
+      router.push('/admin/orders');
+    } catch (err) {
+      setDetailsError(err instanceof Error ? err.message : 'Failed to delete order');
+    }
+  };
+
+  if (!isLoaded) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
+  if (loadError || !order) {
+    return (
+      <div className="space-y-4">
+        <Link
+          href="/admin/orders"
+          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+        >
+          <FiArrowLeft size={16} />
+          Back to Orders
+        </Link>
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {loadError || 'Order not found'}
+        </div>
       </div>
     );
   }
@@ -107,6 +134,13 @@ export default function OrderDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
+          <Link
+            href="/admin/orders"
+            className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 mb-2"
+          >
+            <FiArrowLeft size={16} />
+            Back to Orders
+          </Link>
           <h2 className="text-2xl font-bold text-gray-900">
             Edit Order #{order.id}
           </h2>
@@ -145,29 +179,52 @@ export default function OrderDetailPage() {
       {/* Tab Content */}
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
         {activeTab === 'details' && (
-          <OrderForm order={order} onSubmit={handleOrderSubmit} />
+          <>
+            {detailsError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">
+                {detailsError}
+              </div>
+            )}
+            <OrderForm
+              order={order}
+              onSubmit={handleOrderSubmit}
+              isLoading={isSubmittingDetails}
+            />
+          </>
         )}
         {activeTab === 'shipment' && (
-          <ShipmentForm
-            shipment={order.shipment}
-            orderId={order.id}
-            onSubmit={handleShipmentSubmit}
-            onSuccess={() => {
-              const updated = getOrder(orderId);
-              if (updated) setOrder(updated);
-            }}
-          />
+          <>
+            {shipmentError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">
+                {shipmentError}
+              </div>
+            )}
+            <ShipmentForm
+              shipment={order.shipment}
+              orderId={order.id}
+              onSubmit={handleShipmentSubmit}
+            />
+            {shipmentSaved && (
+              <p className="text-sm text-green-600 font-medium mt-3">✓ Saved</p>
+            )}
+          </>
         )}
         {activeTab === 'payment' && (
-          <PaymentForm
-            payment={order.payment}
-            orderId={order.id}
-            onSubmit={handlePaymentSubmit}
-            onSuccess={() => {
-              const updated = getOrder(orderId);
-              if (updated) setOrder(updated);
-            }}
-          />
+          <>
+            {paymentError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4">
+                {paymentError}
+              </div>
+            )}
+            <PaymentForm
+              payment={order.payment}
+              orderId={order.id}
+              onSubmit={handlePaymentSubmit}
+            />
+            {paymentSaved && (
+              <p className="text-sm text-green-600 font-medium mt-3">✓ Saved</p>
+            )}
+          </>
         )}
       </div>
     </div>

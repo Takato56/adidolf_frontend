@@ -6,7 +6,7 @@ import { FiPlus } from 'react-icons/fi';
 import Link from 'next/link';
 
 export default function UsersPage() {
-  const { users, isLoaded } = useUsers();
+  const { users, isLoaded, error } = useUsers();
 
   if (!isLoaded) {
     return (
@@ -36,6 +36,12 @@ export default function UsersPage() {
           </Link>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          Couldn't load users: {error}
+        </div>
+      )}
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

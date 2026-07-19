@@ -1,121 +1,83 @@
-import { User, Address } from '@/types';
-import { useEffect, useRef, useState } from 'react';
-
-const STORAGE_KEY = 'admin_users';
-
-function migrateAddress(raw: any): Address {
-  return {
-    id: typeof raw.id === 'number' ? raw.id : 0,
-    recipient_name: raw.recipient_name || '',
-    phone: raw.phone || '',
-    province: raw.province || '',
-    district: raw.district || '',
-    ward: raw.ward || '',
-    street_detail: raw.street_detail || '',
-    is_default: raw.is_default === 1 ? 1 : 0,
-  };
-}
-
-function migrateUser(raw: any): User {
-  return {
-    id: typeof raw.id === 'number' ? raw.id : 0,
-    email: raw.email || '',
-    full_name: raw.full_name || '',
-    phone: raw.phone || '',
-    avatar_url: raw.avatar_url || '',
-    password_hash: raw.password_hash || '',
-    role: raw.role === 'admin' ? 'admin' : 'customer',
-    is_active: raw.is_active === 1 || raw.is_active === true ? 1 : 0,
-    created_at: raw.created_at || new Date().toISOString(),
-    addresses: Array.isArray(raw.addresses) ? raw.addresses.map(migrateAddress) : [],
-  };
-}
+import { User } from '@/types';
+import { useCallback, useEffect, useState } from 'react';
+import { getUsersApi, getUserByIdApi, updateUserApi, deleteUserApi } from '@/lib/users';
+import { getAddressesByUserId, syncUserAddresses } from '@/lib/addresses';
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Persistent ID counters seeded from existing data
-  const nextUserId = useRef(100);
-  const nextAddressId = useRef(200);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      let parsedUsers: User[];
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          parsedUsers = Array.isArray(parsed) ? parsed.map(migrateUser) : [];
-        } catch {
-          parsedUsers = [];
-        }
-      } else {
-        parsedUsers = [];
-      }
-      // Seed counters from existing data to avoid key collisions
-      nextUserId.current =
-        Math.max(...parsedUsers.map((u) => u.id), 0) + 1;
-      const maxAddrId = Math.max(
-        ...parsedUsers.flatMap((u) => u.addresses.map((a) => a.id)),
-        0
-      );
-      nextAddressId.current = maxAddrId + 1;
-      setUsers(parsedUsers);
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      const data = await getUsersApi();
+      setUsers(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load users');
+    } finally {
       setIsLoaded(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoaded && typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-    }
-  }, [users, isLoaded]);
+    load();
+  }, [load]);
 
-  const addUser = (user: Omit<User, 'id' | 'addresses'> & { addresses?: Omit<Address, 'id'>[] }) => {
-    const newUser: User = {
-      ...user,
-      id: nextUserId.current++,
-      addresses: (user.addresses || []).map((a) => ({
-        ...a,
-        id: nextAddressId.current++,
-      })),
-    };
-    setUsers((prev) => [...prev, newUser]);
-    return newUser;
-  };
-
-  const updateUser = (id: number, updates: Partial<User>) => {
-    setUsers((prev) =>
-      prev.map((u) => {
-        if (u.id !== id) return u;
-        // If addresses are provided, assign new IDs to new addresses
-        let updatedAddresses = u.addresses;
-        if (updates.addresses) {
-          updatedAddresses = updates.addresses.map((a) => ({
-            ...a,
-            id: a.id || nextAddressId.current++,
-          }));
-        }
-        return { ...u, ...updates, addresses: updatedAddresses };
-      })
+  // User creation is intentionally unsupported here. The backend's generic
+  // /admin/users endpoint writes whatever "password_hash" it's given
+  // straight into the database with no hashing — sending a plaintext
+  // password through it would either permanently break that user's login
+  // or store their real password unencrypted. Real accounts should go
+  // through /auth/register (which does hash properly via argon2); this
+  // panel is for managing (editing role/status/details, or deleting)
+  // users after that.
+  const addUser = async (): Promise<never> => {
+    throw new Error(
+      "Creating users isn't supported from this panel — have them sign up normally, then manage their account here."
     );
   };
 
-  const deleteUser = (id: number) => {
+  const updateUser = async (id: number, updates: Partial<User>) => {
+    const { addresses, password_hash, created_at, id: _id, ...rest } = updates;
+    const updated = await updateUserApi(id, rest);
+
+    updated.addresses = addresses
+      ? await syncUserAddresses(id, addresses)
+      : await getAddressesByUserId(id);
+
+    setUsers((prev) => prev.map((u) => (u.id === id ? updated : u)));
+    return updated;
+  };
+
+  const deleteUser = async (id: number) => {
+    await deleteUserApi(id);
     setUsers((prev) => prev.filter((u) => u.id !== id));
   };
 
-  const getUser = (id: number) => {
-    return users.find((u) => u.id === id);
+  const getUser = (id: number) => users.find((u) => u.id === id);
+
+  // Fetches a user with their real, current addresses directly from the
+  // API — use this for the detail/edit page rather than getUser(), since
+  // the in-memory list from load() doesn't carry addresses (avoids an N+1
+  // fetch just to render the list).
+  const fetchUser = async (id: number): Promise<User> => {
+    const [user, addresses] = await Promise.all([
+      getUserByIdApi(id),
+      getAddressesByUserId(id),
+    ]);
+    return { ...user, addresses };
   };
 
   return {
     users,
     isLoaded,
+    error,
+    refetch: load,
     addUser,
     updateUser,
     deleteUser,
     getUser,
+    fetchUser,
   };
 }
