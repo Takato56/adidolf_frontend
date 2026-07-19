@@ -15,6 +15,8 @@ export default function VoucherDetailPage() {
   const { getVoucher, updateVoucher, deleteVoucher, isLoaded } =
     useVouchers();
   const [voucher, setVoucher] = useState<Voucher | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoaded) {
@@ -27,15 +29,32 @@ export default function VoucherDetailPage() {
     }
   }, [isLoaded, voucherId, getVoucher, router]);
 
-  const handleSubmit = (data: any) => {
-    updateVoucher(voucherId, data);
-    router.push('/admin/vouchers');
+  const handleSubmit = async (data: any) => {
+    setActionError(null);
+    setIsSubmitting(true);
+    try {
+      await updateVoucher(voucherId, data);
+      router.push('/admin/vouchers');
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Failed to update voucher'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this voucher?')) {
-      deleteVoucher(voucherId);
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this voucher?')) return;
+
+    setActionError(null);
+    try {
+      await deleteVoucher(voucherId);
       router.push('/admin/vouchers');
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Failed to delete voucher'
+      );
     }
   };
 
@@ -75,8 +94,14 @@ export default function VoucherDetailPage() {
         </button>
       </div>
 
+      {actionError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {actionError}
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <VoucherForm voucher={voucher} onSubmit={handleSubmit} />
+        <VoucherForm voucher={voucher} onSubmit={handleSubmit} isLoading={isSubmitting} />
       </div>
 
       {/* Voucher Preview */}

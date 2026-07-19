@@ -19,10 +19,17 @@ const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
 };
 
 const SLIDES = [
-  { id: 1, bg: "bg-neutral-900", text: "Summer Collection 2026", sub: "Up to 50% Off" },
-  { id: 2, bg: "bg-zinc-800", text: "New Arrivals Just Dropped", sub: "Explore premium streetwear" },
-  { id: 3, bg: "bg-stone-900", text: "The Essentials Pack", sub: "Meticulously crafted basics" },
+  { id: 1, keyword: "fashion,summer", text: "Summer Collection 2026", sub: "Up to 50% Off" },
+  { id: 2, keyword: "fashion,alternative", text: "New Arrivals Just Dropped", sub: "Explore premium streetwear" },
+  { id: 3, keyword: "fashion,minimal", text: "The Essentials Pack", sub: "Meticulously crafted basics" },
 ];
+
+// Changes once a day (not on every page load/random reshuffle): the lock
+// seed is derived from today's date, so all visitors see the same 3 images
+// for the day, and they rotate to a new set tomorrow.
+const todaySeed = Number(new Date().toISOString().slice(0, 10).replace(/-/g, ""));
+const slideImage = (slide: (typeof SLIDES)[number]) =>
+  `https://loremflickr.com/1600/700/${slide.keyword}?lock=${todaySeed + slide.id}`;
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -143,12 +150,18 @@ export default function Home() {
           {SLIDES.map((slide) => (
             <div
               key={slide.id}
-              className={`w-full h-full flex-shrink-0 ${slide.bg} flex flex-col justify-center items-center text-white p-4 text-center`}
+              className="w-full h-full flex-shrink-0 relative overflow-hidden flex flex-col justify-center items-center text-white p-4 text-center"
             >
-              <h1 className="text-2xl md:text-5xl font-extrabold uppercase tracking-wider mb-2">
+              <img
+                src={slideImage(slide)}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/45" />
+              <h1 className="relative z-10 text-2xl md:text-5xl font-extrabold uppercase tracking-wider mb-2">
                 {slide.text}
               </h1>
-              <p className="text-sm md:text-lg text-gray-300">
+              <p className="relative z-10 text-sm md:text-lg text-gray-300">
                 {slide.sub}
               </p>
             </div>

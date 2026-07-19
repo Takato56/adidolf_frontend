@@ -3,14 +3,27 @@
 import { VoucherForm } from '@/components/admin/VoucherForm';
 import { useVouchers } from '@/lib/hooks/useVouchers';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function NewVoucherPage() {
   const router = useRouter();
   const { addVoucher, isLoaded } = useVouchers();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = (data: any) => {
-    addVoucher(data);
-    router.push('/admin/vouchers');
+  const handleSubmit = async (data: any) => {
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      await addVoucher(data);
+      router.push('/admin/vouchers');
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : 'Failed to create voucher'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isLoaded) {
@@ -24,16 +37,20 @@ export default function NewVoucherPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">
-          Add New Voucher
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900">Add New Voucher</h2>
         <p className="text-gray-600 text-sm mt-1">
-          Create a new discount code or promotion
+          Fill in the voucher details below
         </p>
       </div>
 
+      {submitError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+          {submitError}
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <VoucherForm onSubmit={handleSubmit} />
+        <VoucherForm onSubmit={handleSubmit} isLoading={isSubmitting} />
       </div>
     </div>
   );

@@ -1,389 +1,88 @@
 import { Order, OrderItem, Shipment, Payment } from '@/types';
-import { useEffect, useRef, useState } from 'react';
-
-const STORAGE_KEY = 'admin_orders';
-
-const today = new Date().toISOString().split('T')[0];
-
-const defaultOrders: Order[] = [
-  {
-    id: 1,
-    userId: 1,
-    addressId: 1,
-    voucherId: 0,
-    status: 'done',
-    subtotal: 109.98,
-    discountAmount: 10,
-    shippingFee: 5.99,
-    totalPrice: 105.97,
-    note: '',
-    createdAt: today + 'T10:30:00.000Z',
-    items: [
-      {
-        id: 1,
-        productId: 1,
-        variantId: 1,
-        productName: 'Premium Cotton T-Shirt',
-        variantInfo: 'Navy / M',
-        unitPrice: 29.99,
-        quantity: 2,
-        subtotal: 59.98,
-      },
-      {
-        id: 2,
-        productId: 3,
-        variantId: 5,
-        productName: 'Summer Casual Shorts',
-        variantInfo: 'Khaki / L',
-        unitPrice: 39.99,
-        quantity: 1,
-        subtotal: 39.99,
-      },
-    ],
-    shipment: {
-      shipmentId: 1,
-      carrier: 'FedEx',
-      trackingNumber: 'FX-8812-3456',
-      status: 'delivered',
-      shippedAt: today + 'T12:00:00.000Z',
-      estimatedDelivery: today + 'T00:00:00.000Z',
-      deliveredAt: today + 'T16:45:00.000Z',
-    },
-    payment: {
-      paymentId: 1,
-      method: 'card',
-      status: 'paid',
-      amount: 105.97,
-      transactionId: 'TXN-98765',
-      gatewayResponse: 'Approved',
-      paidAt: today + 'T10:31:00.000Z',
-    },
-  },
-  {
-    id: 2,
-    userId: 2,
-    addressId: 2,
-    voucherId: 1,
-    status: 'shipping',
-    subtotal: 289.98,
-    discountAmount: 25,
-    shippingFee: 0,
-    totalPrice: 264.98,
-    note: 'Gift wrap please',
-    createdAt: today + 'T14:15:00.000Z',
-    items: [
-      {
-        id: 3,
-        productId: 5,
-        variantId: 9,
-        productName: 'Vintage Leather Jacket',
-        variantInfo: 'Brown / L',
-        unitPrice: 209.99,
-        quantity: 1,
-        subtotal: 209.99,
-      },
-      {
-        id: 4,
-        productId: 2,
-        variantId: 3,
-        productName: 'Classic Blue Denim Jeans',
-        variantInfo: 'Dark Blue / 32',
-        unitPrice: 79.99,
-        quantity: 1,
-        subtotal: 79.99,
-      },
-    ],
-    shipment: {
-      shipmentId: 2,
-      carrier: 'UPS',
-      trackingNumber: '1Z-999-888',
-      status: 'in_transit',
-      shippedAt: today + 'T15:00:00.000Z',
-      estimatedDelivery: (() => {
-        const d = new Date();
-        d.setDate(d.getDate() + 2);
-        return d.toISOString().split('T')[0];
-      })(),
-      deliveredAt: null,
-    },
-    payment: {
-      paymentId: 2,
-      method: 'VNPay',
-      status: 'paid',
-      amount: 264.98,
-      transactionId: 'VNP-45678',
-      gatewayResponse: 'Success',
-      paidAt: today + 'T14:16:00.000Z',
-    },
-  },
-  {
-    id: 3,
-    userId: 1,
-    addressId: 1,
-    voucherId: 0,
-    status: 'pending',
-    subtotal: 49.99,
-    discountAmount: 0,
-    shippingFee: 4.99,
-    totalPrice: 54.98,
-    note: '',
-    createdAt: today + 'T09:00:00.000Z',
-    items: [
-      {
-        id: 5,
-        productId: 4,
-        variantId: 6,
-        productName: 'Elegant Formal Shirt',
-        variantInfo: 'White / L',
-        unitPrice: 89.99,
-        quantity: 1,
-        subtotal: 89.99,
-      },
-    ],
-    payment: {
-      paymentId: 3,
-      method: 'COD',
-      status: 'pending',
-      amount: 54.98,
-      transactionId: null,
-      gatewayResponse: null,
-      paidAt: null,
-    },
-  },
-];
-
-function migrateOrderId(raw: any): number {
-  if (typeof raw.id === 'number') return raw.id;
-  if (typeof raw.id === 'string') {
-    // Try extracting a numeric suffix, e.g. "ORD-12345" -> 12345
-    const match = raw.id.match(/(\d+)$/);
-    if (match) return parseInt(match[1], 10);
-  }
-  return 0;
-}
-
-function migrateItemId(raw: any): number {
-  if (typeof raw.id === 'number') return raw.id;
-  if (typeof raw.id === 'string') {
-    const match = raw.id.match(/(\d+)$/);
-    if (match) return parseInt(match[1], 10);
-  }
-  return 0;
-}
-
-function migrateOrder(raw: any): Order {
-  return {
-    id: migrateOrderId(raw),
-    userId: typeof raw.userId === 'number' ? raw.userId : 0,
-    addressId: typeof raw.addressId === 'number' ? raw.addressId : 0,
-    voucherId: typeof raw.voucherId === 'number' ? raw.voucherId : 0,
-    status: ['pending', 'confirmed', 'shipping', 'done', 'cancelled'].includes(
-      raw.status
-    )
-      ? raw.status
-      : 'pending',
-    subtotal: typeof raw.subtotal === 'number' ? raw.subtotal : 0,
-    discountAmount:
-      typeof raw.discountAmount === 'number' ? raw.discountAmount : 0,
-    shippingFee: typeof raw.shippingFee === 'number' ? raw.shippingFee : 0,
-    totalPrice: typeof raw.totalPrice === 'number' ? raw.totalPrice : 0,
-    note: raw.note || '',
-    createdAt: raw.createdAt || new Date().toISOString(),
-    items: Array.isArray(raw.items) ? raw.items.map(migrateItem) : [],
-    shipment: raw.shipment ? migrateShipment(raw.shipment) : undefined,
-    payment: raw.payment ? migratePayment(raw.payment) : undefined,
-  };
-}
-
-function migrateItem(raw: any): OrderItem {
-  return {
-    id: migrateItemId(raw),
-    productId: typeof raw.productId === 'number' ? raw.productId : 0,
-    variantId:
-      raw.variantId === null || raw.variantId === undefined || raw.variantId === ''
-        ? null
-        : typeof raw.variantId === 'number'
-        ? raw.variantId
-        : parseInt(String(raw.variantId)) || null,
-    productName: raw.productName || '',
-    variantInfo: raw.variantInfo || null,
-    unitPrice: typeof raw.unitPrice === 'number' ? raw.unitPrice : 0,
-    quantity: typeof raw.quantity === 'number' ? raw.quantity : 0,
-    subtotal: typeof raw.subtotal === 'number' ? raw.subtotal : 0,
-  };
-}
-
-function migrateShipment(raw: any): Shipment {
-  return {
-    shipmentId: typeof raw.shipmentId === 'number' ? raw.shipmentId : 0,
-    carrier: raw.carrier || '',
-    trackingNumber: raw.trackingNumber ?? null,
-    status: ['preparing', 'in_transit', 'delivered', 'returned'].includes(raw.status)
-      ? raw.status
-      : 'preparing',
-    shippedAt: raw.shippedAt ?? null,
-    estimatedDelivery: raw.estimatedDelivery ?? null,
-    deliveredAt: raw.deliveredAt ?? null,
-  };
-}
-
-function migratePayment(raw: any): Payment {
-  return {
-    paymentId: typeof raw.paymentId === 'number' ? raw.paymentId : 0,
-    method: ['COD', 'VNPay', 'Momo', 'ZaloPay', 'card'].includes(raw.method)
-      ? raw.method
-      : 'COD',
-    status: ['pending', 'paid', 'failed'].includes(raw.status)
-      ? raw.status
-      : 'pending',
-    amount: typeof raw.amount === 'number' ? raw.amount : 0,
-    transactionId: raw.transactionId ?? null,
-    gatewayResponse: raw.gatewayResponse ?? null,
-    paidAt: raw.paidAt ?? null,
-  };
-}
+import { useCallback, useEffect, useState } from 'react';
+import {
+  getOrdersApi,
+  getOrderByIdApi,
+  createOrderApi,
+  updateOrderApi,
+  deleteOrderApi,
+  updateShipmentApi,
+  updatePaymentApi,
+} from '@/lib/orders';
 
 export function useOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Persistent ID counters seeded from existing data
-  const nextOrderId = useRef(100);
-  const nextItemId = useRef(Date.now());
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      let parsedOrders: Order[];
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          parsedOrders = Array.isArray(parsed)
-            ? parsed.map(migrateOrder)
-            : defaultOrders;
-        } catch {
-          parsedOrders = defaultOrders;
-        }
-      } else {
-        parsedOrders = defaultOrders;
-      }
-      // Seed counters from existing data to avoid key collisions
-      nextOrderId.current =
-        Math.max(...parsedOrders.map((o) => o.id), 0) + 1;
-      const maxItemId = Math.max(
-        ...parsedOrders.flatMap((o) => o.items.map((i) => i.id)),
-        0
-      );
-      nextItemId.current = maxItemId + 1;
-      setOrders(parsedOrders);
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      const data = await getOrdersApi();
+      setOrders(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load orders');
+    } finally {
       setIsLoaded(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoaded && typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-    }
-  }, [orders, isLoaded]);
+    load();
+  }, [load]);
 
-  const addOrder = (
+  const addOrder = async (
     order: Omit<Order, 'id' | 'subtotal' | 'totalPrice'>
   ) => {
-    const fullItems: OrderItem[] = order.items.map((item, idx) => ({
-      ...item,
-      id: nextItemId.current++,
-      subtotal: item.unitPrice * item.quantity,
-    }));
-    const subtotal = fullItems.reduce((sum, i) => sum + i.subtotal, 0);
-    const totalPrice = subtotal - order.discountAmount + order.shippingFee;
-
-    const newOrder: Order = {
-      ...order,
-      id: nextOrderId.current++,
-      subtotal,
-      totalPrice,
-      items: fullItems,
-    };
-    setOrders((prev) => [...prev, newOrder]);
-    return newOrder;
+    const created = await createOrderApi(order as any);
+    setOrders((prev) => [...prev, created]);
+    return created;
   };
 
-  const updateOrder = (id: number, updates: Partial<Order>) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== id) return o;
-        const merged = { ...o, ...updates };
-        if (updates.items) {
-          const subtotal = updates.items.reduce(
-            (sum, i) => sum + (i.subtotal ?? i.unitPrice * i.quantity),
-            0
-          );
-          const totalPrice =
-            subtotal - merged.discountAmount + merged.shippingFee;
-          return { ...merged, subtotal, totalPrice };
-        }
-        return merged;
-      })
-    );
+  const updateOrder = async (id: number, updates: Partial<Order>) => {
+    const updated = await updateOrderApi(id, updates);
+    setOrders((prev) => prev.map((o) => (o.id === id ? updated : o)));
+    return updated;
   };
 
-  const deleteOrder = (id: number) => {
+  const deleteOrder = async (id: number) => {
+    await deleteOrderApi(id);
     setOrders((prev) => prev.filter((o) => o.id !== id));
   };
 
-  const getOrder = (id: number) => {
-    return orders.find((o) => o.id === id);
+  // The list from load() doesn't carry items/shipment/payment (avoids an
+  // N+1 fetch across 3 more tables just to render a table row) — use this
+  // for the detail/edit page instead of getOrder().
+  const fetchOrder = async (id: number): Promise<Order> => getOrderByIdApi(id);
+
+  const getOrder = (id: number) => orders.find((o) => o.id === id);
+
+  const updateShipment = async (orderId: number, data: Partial<Shipment>) => {
+    const updated = await updateShipmentApi(orderId, data);
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, shipment: updated } : o))
+    );
+    return updated;
   };
 
-  const updateShipment = (orderId: number, data: Partial<Shipment>) => {
+  const updatePayment = async (orderId: number, data: Partial<Payment>) => {
+    const updated = await updatePaymentApi(orderId, data);
     setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== orderId) return o;
-        const existing = o.shipment || {
-          shipmentId: 0,
-          carrier: '',
-          trackingNumber: null,
-          status: 'preparing' as const,
-          shippedAt: null,
-          estimatedDelivery: null,
-          deliveredAt: null,
-        };
-        return {
-          ...o,
-          shipment: { ...existing, ...data },
-        };
-      })
+      prev.map((o) => (o.id === orderId ? { ...o, payment: updated } : o))
     );
-  };
-
-  const updatePayment = (orderId: number, data: Partial<Payment>) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== orderId) return o;
-        const existing = o.payment || {
-          paymentId: 0,
-          method: 'COD' as const,
-          status: 'pending' as const,
-          amount: 0,
-          transactionId: null,
-          gatewayResponse: null,
-          paidAt: null,
-        };
-        return {
-          ...o,
-          payment: { ...existing, ...data },
-        };
-      })
-    );
+    return updated;
   };
 
   return {
     orders,
     isLoaded,
+    error,
+    refetch: load,
     addOrder,
     updateOrder,
     deleteOrder,
     getOrder,
+    fetchOrder,
     updateShipment,
     updatePayment,
   };

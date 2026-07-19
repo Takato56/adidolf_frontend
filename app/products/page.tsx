@@ -7,6 +7,7 @@ import { FiShoppingCart, FiHeart, FiMinus, FiPlus, FiChevronLeft, FiChevronRight
 import ProductCard from "@/components/ProductCard";
 import { getProductBySlug } from "@/lib/products";
 import { useProducts } from "@/lib/hooks/useProducts";
+import { useCart } from "@/lib/hooks/useCart";
 import { toProductCardData } from "@/lib/adapters/productDisplay";
 import { USE_MOCK_DATA } from "@/lib/config";
 import { Product } from "@/types";
@@ -109,6 +110,62 @@ function ProductPageContent() {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const sliderRef = useRef<HTMLDivElement>(null);
+
+  const { addItem, voucher, discountAmount, subtotal: cartSubtotal } = useCart();
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [addToCartError, setAddToCartError] = useState<string | null>(null);
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const selectedVariant =
+    !USE_MOCK_DATA && product
+      ? product.variants.find(
+          (v) =>
+            (!sizes.length || v.size === selectedSize) &&
+            (!colors.length || v.color === selectedColor)
+        )
+      : undefined;
+
+  const unitPrice =
+    USE_MOCK_DATA || !product
+      ? parseFloat(displayPrice)
+      : product.price + (selectedVariant?.extra_price ?? 0);
+
+  const handleAddToCart = () => {
+    setAddedToCart(false);
+    if (sizes.length > 0 && !selectedSize) {
+      setAddToCartError("Please select a size.");
+      return;
+    }
+    if (colors.length > 0 && !selectedColor) {
+      setAddToCartError("Please select a color.");
+      return;
+    }
+    if (product && product.variants.length > 0 && !selectedVariant) {
+      setAddToCartError("That combination isn't available.");
+      return;
+    }
+    if (selectedVariant && selectedVariant.stock <= 0) {
+      setAddToCartError("This variant is out of stock.");
+      return;
+    }
+
+    setAddToCartError(null);
+    addItem({
+      productId: product ? product.id : "mock",
+      variantId: selectedVariant?.id,
+      slug: product ? product.slug : "mock-product",
+      name: displayName,
+      image: images[0] ?? "",
+      unitPrice,
+      quantity,
+      size: selectedSize ?? undefined,
+      color: selectedColor ?? undefined,
+      stock: selectedVariant?.stock,
+    });
+    setAddedToCart(true);
+  };
 
   // Reset the image carousel whenever a different product loads.
   useEffect(() => {
@@ -275,7 +332,14 @@ function ProductPageContent() {
             </div>
           )}
 
-          <p className="pt-3 md:pt-5 text-[30px] md:text-[35px] font-bold text-red-600">${displayPrice}</p>
+          <p className="pt-3 md:pt-5 text-[30px] md:text-[35px] font-bold text-red-600">${unitPrice.toFixed(2)}</p>
+          {voucher && discountAmount > 0 && (
+            <p className="text-sm text-green-700 mt-1">
+              Voucher <span className="font-mono font-semibold">{voucher.code}</span> is applied to your cart
+              (−${discountAmount.toFixed(2)} on your ${cartSubtotal.toFixed(2)} subtotal).{" "}
+              <Link href="/cart" className="underline">View cart</Link>
+            </p>
+          )}
 
           <div>
             {sizes.length > 0 && (
@@ -283,7 +347,18 @@ function ProductPageContent() {
                 <p className="my-auto font-semibold pr-4 text-gray-700">Size:</p>
                 {sizes.map((item) => (
                   <label key={item} className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 bg-white has-checked:bg-black has-checked:text-white has-checked:border-black select-none transition-all">
-                    <input type="radio" name="product-size" value={item} className="hidden" />
+                    <input
+                      type="radio"
+                      name="product-size"
+                      value={item}
+                      className="hidden"
+                      checked={selectedSize === item}
+                      onChange={() => {
+                        setSelectedSize(item);
+                        setAddToCartError(null);
+                        setAddedToCart(false);
+                      }}
+                    />
                     <span className="text-[14px] md:text-[16px]">{item}</span>
                   </label>
                 ))}
@@ -300,7 +375,18 @@ function ProductPageContent() {
                     style={{ backgroundColor: item.startsWith('#') ? item : undefined }}
                     title={item}
                   >
-                    <input type="radio" name="product-color" value={item} className="hidden" />
+                    <input
+                      type="radio"
+                      name="product-color"
+                      value={item}
+                      className="hidden"
+                      checked={selectedColor === item}
+                      onChange={() => {
+                        setSelectedColor(item);
+                        setAddToCartError(null);
+                        setAddedToCart(false);
+                      }}
+                    />
                     {!item.startsWith('#') && (
                       <span className="text-[10px] text-gray-700">{item}</span>
                     )}
@@ -308,7 +394,57 @@ function ProductPageContent() {
                 ))}
               </div>
             )}
+
+            {/* Quantity */}
+            <div className="flex items-center gap-3 mt-6">
+              <p className="font-semibold text-gray-700">Quantity:</p>
+              <div className="flex items-center gap-3 border border-gray-300 rounded-lg px-3 py-1.5">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="text-gray-500 hover:text-black transition-colors"
+                >
+                  <FiMinus size={14} />
+                </button>
+                <span className="w-6 text-center font-medium">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuantity((q) =>
+                      selectedVariant?.stock ? Math.min(selectedVariant.stock, q + 1) : q + 1
+                    )
+                  }
+                  className="text-gray-500 hover:text-black transition-colors"
+                >
+                  <FiPlus size={14} />
+                </button>
+              </div>
+              {selectedVariant && (
+                <span
+                  className={
+                    selectedVariant.stock > 5
+                      ? "text-xs text-green-600"
+                      : selectedVariant.stock > 0
+                      ? "text-xs text-amber-600"
+                      : "text-xs text-red-600"
+                  }
+                >
+                  {selectedVariant.stock > 0
+                    ? `${selectedVariant.stock} in stock`
+                    : "Out of stock"}
+                </span>
+              )}
+            </div>
           </div>
+
+          {addToCartError && (
+            <p className="text-sm text-red-600 mt-3">{addToCartError}</p>
+          )}
+          {addedToCart && !addToCartError && (
+            <p className="text-sm text-green-700 mt-3">
+              Added to your cart. <Link href="/cart" className="underline">View cart</Link>
+            </p>
+          )}
 
           <div className="flex flex-row gap-3 mt-8 mb-8">
             <button
@@ -330,7 +466,10 @@ function ProductPageContent() {
               <FiHeart />
             </button>
 
-            <button className="border border-transparent flex flex-row rounded-lg w-[85%] py-3 justify-center items-center bg-black text-white font-medium hover:bg-gray-800 transition-colors">
+            <button
+              onClick={handleAddToCart}
+              className="border border-transparent flex flex-row rounded-lg w-[85%] py-3 justify-center items-center bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+            >
               <FiShoppingCart className="mr-2" />
               Add to cart
             </button>
