@@ -2,8 +2,6 @@
 
 import { UserTable } from '@/components/admin/UserTable';
 import { useUsers } from '@/lib/hooks/useUsers';
-import { FiPlus } from 'react-icons/fi';
-import Link from 'next/link';
 
 export default function UsersPage() {
   const { users, isLoaded, error } = useUsers();
@@ -18,22 +16,13 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Actions */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Users</h2>
           <p className="text-gray-600 text-sm mt-1">
             Manage and view registered users
           </p>
-        </div>
-        <div className="flex gap-3">
-          <Link
-            href="/admin/users/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <FiPlus size={18} />
-            Add User
-          </Link>
         </div>
       </div>
 

@@ -248,6 +248,31 @@ export async function deleteProductImageApi(
   }
 }
 
+// Real image upload — goes through the backend ONLY for the actual upload
+// step, because writing to Supabase Storage requires the service-role key,
+// which must stay server-side (that's what POST /:id/images/upload does:
+// receives the file, uploads it to the bucket, and creates the
+// product_images row itself). Everything AFTER that — every time this image
+// is displayed — hits the returned public bucket URL directly via <img
+// src>, never through the backend again. That split (upload via backend,
+// serve directly from the bucket) is intentional, not a shortcut: proxying
+// every image read through Express would bottleneck it for no reason.
+export async function uploadProductImagesApi(
+  productId: string | number,
+  files: File[]
+): Promise<ApiProductImage[]> {
+  const formData = new FormData();
+  files.forEach((file) => formData.append('images', file));
+
+  const res = await fetchWithAuth(`${BASE_URL}/products/${productId}/images/upload`, {
+    method: 'POST',
+    // No Content-Type header here on purpose — the browser sets the
+    // multipart/form-data boundary itself. Setting it manually breaks it.
+    body: formData,
+  });
+  return unwrap<ApiProductImage[]>(res, 'Failed to upload product images');
+}
+
 // Reconciles a product's images with whatever URLs are currently in the
 // edit form, since PUT /products/:id doesn't touch the images table at all.
 // Anything removed from the form gets deleted; anything new gets created;
