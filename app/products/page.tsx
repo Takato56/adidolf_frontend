@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FiShoppingCart, FiHeart, FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiShoppingCart, FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import ProductCard from "@/components/ProductCard";
 import { getProductBySlug } from "@/lib/products";
 import { useProducts } from "@/lib/hooks/useProducts";
@@ -171,6 +171,20 @@ function ProductPageContent() {
   useEffect(() => {
     setActiveIndex(0);
   }, [product?.id]);
+
+  // Auto-advance the image carousel every few seconds, looping back to the
+  // start. The timer resets on every index change (including manual swipes
+  // or thumbnail clicks), so it doesn't fight with the user right after
+  // they navigate manually.
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const timeout = setTimeout(() => {
+      setActiveIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+
+    return () => clearTimeout(timeout);
+  }, [currentActiveIndex, images.length]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0].clientX;
@@ -448,27 +462,8 @@ function ProductPageContent() {
 
           <div className="flex flex-row gap-3 mt-8 mb-8">
             <button
-              id="favor"
-              className="border border-gray-300 flex rounded-lg w-[15%] py-3 justify-center items-center bg-white text-xl transition-colors"
-              onClick={() => {
-                const element = document.getElementById("favor");
-                if (element) {
-                  if (element.style.backgroundColor === "red") {
-                    element.style.backgroundColor = "white";
-                    element.style.color = "black";
-                  } else {
-                    element.style.backgroundColor = "red";
-                    element.style.color = "white";
-                  }
-                }
-              }}
-            >
-              <FiHeart />
-            </button>
-
-            <button
               onClick={handleAddToCart}
-              className="border border-transparent flex flex-row rounded-lg w-[85%] py-3 justify-center items-center bg-black text-white font-medium hover:bg-gray-800 transition-colors"
+              className="border border-transparent flex flex-row rounded-lg w-full py-3 justify-center items-center bg-black text-white font-medium hover:bg-gray-800 transition-colors"
             >
               <FiShoppingCart className="mr-2" />
               Add to cart

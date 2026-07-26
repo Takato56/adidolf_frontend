@@ -65,15 +65,16 @@ export default function NewArrivals() {
           <div className="flex overflow-x-auto gap-4 pb-4">
             {(USE_MOCK_DATA || isLoaded) &&
               deals.map((product, index) => (
-                <ProductCard
-                  key={`deal-${index}`}
-                  image={product.image}
-                  alt={product.alt}
-                  category={product.category}
-                  name={product.name}
-                  price={product.price}
-                  shopLink={product.shopLink}
-                />
+                <div key={`deal-${index}`} className="shrink-0 w-[260px] sm:w-[320px] md:w-[370px]">
+                  <ProductCard
+                    image={product.image}
+                    alt={product.alt}
+                    category={product.category}
+                    name={product.name}
+                    price={product.price}
+                    shopLink={product.shopLink}
+                  />
+                </div>
               ))}
           </div>
         </div>
@@ -86,15 +87,16 @@ export default function NewArrivals() {
           <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
             {(USE_MOCK_DATA || isLoaded) &&
               newArrivals.map((product, index) => (
-                <ProductCard
-                  key={`new-${index}`}
-                  image={product.image}
-                  alt={product.alt}
-                  category={product.category}
-                  name={product.name}
-                  price={product.price}
-                  shopLink={product.shopLink}
-                />
+                <div key={`new-${index}`} className="shrink-0 w-[260px] sm:w-[320px] md:w-[370px]">
+                  <ProductCard
+                    image={product.image}
+                    alt={product.alt}
+                    category={product.category}
+                    name={product.name}
+                    price={product.price}
+                    shopLink={product.shopLink}
+                  />
+                </div>
               ))}
           </div>
         </div>
