@@ -8,7 +8,7 @@ import { useCategories } from '@/lib/hooks/useCategories';
 
 interface ProductFormProps {
   product?: Product;
-  onSubmit: (data: Omit<Product, 'id'>) => void;
+  onSubmit: (data: Omit<Product, 'id'> & { imageFiles?: File[] }) => void;
   isLoading?: boolean;
 }
 
@@ -37,6 +37,7 @@ export function ProductForm({
     images: product?.images?.length ? product.images : [''],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   const generateSlug = (name: string) => {
     return name
@@ -64,7 +65,7 @@ export function ProductForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    onSubmit(formData);
+    onSubmit({ ...formData, imageFiles });
   };
 
   const handleChange = (
@@ -160,6 +161,19 @@ export function ProductForm({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
+  };
+
+  // Real file upload handlers — these files get uploaded to Supabase
+  // Storage (via the backend, which owns the service-role key) only when
+  // the form is actually submitted; see the parent page's onSubmit.
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files ?? []);
+    setImageFiles((prev) => [...prev, ...selected]);
+    e.target.value = ''; // allow re-selecting the same file if removed
+  };
+
+  const removeImageFile = (index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -428,38 +442,95 @@ export function ProductForm({
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-gray-700">
-            Product Images *
+            Upload Images
           </label>
-          <button
-            type="button"
-            onClick={addImage}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition"
-          >
-            <FiPlus size={16} /> Add Image
-          </button>
+          <label className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition cursor-pointer">
+            <FiPlus size={16} /> Choose Files
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </label>
         </div>
-        <div className="space-y-3">
-          {formData.images.map((imageUrl, index) => (
-            <div key={index} className="flex gap-3 items-center">
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => handleImageChange(index, e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
-                placeholder="https://example.com/image.jpg"
-              />
-              <button
-                type="button"
-                onClick={() => removeImage(index)}
-                disabled={formData.images.length <= 1}
-                className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
-                title="Remove image"
-              >
-                <FiTrash2 size={18} />
-              </button>
+        <p className="text-xs text-gray-500 mb-3">
+          Uploaded on save — files are stored directly in Supabase Storage.
+        </p>
+
+        {imageFiles.length > 0 && (
+          <div className="flex flex-wrap gap-3 mb-4">
+            {imageFiles.map((file, index) => (
+              <div key={index} className="relative w-20 h-20 group">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={file.name}
+                  className="w-full h-full object-cover rounded-lg border border-gray-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImageFile(index)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                  title="Remove"
+                >
+                  <FiTrash2 size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {product && product.images.filter(Boolean).length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 mb-2">Current images:</p>
+            <div className="flex flex-wrap gap-3">
+              {product.images.filter(Boolean).map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt=""
+                  className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+
+        <details className="mt-2">
+          <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+            Or paste external image URLs instead
+          </summary>
+          <div className="space-y-3 mt-3">
+            {formData.images.map((imageUrl, index) => (
+              <div key={index} className="flex gap-3 items-center">
+                <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => handleImageChange(index, e.target.value)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  disabled={formData.images.length <= 1}
+                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Remove image"
+                >
+                  <FiTrash2 size={18} />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addImage}
+              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition"
+            >
+              <FiPlus size={16} /> Add URL
+            </button>
+          </div>
+        </details>
       </div>
 
       {/* Form Actions */}

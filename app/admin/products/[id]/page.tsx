@@ -2,6 +2,7 @@
 
 import { ProductForm } from '@/components/admin/ProductForm';
 import { useProducts } from '@/lib/hooks/useProducts';
+import { uploadProductImagesApi } from '@/lib/products';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
@@ -32,7 +33,15 @@ export default function ProductDetailPage() {
     setActionError(null);
     setIsSubmitting(true);
     try {
-      await updateProduct(productId, data);
+      const { imageFiles, ...productData } = data;
+      await updateProduct(productId, productData);
+
+      // Uploads straight to Supabase Storage via the backend (which owns
+      // the service-role key) and creates the product_images rows itself.
+      if (imageFiles?.length) {
+        await uploadProductImagesApi(productId, imageFiles);
+      }
+
       router.push('/admin/products');
     } catch (err) {
       setActionError(

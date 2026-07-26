@@ -2,6 +2,7 @@
 
 import { ProductForm } from '@/components/admin/ProductForm';
 import { useProducts } from '@/lib/hooks/useProducts';
+import { uploadProductImagesApi } from '@/lib/products';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -15,7 +16,17 @@ export default function NewProductPage() {
     setSubmitError(null);
     setIsSubmitting(true);
     try {
-      await addProduct(data);
+      const { imageFiles, ...productData } = data;
+      const created = await addProduct(productData);
+
+      // Uploaded files can only go up after the product exists (the upload
+      // endpoint needs a real product id) — this uploads them straight to
+      // Supabase Storage via the backend and creates their product_images
+      // rows in one call.
+      if (imageFiles?.length) {
+        await uploadProductImagesApi(created.id, imageFiles);
+      }
+
       router.push('/admin/products');
     } catch (err) {
       setSubmitError(
