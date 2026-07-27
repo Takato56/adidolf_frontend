@@ -1,10 +1,13 @@
+// FILE: takato56-adidolf_frontend/components/admin/ProductForm.tsx
+
 'use client';
 
 import { Product, ProductVariant } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiUpload } from 'react-icons/fi';
 import { useCategories } from '@/lib/hooks/useCategories';
+import { uploadVariantImageApi } from '@/lib/products';
 
 interface ProductFormProps {
   product?: Product;
@@ -13,7 +16,14 @@ interface ProductFormProps {
 }
 
 function emptyVariant(): ProductVariant {
-  return { color: '', size: '', extra_price: 0, stock: 0, image_url: '' };
+  return {
+    sku: `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    color: '',
+    size: '',
+    extra_price: 0,
+    stock: 0,
+    image_url: '',
+  };
 }
 
 export function ProductForm({
@@ -31,13 +41,12 @@ export function ProductForm({
     price: product?.price || 0,
     brand: product?.brand || '',
     isPublished: product?.isPublished ?? true,
-    variants: product?.variants?.length
-      ? product.variants
-      : [emptyVariant()],
+    variants: product?.variants?.length ? product.variants : [emptyVariant()],
     images: product?.images?.length ? product.images : [''],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [uploadingVariantIndex, setUploadingVariantIndex] = useState<number | null>(null);
 
   const generateSlug = (name: string) => {
     return name
@@ -51,12 +60,16 @@ export function ProductForm({
 
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
     if (!formData.slug.trim()) newErrors.slug = 'Slug is required';
-    if (!formData.description.trim())
-      newErrors.description = 'Description is required';
+    if (!formData.description.trim()) newErrors.description = 'Description is required';
     if (formData.price < 0) newErrors.price = 'Price must be positive';
     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
-    if (!formData.categorySlug.trim())
-      newErrors.categorySlug = 'Category is required';
+    if (!formData.categorySlug.trim()) newErrors.categorySlug = 'Category is required';
+
+    formData.variants.forEach((v, idx) => {
+      if (!v.sku || !v.sku.trim()) {
+        newErrors[`variant_${idx}_sku`] = 'SKU is required';
+      }
+    });
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -81,7 +94,7 @@ export function ProductForm({
       [name]: isCheckbox
         ? (e.target as HTMLInputElement).checked
         : name === 'price'
-        ? parseFloat(value)
+        ? parseFloat(value) || 0
         : value,
     }));
 
@@ -121,10 +134,34 @@ export function ProductForm({
       updated[index] = {
         ...updated[index],
         [field]:
-          field === 'extra_price' || field === 'stock' ? Number(value) : value,
+          field === 'extra_price' || field === 'stock' ? Number(value) || 0 : value,
       };
       return { ...prev, variants: updated };
     });
+  };
+
+  const handleVariantFileUpload = async (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!product?.id) {
+      alert('Please create and save the product first before uploading variant images directly.');
+      return;
+    }
+
+    setUploadingVariantIndex(index);
+    try {
+      const uploadedUrl = await uploadVariantImageApi(product.id, file);
+      handleVariantChange(index, 'image_url', uploadedUrl);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to upload variant image');
+    } finally {
+      setUploadingVariantIndex(null);
+      e.target.value = '';
+    }
   };
 
   const addVariant = () => {
@@ -163,13 +200,10 @@ export function ProductForm({
     }));
   };
 
-  // Real file upload handlers — these files get uploaded to Supabase
-  // Storage (via the backend, which owns the service-role key) only when
-  // the form is actually submitted; see the parent page's onSubmit.
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files ?? []);
     setImageFiles((prev) => [...prev, ...selected]);
-    e.target.value = ''; // allow re-selecting the same file if removed
+    e.target.value = '';
   };
 
   const removeImageFile = (index: number) => {
@@ -179,7 +213,6 @@ export function ProductForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Product Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Product Name *
@@ -199,7 +232,6 @@ export function ProductForm({
           )}
         </div>
 
-        {/* Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Category *
@@ -222,19 +254,11 @@ export function ProductForm({
               </option>
             ))}
           </select>
-          {categoriesLoaded && categories.length === 0 && (
-            <p className="text-amber-600 text-sm mt-1">
-              No categories exist yet — create one first.
-            </p>
-          )}
           {errors.categorySlug && (
-            <p className="text-red-600 text-sm mt-1">
-              {errors.categorySlug}
-            </p>
+            <p className="text-red-600 text-sm mt-1">{errors.categorySlug}</p>
           )}
         </div>
 
-        {/* Slug */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Slug *
@@ -254,7 +278,6 @@ export function ProductForm({
           )}
         </div>
 
-        {/* Price */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Price (USD) *
@@ -276,7 +299,6 @@ export function ProductForm({
           )}
         </div>
 
-        {/* Brand */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Brand *
@@ -289,15 +311,14 @@ export function ProductForm({
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
               errors.brand ? 'border-red-500' : 'border-gray-300'
             }`}
-            placeholder="e.g., Nike"
+            placeholder="e.g., Adidolf"
           />
           {errors.brand && (
             <p className="text-red-600 text-sm mt-1">{errors.brand}</p>
           )}
         </div>
 
-        {/* Published */}
-        <div className="flex items-center">
+        <div className="flex items-center pt-6">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -311,7 +332,6 @@ export function ProductForm({
         </div>
       </div>
 
-      {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Description *
@@ -331,11 +351,11 @@ export function ProductForm({
         )}
       </div>
 
-      {/* Variants */}
+      {/* Variants Section */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-gray-700">
-            Variants *
+            Product Variants *
           </label>
           <button
             type="button"
@@ -345,104 +365,141 @@ export function ProductForm({
             <FiPlus size={16} /> Add Variant
           </button>
         </div>
+
         <div className="space-y-4">
           {formData.variants.map((variant, index) => (
             <div
               key={index}
-              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-3 items-end p-4 bg-gray-50 rounded-lg border border-gray-200"
+              className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3"
             >
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">
-                  Color
-                </label>
-                <input
-                  type="text"
-                  value={variant.color || ''}
-                  onChange={(e) =>
-                    handleVariantChange(index, 'color', e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                  placeholder="e.g., Navy"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    SKU *
+                  </label>
+                  <input
+                    type="text"
+                    value={variant.sku || ''}
+                    onChange={(e) =>
+                      handleVariantChange(index, 'sku', e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-mono"
+                    placeholder="SKU-123"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Color</label>
+                  <input
+                    type="text"
+                    value={variant.color || ''}
+                    onChange={(e) =>
+                      handleVariantChange(index, 'color', e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                    placeholder="e.g. Black"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Size</label>
+                  <input
+                    type="text"
+                    value={variant.size || ''}
+                    onChange={(e) =>
+                      handleVariantChange(index, 'size', e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                    placeholder="e.g. M"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Extra Price ($)
+                  </label>
+                  <input
+                    type="number"
+                    value={variant.extra_price}
+                    onChange={(e) =>
+                      handleVariantChange(index, 'extra_price', e.target.value)
+                    }
+                    step="0.01"
+                    min="0"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Stock</label>
+                  <input
+                    type="number"
+                    value={variant.stock}
+                    onChange={(e) =>
+                      handleVariantChange(index, 'stock', e.target.value)
+                    }
+                    min="0"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => removeVariant(index)}
+                    disabled={formData.variants.length <= 1}
+                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Remove variant"
+                  >
+                    <FiTrash2 size={18} />
+                  </button>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">
-                  Size
-                </label>
-                <input
-                  type="text"
-                  value={variant.size || ''}
-                  onChange={(e) =>
-                    handleVariantChange(index, 'size', e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                  placeholder="e.g., M"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">
-                  Extra Price
-                </label>
-                <input
-                  type="number"
-                  value={variant.extra_price}
-                  onChange={(e) =>
-                    handleVariantChange(index, 'extra_price', e.target.value)
-                  }
-                  step="0.01"
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  value={variant.stock}
-                  onChange={(e) =>
-                    handleVariantChange(index, 'stock', e.target.value)
-                  }
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">
-                  Image URL
-                </label>
+
+              {/* Variant Image & File Upload */}
+              <div className="flex flex-col sm:flex-row gap-2 items-center pt-1 border-t border-gray-200">
                 <input
                   type="url"
                   value={variant.image_url || ''}
                   onChange={(e) =>
                     handleVariantChange(index, 'image_url', e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
-                  placeholder="https://..."
+                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs"
+                  placeholder="Variant Image URL (or upload image button ->)"
                 />
+
+                <label className="flex items-center gap-1 text-xs px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg cursor-pointer transition shrink-0">
+                  <FiUpload size={14} />
+                  {uploadingVariantIndex === index ? 'Uploading...' : 'Upload Image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleVariantFileUpload(index, e)}
+                    className="hidden"
+                    disabled={uploadingVariantIndex === index}
+                  />
+                </label>
+
+                {variant.image_url && (
+                  <img
+                    src={variant.image_url}
+                    alt="Variant thumbnail"
+                    className="w-7 h-7 rounded border border-gray-300 object-cover shrink-0"
+                  />
+                )}
               </div>
-              <button
-                type="button"
-                onClick={() => removeVariant(index)}
-                disabled={formData.variants.length <= 1}
-                className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
-                title="Remove variant"
-              >
-                <FiTrash2 size={18} />
-              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Images */}
+      {/* Main Images */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-gray-700">
-            Upload Images
+            Main Product Images
           </label>
           <label className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition cursor-pointer">
             <FiPlus size={16} /> Choose Files
@@ -455,9 +512,6 @@ export function ProductForm({
             />
           </label>
         </div>
-        <p className="text-xs text-gray-500 mb-3">
-          Uploaded on save — files are stored directly in Supabase Storage.
-        </p>
 
         {imageFiles.length > 0 && (
           <div className="flex flex-wrap gap-3 mb-4">
@@ -481,25 +535,9 @@ export function ProductForm({
           </div>
         )}
 
-        {product && product.images.filter(Boolean).length > 0 && (
-          <div className="mb-4">
-            <p className="text-xs text-gray-500 mb-2">Current images:</p>
-            <div className="flex flex-wrap gap-3">
-              {product.images.filter(Boolean).map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt=""
-                  className="w-20 h-20 object-cover rounded-lg border border-gray-200"
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
         <details className="mt-2">
           <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
-            Or paste external image URLs instead
+            Or paste image URLs directly
           </summary>
           <div className="space-y-3 mt-3">
             {formData.images.map((imageUrl, index) => (
@@ -533,7 +571,6 @@ export function ProductForm({
         </details>
       </div>
 
-      {/* Form Actions */}
       <div className="flex gap-4 pt-6 border-t border-gray-200">
         <button
           type="submit"

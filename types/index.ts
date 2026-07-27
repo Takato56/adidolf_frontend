@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/types/index.ts
+
 export interface Category {
   id: string;
   name: string;
@@ -6,12 +8,13 @@ export interface Category {
   description: string;
   trending?: boolean;
   exclusive?: boolean;
-  soldOutRate?: string; // e.g. "94%"
+  soldOutRate?: string;
   tagline?: string;
 }
 
 export interface ProductVariant {
   id?: string;
+  sku?: string;
   color?: string;
   size?: string;
   extra_price: number;
@@ -36,14 +39,14 @@ export interface OverviewStats {
   totalSales: number;
   totalOrders: number;
   activeCustomers: number;
-  revenueGrowth: string; // e.g. "+12.5%"
+  revenueGrowth: string;
   salesTrend: number[];
   ordersTrend: number[];
   customersTrend: number[];
   revenueTrend: number[];
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'done' | 'cancelled';
+export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'delivered' | 'cancelled';
 
 export type ShipmentStatus = 'preparing' | 'in_transit' | 'delivered' | 'returned';
 
@@ -93,7 +96,7 @@ export interface Order {
   shippingFee: number;
   totalPrice: number;
   note: string;
-  createdAt: string; // ISO date string
+  createdAt: string;
   items: OrderItem[];
   shipment?: Shipment;
   payment?: Payment;
@@ -112,8 +115,8 @@ export interface Voucher {
   min_order_amount: number | null;
   usage_limit: number | null;
   usage_count: number;
-  valid_from: string; // ISO date string
-  valid_to: string; // ISO date string
+  valid_from: string;
+  valid_to: string;
   is_active: boolean;
 }
 
@@ -125,7 +128,7 @@ export interface Address {
   district: string;
   ward: string;
   street_detail: string;
-  is_default: number; // 0 or 1
+  is_default: number;
 }
 
 export interface User {
@@ -136,7 +139,7 @@ export interface User {
   avatar_url: string;
   password_hash: string;
   role: UserRole;
-  is_active: number; // 0 or 1
-  created_at: string; // ISO date string
+  is_active: number;
+  created_at: string;
   addresses: Address[];
 }

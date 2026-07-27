@@ -1,9 +1,18 @@
+// FILE: takato56-adidolf_frontend/lib/orders.ts
+
 import { fetchWithAuth } from '@/lib/auth';
-import { Order, OrderItem, Shipment, Payment, OrderStatus, ShipmentStatus, PaymentStatus, PaymentMethod } from '@/types';
+import {
+  Order,
+  OrderItem,
+  Shipment,
+  Payment,
+  OrderStatus,
+  ShipmentStatus,
+  PaymentStatus,
+  PaymentMethod,
+} from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
-// ---------- Backend shapes (snake_case, matching each table) ----------
 
 export interface ApiOrder {
   order_id: number;
@@ -18,6 +27,9 @@ export interface ApiOrder {
   note: string | null;
   created_at: string;
   updated_at?: string;
+  items?: ApiOrderItem[];
+  shipment?: ApiShipment;
+  payment?: ApiPayment;
 }
 
 export interface ApiOrderItem {
@@ -54,6 +66,13 @@ export interface ApiPayment {
   paid_at: string | null;
 }
 
+export interface CreateOrderFromCartDto {
+  address_id: number;
+  payment_method: PaymentMethod;
+  voucher_code?: string;
+  note?: string;
+}
+
 interface ApiEnvelope<T> {
   status: string;
   data: T;
@@ -74,8 +93,6 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
   return json.data;
 }
 
-// ---------- Mapping ----------
-
 function toFrontendItem(i: ApiOrderItem): OrderItem {
   return {
     id: i.item_id,
@@ -83,9 +100,9 @@ function toFrontendItem(i: ApiOrderItem): OrderItem {
     variantId: i.variant_id,
     productName: i.product_name,
     variantInfo: i.variant_info,
-    unitPrice: i.unit_price,
+    unitPrice: Number(i.unit_price) || 0,
     quantity: i.quantity,
-    subtotal: i.subtotal,
+    subtotal: Number(i.subtotal) || 0,
   };
 }
 
@@ -106,7 +123,7 @@ function toFrontendPayment(p: ApiPayment): Payment {
     paymentId: p.payment_id,
     method: p.method,
     status: p.status,
-    amount: p.amount,
+    amount: Number(p.amount) || 0,
     transactionId: p.transaction_id,
     gatewayResponse: p.gateway_response,
     paidAt: p.paid_at,
@@ -119,28 +136,61 @@ function toFrontendOrder(
   shipment?: Shipment,
   payment?: Payment
 ): Order {
+  const parsedItems =
+    items.length > 0
+      ? items
+      : Array.isArray(o.items)
+      ? o.items.map(toFrontendItem)
+      : [];
+
+  const parsedShipment = shipment || (o.shipment ? toFrontendShipment(o.shipment) : undefined);
+  const parsedPayment = payment || (o.payment ? toFrontendPayment(o.payment) : undefined);
+
   return {
     id: o.order_id,
     userId: o.user_id,
     addressId: o.address_id,
     voucherId: o.voucher_id ?? 0,
     status: o.status,
-    subtotal: o.subtotal,
-    discountAmount: o.discount_amount,
-    shippingFee: o.shipping_fee,
-    totalPrice: o.total_price,
+    subtotal: Number(o.subtotal) || 0,
+    discountAmount: Number(o.discount_amount) || 0,
+    shippingFee: Number(o.shipping_fee) || 0,
+    totalPrice: Number(o.total_price) || 0,
     note: o.note ?? '',
     createdAt: o.created_at,
-    items,
-    shipment,
-    payment,
+    items: parsedItems,
+    shipment: parsedShipment,
+    payment: parsedPayment,
   };
 }
 
-// ---------- Reads ----------
+// ---------- Customer Order APIs ----------
 
-// List view — order headers only, no items/shipment/payment (would be an
-// N+1 fetch across 3 more tables per order just to render a table row).
+export async function createOrderFromCartApi(
+  dto: CreateOrderFromCartDto
+): Promise<Order> {
+  const res = await fetchWithAuth(`${BASE_URL}/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dto),
+  });
+  const data = await unwrap<any>(res, 'Failed to place order');
+
+  if (data.order_id) {
+    return toFrontendOrder(data);
+  }
+
+  return data as Order;
+}
+
+export async function getMyOrdersApi(): Promise<Order[]> {
+  const res = await fetchWithAuth(`${BASE_URL}/orders`);
+  const data = await unwrap<ApiOrder[]>(res, 'Failed to fetch your orders');
+  return (Array.isArray(data) ? data : []).map((o) => toFrontendOrder(o));
+}
+
+// ---------- Admin Reads ----------
+
 export async function getOrdersApi(): Promise<Order[]> {
   const res = await fetchWithAuth(`${BASE_URL}/admin/orders`);
   const data = await unwrap<ApiOrder[]>(res, 'Failed to fetch orders');
@@ -177,8 +227,6 @@ async function getRawPaymentByOrderId(orderId: number): Promise<ApiPayment | und
   return data[0];
 }
 
-// Detail view — full order with items, shipment, and payment composed
-// together from 4 separate endpoints.
 export async function getOrderByIdApi(id: number): Promise<Order> {
   const res = await fetchWithAuth(`${BASE_URL}/admin/orders/${id}`);
   const orderData = await unwrap<ApiOrder>(res, 'Failed to fetch order');
@@ -192,7 +240,7 @@ export async function getOrderByIdApi(id: number): Promise<Order> {
   return toFrontendOrder(orderData, items, shipment, payment);
 }
 
-// ---------- Writes ----------
+// ---------- Admin Writes ----------
 
 export async function createOrderApi(
   order: Omit<Order, 'id' | 'subtotal' | 'totalPrice'> & { items: Omit<OrderItem, 'id' | 'subtotal'>[] }
@@ -241,10 +289,6 @@ export async function createOrderApi(
   return toFrontendOrder(createdOrder, items);
 }
 
-// Updates the order header, and reconciles order_items against whatever the
-// form currently has: items with an existing id get updated, items without
-// one (or with an id that no longer exists) get created, anything removed
-// gets deleted.
 export async function updateOrderApi(
   id: number,
   updates: Partial<Order>
@@ -348,8 +392,6 @@ async function syncOrderItems(
   return getOrderItemsByOrderId(orderId);
 }
 
-// Creates the shipment if none exists yet, otherwise updates the existing
-// one — /admin/shipments has no "upsert", so this has to check first.
 export async function updateShipmentApi(
   orderId: number,
   data: Partial<Shipment>
@@ -384,7 +426,6 @@ export async function updateShipmentApi(
   return toFrontendShipment(saved);
 }
 
-// Same create-or-update pattern as shipments, for payments.
 export async function updatePaymentApi(
   orderId: number,
   data: Partial<Payment>
@@ -417,10 +458,6 @@ export async function updatePaymentApi(
   return toFrontendPayment(saved);
 }
 
-// Deletes the order and everything that references it (items, shipment,
-// payment) first — the schema may or may not cascade-delete these, and
-// there's no way to tell from the generic CRUD config alone, so this does
-// it explicitly rather than risk an FK violation on the order delete.
 export async function deleteOrderApi(id: number): Promise<void> {
   const [items, shipment, payment] = await Promise.all([
     getOrderItemsByOrderId(id),

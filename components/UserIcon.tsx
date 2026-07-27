@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/components/UserIcon.tsx
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -13,9 +15,10 @@ interface UserSession {
 
 function getSession(): UserSession | null {
   if (typeof window === "undefined") return null;
-  const token = sessionStorage.getItem("accessToken");
-  const name = sessionStorage.getItem("userName");
-  const role = sessionStorage.getItem("userRole");
+  const token = sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken");
+  const name = sessionStorage.getItem("userName") || localStorage.getItem("userName");
+  const role = sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
+
   if (!token || !name || !role) return null;
   return { name, role };
 }
@@ -26,7 +29,7 @@ export default function UserIcon() {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Read session on mount and whenever storage changes (e.g. after login)
+  // Read session on mount and whenever storage/auth changes
   useEffect(() => {
     setSession(getSession());
 
@@ -36,13 +39,13 @@ export default function UserIcon() {
     window.addEventListener("authchange", onStorage);
 
     return () => {
-        window.removeEventListener("storage", onStorage);
-        window.removeEventListener("focus", onStorage);
-        window.removeEventListener("authchange", onStorage);
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onStorage);
+      window.removeEventListener("authchange", onStorage);
     };
   }, []);
 
-  // Close on outside click
+  // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -78,7 +81,7 @@ export default function UserIcon() {
         <div className="absolute right-0 mt-3 w-48 bg-white border border-slate-100 rounded-xl shadow-lg overflow-hidden z-50">
           {session ? (
             <>
-              {/* Logged-in header */}
+              {/* Logged-in Header */}
               <div className="px-4 py-3 border-b border-slate-100">
                 <p className="text-xs text-slate-400">Signed in as</p>
                 <p className="text-sm font-semibold text-black truncate">
@@ -101,7 +104,7 @@ export default function UserIcon() {
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
-                    Admin
+                    Admin Panel
                   </Link>
                 )}
 

@@ -1,15 +1,25 @@
+// FILE: takato56-adidolf_frontend/lib/hooks/useCart.ts
+
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 import { Voucher } from '@/types';
-import { lookupVoucherByCode } from '@/lib/vouchers';
-import { evaluateVoucher } from '@/lib/utils/voucherLogic';
+import { validateVoucherApi } from '@/lib/vouchers';
+import {
+  getCartApi,
+  addCartItemApi,
+  updateCartItemQuantityApi,
+  removeCartItemApi,
+  clearCartApi,
+  ApiCartItem,
+} from '@/lib/cart';
 
-const ITEMS_KEY = 'cart_items';
+const LOCAL_ITEMS_KEY = 'cart_items';
 const VOUCHER_KEY = 'cart_voucher_code';
 
 export interface CartItem {
-  key: string; // `${productId}:${variantId ?? 'default'}` — used for dedupe/updates
+  key: string;
+  cartItemId?: number;
   productId: string;
   variantId?: string;
   slug: string;
@@ -22,117 +32,203 @@ export interface CartItem {
   stock?: number;
 }
 
-function readItems(): CartItem[] {
+function isAuthenticated(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !!sessionStorage.getItem('accessToken');
+}
+
+function readLocalItems(): CartItem[] {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(ITEMS_KEY);
+    const raw = localStorage.getItem(LOCAL_ITEMS_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 }
 
-// The backend has no customer-facing cart endpoint (/carts and /cart-items
-// are both admin-only), so this cart is entirely client-side, scoped to
-// this browser. It won't sync across devices and won't survive clearing
-// site data — a real fix needs the backend to add customer-scoped cart
-// routes.
+function mapApiCartItemToCartItem(item: ApiCartItem): CartItem {
+  return {
+    key: `api-${item.cart_item_id}`,
+    cartItemId: item.cart_item_id,
+    productId: String(item.product_id),
+    variantId: item.variant_id ? String(item.variant_id) : undefined,
+    slug: item.product.slug,
+    name: item.product.name,
+    image:
+      item.variant?.image_url ||
+      item.product.primary_image ||
+      '/images/placeholder.jpg',
+    unitPrice: item.unit_price,
+    quantity: item.quantity,
+    size: item.variant?.size || undefined,
+    color: item.variant?.color || undefined,
+    stock: item.variant?.stock_quantity,
+  };
+}
+
 export function useCart() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const [voucher, setVoucher] = useState<Voucher | null>(null);
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [voucherError, setVoucherError] = useState<string | null>(null);
   const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
 
-  useEffect(() => {
-    setItems(readItems());
+  const fetchCart = useCallback(async () => {
+    if (isAuthenticated()) {
+      try {
+        const summary = await getCartApi();
+        setItems(summary.items.map(mapApiCartItemToCartItem));
+      } catch (err) {
+        console.warn('Backend cart sync failed, falling back to local cart:', err);
+        setItems(readLocalItems());
+      }
+    } else {
+      setItems(readLocalItems());
+    }
     setIsLoaded(true);
   }, []);
 
   useEffect(() => {
-    if (!isLoaded) return;
-    localStorage.setItem(ITEMS_KEY, JSON.stringify(items));
+    fetchCart();
+    const handleAuthChange = () => fetchCart();
+    window.addEventListener('authchange', handleAuthChange);
+    return () => window.removeEventListener('authchange', handleAuthChange);
+  }, [fetchCart]);
+
+  useEffect(() => {
+    if (!isLoaded || isAuthenticated()) return;
+    localStorage.setItem(LOCAL_ITEMS_KEY, JSON.stringify(items));
     window.dispatchEvent(new Event('cartchange'));
   }, [items, isLoaded]);
 
   const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
 
+  // ---------- Real Voucher Validation ----------
   const applyVoucherCode = useCallback(
     async (code: string) => {
+      const cleanCode = code.trim().toUpperCase();
+      if (!cleanCode) return;
+
       setVoucherError(null);
       setIsApplyingVoucher(true);
+
       try {
-        const found = await lookupVoucherByCode(code);
-        const evaluation = evaluateVoucher(found, subtotal);
-        if (!evaluation.eligible) {
-          setVoucher(null);
-          localStorage.removeItem(VOUCHER_KEY);
-          setVoucherError(evaluation.reason || 'This voucher cannot be applied.');
-          return;
+        if (isAuthenticated()) {
+          const result = await validateVoucherApi(cleanCode);
+          if (!result.valid) {
+            setAppliedCode(null);
+            setDiscountAmount(0);
+            localStorage.removeItem(VOUCHER_KEY);
+            setVoucherError(result.reason || 'This voucher cannot be applied.');
+            return;
+          }
+          setAppliedCode(cleanCode);
+          setDiscountAmount(result.discount_amount);
+          localStorage.setItem(VOUCHER_KEY, cleanCode);
+        } else {
+          setVoucherError('Please log in to apply voucher codes.');
         }
-        setVoucher(found);
-        localStorage.setItem(VOUCHER_KEY, found.code);
       } catch (err) {
-        setVoucher(null);
+        setAppliedCode(null);
+        setDiscountAmount(0);
         localStorage.removeItem(VOUCHER_KEY);
-        setVoucherError(err instanceof Error ? err.message : 'Failed to apply voucher');
+        setVoucherError(
+          err instanceof Error ? err.message : 'Failed to apply voucher'
+        );
       } finally {
         setIsApplyingVoucher(false);
       }
     },
-    [subtotal]
+    []
   );
 
-  // Re-validate a previously-applied voucher code once the cart has loaded
-  // (e.g. after a refresh) — subtotal may have changed since it was saved.
   useEffect(() => {
     if (!isLoaded) return;
     const storedCode = localStorage.getItem(VOUCHER_KEY);
-    if (storedCode && !voucher) {
+    if (storedCode && isAuthenticated()) {
       applyVoucherCode(storedCode);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded]);
+  }, [isLoaded, items, applyVoucherCode]);
 
   const removeVoucher = useCallback(() => {
-    setVoucher(null);
+    setAppliedCode(null);
+    setDiscountAmount(0);
     setVoucherError(null);
     localStorage.removeItem(VOUCHER_KEY);
   }, []);
 
-  const addItem = useCallback((item: Omit<CartItem, 'key'>) => {
-    const key = `${item.productId}:${item.variantId ?? 'default'}`;
-    setItems((prev) => {
-      const existing = prev.find((i) => i.key === key);
-      if (existing) {
-        return prev.map((i) =>
-          i.key === key ? { ...i, quantity: i.quantity + item.quantity } : i
+  const addItem = useCallback(
+    async (item: Omit<CartItem, 'key'>) => {
+      if (isAuthenticated()) {
+        const pId = Number(item.productId);
+        const vId = Number(item.variantId);
+        if (!pId || !vId) {
+          throw new Error('Valid Product and Variant IDs are required');
+        }
+        const summary = await addCartItemApi(pId, vId, item.quantity);
+        setItems(summary.items.map(mapApiCartItemToCartItem));
+      } else {
+        const key = `${item.productId}:${item.variantId ?? 'default'}`;
+        setItems((prev) => {
+          const existing = prev.find((i) => i.key === key);
+          if (existing) {
+            return prev.map((i) =>
+              i.key === key ? { ...i, quantity: i.quantity + item.quantity } : i
+            );
+          }
+          return [...prev, { ...item, key }];
+        });
+      }
+    },
+    []
+  );
+
+  const removeItem = useCallback(
+    async (key: string) => {
+      const target = items.find((i) => i.key === key);
+      if (isAuthenticated() && target?.cartItemId) {
+        const summary = await removeCartItemApi(target.cartItemId);
+        setItems(summary.items.map(mapApiCartItemToCartItem));
+      } else {
+        setItems((prev) => prev.filter((i) => i.key !== key));
+      }
+    },
+    [items]
+  );
+
+  const updateQuantity = useCallback(
+    async (key: string, quantity: number) => {
+      const target = items.find((i) => i.key === key);
+      if (quantity <= 0) {
+        await removeItem(key);
+        return;
+      }
+      if (isAuthenticated() && target?.cartItemId) {
+        const summary = await updateCartItemQuantityApi(target.cartItemId, quantity);
+        setItems(summary.items.map(mapApiCartItemToCartItem));
+      } else {
+        setItems((prev) =>
+          prev.map((i) => (i.key === key ? { ...i, quantity } : i))
         );
       }
-      return [...prev, { ...item, key }];
-    });
-  }, []);
+    },
+    [items, removeItem]
+  );
 
-  const removeItem = useCallback((key: string) => {
-    setItems((prev) => prev.filter((i) => i.key !== key));
-  }, []);
-
-  const updateQuantity = useCallback((key: string, quantity: number) => {
-    setItems((prev) =>
-      quantity <= 0
-        ? prev.filter((i) => i.key !== key)
-        : prev.map((i) => (i.key === key ? { ...i, quantity } : i))
-    );
-  }, []);
-
-  const clearCart = useCallback(() => {
+  const clearCart = useCallback(async () => {
+    if (isAuthenticated()) {
+      await clearCartApi();
+    }
     setItems([]);
     removeVoucher();
   }, [removeVoucher]);
 
-  const evaluation = voucher ? evaluateVoucher(voucher, subtotal) : null;
-  const discountAmount = evaluation?.eligible ? evaluation.discountAmount : 0;
+  const voucherObj = appliedCode
+    ? ({ id: 0, code: appliedCode } as Voucher)
+    : null;
 
   return {
     items,
@@ -143,11 +239,13 @@ export function useCart() {
     clearCart,
     subtotal,
     itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
-    voucher,
+    voucher: voucherObj,
+    voucherCode: appliedCode,
     voucherError,
     isApplyingVoucher,
     discountAmount,
     applyVoucherCode,
     removeVoucher,
+    refetchCart: fetchCart,
   };
 }

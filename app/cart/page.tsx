@@ -1,6 +1,7 @@
+// FILE: takato56-adidolf_frontend/app/cart/page.tsx
+
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { FaTrash, FaMinus, FaPlus, FaArrowLeft } from "react-icons/fa";
 import { useCart, CartItem } from "@/lib/hooks/useCart";
@@ -25,7 +26,6 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-[#fbfdff]">
-      {/* ── Page header ── */}
       <div className="border-b border-slate-100 px-4 md:px-20 py-6 flex items-center justify-between">
         <h1 className="text-2xl md:text-3xl font-extrabold">Your Cart</h1>
         <Link
@@ -41,9 +41,7 @@ export default function CartPage() {
         <EmptyCart />
       ) : (
         <div className="px-4 md:px-20 py-8 grid md:grid-cols-[1fr_340px] gap-10 items-start">
-          {/* ── Item list ── */}
           <div className="space-y-4">
-            {/* Free shipping progress */}
             {freeShippingLeft > 0 && (
               <div className="bg-slate-50 rounded-lg px-4 py-3 text-sm text-slate-600">
                 Spend{" "}
@@ -70,7 +68,6 @@ export default function CartPage() {
               </div>
             )}
 
-            {/* Items */}
             {items.map((item) => (
               <CartRow
                 key={item.key}
@@ -83,7 +80,6 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* ── Order summary ── */}
           <div className="bg-white border border-slate-100 rounded-xl p-6 space-y-4 sticky top-4">
             <h2 className="text-lg font-extrabold">Order Summary</h2>
 
@@ -130,8 +126,6 @@ export default function CartPage() {
   );
 }
 
-// ─── Cart Row ─────────────────────────────────────────────────────────────────
-
 function CartRow({
   item,
   onUpdateQty,
@@ -171,18 +165,17 @@ function CartRow({
         <div className="flex items-center gap-2 mt-2">
           {item.size && (
             <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-              {item.size}
+              Size: {item.size}
             </span>
           )}
           {item.color && (
             <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-              {item.color}
+              Color: {item.color}
             </span>
           )}
         </div>
 
         <div className="flex items-center justify-between mt-3">
-          {/* Quantity */}
           <div className="flex items-center gap-2 border border-slate-200 rounded-lg px-2 py-1">
             <button
               onClick={() => onUpdateQty(item.key, -1)}
@@ -202,10 +195,9 @@ function CartRow({
             </button>
           </div>
 
-          {/* Remove */}
           <button
             onClick={() => onRemove(item.key)}
-            className="text-slate-300 hover:text-red-400 transition-colors text-xs flex items-center gap-1.5"
+            className="text-slate-300 hover:text-red-400 transition-colors text-xs flex items-center gap-1.5 cursor-pointer"
           >
             <FaTrash />
             Remove
@@ -215,8 +207,6 @@ function CartRow({
     </div>
   );
 }
-
-// ─── Empty State ──────────────────────────────────────────────────────────────
 
 function EmptyCart() {
   return (

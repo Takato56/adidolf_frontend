@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/lib/addresses.ts
+
 import { fetchWithAuth } from '@/lib/auth';
 import { Address } from '@/types';
 
@@ -17,13 +19,6 @@ interface ApiEnvelope<T> {
   data: T;
 }
 
-// The backend stores an address as ONE free-text column (address_details),
-// not separate province/district/ward columns like the frontend's Address
-// type expects. This is a best-effort mapping, not a real fix: on read, the
-// whole string goes into street_detail (province/district/ward left blank);
-// on write, whatever's in the separate fields gets joined back into one
-// string. If the backend ever adds real columns for these, this mapping
-// should be deleted in favor of sending them directly.
 function toFrontendAddress(a: ApiAddress): Address {
   return {
     id: a.address_id,
@@ -48,13 +43,41 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
       const body = await res.json();
       message = body?.message || message;
     } catch {
-      // ignore
+      // ignore parse errors
     }
     throw new Error(`${message} (${res.status})`);
   }
   const json: ApiEnvelope<T> = await res.json();
   return json.data;
 }
+
+// ---------- Customer-Facing Address APIs (/user/addresses) ----------
+
+export async function getMyAddressesApi(): Promise<Address[]> {
+  const res = await fetchWithAuth(`${BASE_URL}/user/addresses`);
+  const data = await unwrap<ApiAddress[]>(res, 'Failed to fetch addresses');
+  return data.map(toFrontendAddress);
+}
+
+export async function createCustomerAddressApi(
+  address: Partial<Address>
+): Promise<Address> {
+  const details = toAddressDetails(address);
+  const res = await fetchWithAuth(`${BASE_URL}/user/addresses`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      recipient_name: address.recipient_name,
+      phone: address.phone,
+      address_details: details || 'Default Address',
+      is_default: !!address.is_default,
+    }),
+  });
+  const data = await unwrap<ApiAddress>(res, 'Failed to save address');
+  return toFrontendAddress(data);
+}
+
+// ---------- Admin-Only Address APIs (/admin/addresses) ----------
 
 export async function getAddressesByUserId(userId: number): Promise<Address[]> {
   const res = await fetchWithAuth(`${BASE_URL}/admin/addresses?user_id=${userId}`);
@@ -106,9 +129,6 @@ export async function deleteAddressApi(id: number): Promise<void> {
   }
 }
 
-// Reconciles a user's addresses with whatever's currently in the edit form:
-// anything with an id no longer present gets deleted, anything without an id
-// (or with an id we don't recognize) gets created, everything else updated.
 export async function syncUserAddresses(
   userId: number,
   desired: Partial<Address>[]

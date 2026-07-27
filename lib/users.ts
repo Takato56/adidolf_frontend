@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/lib/users.ts
+
 import { fetchWithAuth } from '@/lib/auth';
 import { User } from '@/types';
 import { isTestEntry } from '@/lib/utils/testData';
@@ -21,8 +23,6 @@ interface ApiEnvelope<T> {
   data: T;
 }
 
-// Addresses aren't included here — they're a separate resource
-// (/admin/addresses) fetched/synced via lib/api/addresses.ts.
 function toFrontendUser(u: ApiUser): User {
   return {
     id: u.user_id,
@@ -30,7 +30,7 @@ function toFrontendUser(u: ApiUser): User {
     full_name: u.full_name,
     phone: u.phone ?? '',
     avatar_url: u.avatar_url ?? '',
-    password_hash: '', // never fetched or edited from the client
+    password_hash: '',
     role: u.role,
     is_active: u.is_active ? 1 : 0,
     created_at: u.created_at,
@@ -45,7 +45,7 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
       const body = await res.json();
       message = body?.message || message;
     } catch {
-      // ignore body parse errors
+      // ignore
     }
     throw new Error(`${message} (${res.status})`);
   }
@@ -53,7 +53,44 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
   return json.data;
 }
 
-// All /admin/* routes require auth + admin role (enforced server-side).
+// ---------- Customer Self-Service Profile APIs ----------
+
+export async function updateMyProfileApi(data: {
+  full_name?: string;
+  phone?: string;
+  avatar_url?: string;
+}): Promise<User> {
+  const res = await fetchWithAuth(`${BASE_URL}/user/me`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  const updated = await unwrap<ApiUser>(res, 'Failed to update profile');
+  return toFrontendUser(updated);
+}
+
+export async function changePasswordApi(data: {
+  old_password: string;
+  new_password: string;
+}): Promise<void> {
+  const res = await fetchWithAuth(`${BASE_URL}/user/me/password`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    let message = 'Failed to change password';
+    try {
+      const body = await res.json();
+      message = body?.message || message;
+    } catch {
+      // ignore
+    }
+    throw new Error(`${message} (${res.status})`);
+  }
+}
+
+// ---------- Admin-Only User APIs ----------
 
 export async function getUsersApi(): Promise<User[]> {
   const res = await fetchWithAuth(`${BASE_URL}/admin/users`);
@@ -72,10 +109,6 @@ export async function getUserByIdApi(id: number): Promise<User> {
   return toFrontendUser(data);
 }
 
-// Note: role/full_name/phone/avatar_url/email/is_active only — password_hash
-// is deliberately never sent from here. The generic CRUD endpoint inserts
-// whatever it's given verbatim (no hashing), so a client-supplied value
-// would either break the user's login or store a real password unhashed.
 export async function updateUserApi(
   id: number,
   updates: Partial<Omit<User, 'id' | 'addresses' | 'password_hash' | 'created_at'>>

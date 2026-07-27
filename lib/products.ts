@@ -1,10 +1,10 @@
+// FILE: takato56-adidolf_frontend/lib/products.ts
+
 import { fetchWithAuth } from '@/lib/auth';
-import { Product } from '@/types';
+import { Product, ProductVariant } from '@/types';
 import { isTestEntry } from '@/lib/utils/testData';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
-// ---------- Shapes returned by the backend (src/types/product.types.ts) ----------
 
 interface ApiProductImage {
   image_id: number;
@@ -16,6 +16,7 @@ interface ApiProductImage {
 
 interface ApiProductVariant {
   variant_id: number;
+  product_id: number;
   sku: string;
   color: string | null;
   size: string | null;
@@ -52,8 +53,6 @@ interface ApiEnvelope<T> {
   data: T;
 }
 
-// ---------- Mapping: backend shape <-> frontend shape (types/index.ts) ----------
-
 export function toFrontendProduct(p: ApiProduct): Product {
   const sortedImages = (p.images ?? [])
     .slice()
@@ -67,14 +66,15 @@ export function toFrontendProduct(p: ApiProduct): Product {
     categorySlug: p.category?.slug ?? '',
     slug: p.slug,
     description: p.description ?? '',
-    price: p.base_price,
+    price: Number(p.base_price) || 0,
     brand: p.brand ?? '',
     isPublished: p.is_published,
     variants: (p.variants ?? []).map((v) => ({
       id: String(v.variant_id),
+      sku: v.sku,
       color: v.color ?? undefined,
       size: v.size ?? undefined,
-      extra_price: v.extra_price,
+      extra_price: Number(v.extra_price) || 0,
       stock: v.stock_quantity,
       image_url: v.image_url ?? undefined,
     })),
@@ -84,7 +84,6 @@ export function toFrontendProduct(p: ApiProduct): Product {
 
 const isValidUrl = (value: string): boolean => {
   try {
-    // eslint-disable-next-line no-new
     new URL(value);
     return true;
   } catch {
@@ -107,15 +106,13 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
       const body = await res.json();
       message = body?.message || message;
     } catch {
-      // ignore body parse errors
+      // ignore
     }
     throw new Error(`${message} (${res.status})`);
   }
   const json: ApiEnvelope<T> = await res.json();
   return json.data;
 }
-
-// ---------- Reads (public, no auth) ----------
 
 export async function getProducts(filters?: ProductFilters): Promise<Product[]> {
   const params = new URLSearchParams();
@@ -149,8 +146,6 @@ export async function getProductBySlug(slug: string): Promise<Product> {
   }
   return toFrontendProduct(data);
 }
-
-// ---------- Writes (admin only, require auth) ----------
 
 export async function createProductApi(
   product: Omit<Product, 'id'>,
@@ -207,12 +202,9 @@ export async function deleteProductApi(id: string | number): Promise<void> {
   }
 }
 
-// ---------- Images (separate sub-resource on the backend — PUT /products/:id
-// never touches these, so they need their own calls) ----------
+// ---------- Images ----------
 
-export async function getProductImagesApi(
-  id: string | number
-): Promise<ApiProductImage[]> {
+export async function getProductImagesApi(id: string | number): Promise<ApiProductImage[]> {
   const res = await fetch(`${BASE_URL}/products/${id}/images`);
   return unwrap<ApiProductImage[]>(res, 'Failed to fetch product images');
 }
@@ -248,15 +240,6 @@ export async function deleteProductImageApi(
   }
 }
 
-// Real image upload — goes through the backend ONLY for the actual upload
-// step, because writing to Supabase Storage requires the service-role key,
-// which must stay server-side (that's what POST /:id/images/upload does:
-// receives the file, uploads it to the bucket, and creates the
-// product_images row itself). Everything AFTER that — every time this image
-// is displayed — hits the returned public bucket URL directly via <img
-// src>, never through the backend again. That split (upload via backend,
-// serve directly from the bucket) is intentional, not a shortcut: proxying
-// every image read through Express would bottleneck it for no reason.
 export async function uploadProductImagesApi(
   productId: string | number,
   files: File[]
@@ -266,17 +249,11 @@ export async function uploadProductImagesApi(
 
   const res = await fetchWithAuth(`${BASE_URL}/products/${productId}/images/upload`, {
     method: 'POST',
-    // No Content-Type header here on purpose — the browser sets the
-    // multipart/form-data boundary itself. Setting it manually breaks it.
     body: formData,
   });
   return unwrap<ApiProductImage[]>(res, 'Failed to upload product images');
 }
 
-// Reconciles a product's images with whatever URLs are currently in the
-// edit form, since PUT /products/:id doesn't touch the images table at all.
-// Anything removed from the form gets deleted; anything new gets created;
-// unchanged URLs are left alone.
 export async function syncProductImagesApi(
   id: string | number,
   desiredUrls: string[]
@@ -293,4 +270,91 @@ export async function syncProductImagesApi(
   if (toAdd.length > 0) {
     await addProductImagesApi(id, toAdd);
   }
+}
+
+// ---------- Product Variants CRUD ----------
+
+export async function getVariantsByProductIdApi(productId: string | number): Promise<ApiProductVariant[]> {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/product-variants?product_id=${productId}`);
+  return unwrap<ApiProductVariant[]>(res, 'Failed to fetch variants');
+}
+
+export async function createVariantApi(
+  productId: string | number,
+  variant: ProductVariant
+): Promise<ApiProductVariant> {
+  const sku =
+    variant.sku?.trim() ||
+    `SKU-${productId}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+  const res = await fetchWithAuth(`${BASE_URL}/admin/product-variants`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      product_id: Number(productId),
+      sku,
+      color: variant.color || undefined,
+      size: variant.size || undefined,
+      extra_price: variant.extra_price || 0,
+      stock_quantity: variant.stock || 0,
+      image_url: variant.image_url || undefined,
+    }),
+  });
+  return unwrap<ApiProductVariant>(res, 'Failed to create variant');
+}
+
+export async function updateVariantApi(
+  variantId: string | number,
+  variant: Partial<ProductVariant>
+): Promise<ApiProductVariant> {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/product-variants/${variantId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...(variant.sku ? { sku: variant.sku } : {}),
+      ...(variant.color !== undefined ? { color: variant.color || null } : {}),
+      ...(variant.size !== undefined ? { size: variant.size || null } : {}),
+      ...(variant.extra_price !== undefined ? { extra_price: variant.extra_price } : {}),
+      ...(variant.stock !== undefined ? { stock_quantity: variant.stock } : {}),
+      ...(variant.image_url !== undefined ? { image_url: variant.image_url || null } : {}),
+    }),
+  });
+  return unwrap<ApiProductVariant>(res, 'Failed to update variant');
+}
+
+export async function deleteVariantApi(variantId: string | number): Promise<void> {
+  const res = await fetchWithAuth(`${BASE_URL}/admin/product-variants/${variantId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok && res.status !== 204) {
+    throw new Error(`Failed to delete variant (${res.status})`);
+  }
+}
+
+export async function syncProductVariantsApi(
+  productId: string | number,
+  desiredVariants: ProductVariant[]
+): Promise<void> {
+  const current = await getVariantsByProductIdApi(productId);
+  const currentIds = new Set(current.map((v) => String(v.variant_id)));
+
+  const toUpdate = desiredVariants.filter((v) => v.id && currentIds.has(v.id));
+  const toCreate = desiredVariants.filter((v) => !v.id || !currentIds.has(v.id));
+  const desiredIds = new Set(toUpdate.map((v) => v.id));
+  const toDelete = current.filter((v) => !desiredIds.has(String(v.variant_id)));
+
+  await Promise.all(toDelete.map((v) => deleteVariantApi(v.variant_id)));
+  await Promise.all(toUpdate.map((v) => updateVariantApi(v.id!, v)));
+  await Promise.all(toCreate.map((v) => createVariantApi(productId, v)));
+}
+
+export async function uploadVariantImageApi(
+  productId: string | number,
+  file: File
+): Promise<string> {
+  const uploaded = await uploadProductImagesApi(productId, [file]);
+  if (uploaded.length > 0) {
+    return uploaded[0].image_url;
+  }
+  throw new Error('Image upload failed');
 }
