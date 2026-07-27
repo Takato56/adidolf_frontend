@@ -1,152 +1,126 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Voucher } from '@/types';
-import { lookupVoucherByCode } from '@/lib/vouchers';
-import { evaluateVoucher } from '@/lib/utils/voucherLogic';
+import {
+  getCartApi,
+  addCartItemApi,
+  updateCartItemQuantityApi,
+  removeCartItemApi,
+  clearCartApi,
+  ApiCartItem,
+} from '@/lib/cart';
+import { validateVoucherApi } from '@/lib/vouchers';
 
-const ITEMS_KEY = 'cart_items';
-const VOUCHER_KEY = 'cart_voucher_code';
-
-export interface CartItem {
-  key: string; // `${productId}:${variantId ?? 'default'}` — used for dedupe/updates
-  productId: string;
-  variantId?: string;
-  slug: string;
-  name: string;
-  image: string;
-  unitPrice: number;
-  quantity: number;
-  size?: string;
-  color?: string;
-  stock?: number;
-}
-
-function readItems(): CartItem[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem(ITEMS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-// The backend has no customer-facing cart endpoint (/carts and /cart-items
-// are both admin-only), so this cart is entirely client-side, scoped to
-// this browser. It won't sync across devices and won't survive clearing
-// site data — a real fix needs the backend to add customer-scoped cart
-// routes.
+// The cart is now real and server-side (GET/POST/PATCH/DELETE /cart, tied
+// to the logged-in user) — this hook is just a thin client wrapper around
+// it. It requires the user to be logged in; every call will 401 otherwise.
 export function useCart() {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [cartId, setCartId] = useState<number | null>(null);
+  const [items, setItems] = useState<ApiCartItem[]>([]);
+  const [subtotal, setSubtotal] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [voucher, setVoucher] = useState<Voucher | null>(null);
+  // The voucher isn't persisted against the cart server-side — it's just a
+  // live preview via POST /vouchers/validate. The code only gets "really"
+  // applied when it's passed along to POST /orders at checkout.
+  const [voucherCode, setVoucherCode] = useState<string | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
   const [voucherError, setVoucherError] = useState<string | null>(null);
   const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
 
-  useEffect(() => {
-    setItems(readItems());
-    setIsLoaded(true);
-  }, []);
+  const applyFromSummary = (summary: {
+    cart_id: number;
+    items: ApiCartItem[];
+    subtotal: number;
+  }) => {
+    setCartId(summary.cart_id);
+    setItems(summary.items);
+    setSubtotal(summary.subtotal);
+  };
 
-  useEffect(() => {
-    if (!isLoaded) return;
-    localStorage.setItem(ITEMS_KEY, JSON.stringify(items));
-    window.dispatchEvent(new Event('cartchange'));
-  }, [items, isLoaded]);
-
-  const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
-
-  const applyVoucherCode = useCallback(
-    async (code: string) => {
-      setVoucherError(null);
-      setIsApplyingVoucher(true);
-      try {
-        const found = await lookupVoucherByCode(code);
-        const evaluation = evaluateVoucher(found, subtotal);
-        if (!evaluation.eligible) {
-          setVoucher(null);
-          localStorage.removeItem(VOUCHER_KEY);
-          setVoucherError(evaluation.reason || 'This voucher cannot be applied.');
-          return;
-        }
-        setVoucher(found);
-        localStorage.setItem(VOUCHER_KEY, found.code);
-      } catch (err) {
-        setVoucher(null);
-        localStorage.removeItem(VOUCHER_KEY);
-        setVoucherError(err instanceof Error ? err.message : 'Failed to apply voucher');
-      } finally {
-        setIsApplyingVoucher(false);
-      }
-    },
-    [subtotal]
-  );
-
-  // Re-validate a previously-applied voucher code once the cart has loaded
-  // (e.g. after a refresh) — subtotal may have changed since it was saved.
-  useEffect(() => {
-    if (!isLoaded) return;
-    const storedCode = localStorage.getItem(VOUCHER_KEY);
-    if (storedCode && !voucher) {
-      applyVoucherCode(storedCode);
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      const summary = await getCartApi();
+      applyFromSummary(summary);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load cart');
+    } finally {
+      setIsLoaded(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded]);
+  }, []);
 
-  const removeVoucher = useCallback(() => {
-    setVoucher(null);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const addItem = async (productId: number, variantId: number, quantity: number) => {
+    const summary = await addCartItemApi(productId, variantId, quantity);
+    applyFromSummary(summary);
+  };
+
+  const updateQuantity = async (itemId: number, quantity: number) => {
+    const summary = await updateCartItemQuantityApi(itemId, quantity);
+    applyFromSummary(summary);
+  };
+
+  const removeItem = async (itemId: number) => {
+    const summary = await removeCartItemApi(itemId);
+    applyFromSummary(summary);
+  };
+
+  const removeVoucher = () => {
+    setVoucherCode(null);
+    setDiscountAmount(0);
     setVoucherError(null);
-    localStorage.removeItem(VOUCHER_KEY);
-  }, []);
+  };
 
-  const addItem = useCallback((item: Omit<CartItem, 'key'>) => {
-    const key = `${item.productId}:${item.variantId ?? 'default'}`;
-    setItems((prev) => {
-      const existing = prev.find((i) => i.key === key);
-      if (existing) {
-        return prev.map((i) =>
-          i.key === key ? { ...i, quantity: i.quantity + item.quantity } : i
-        );
-      }
-      return [...prev, { ...item, key }];
-    });
-  }, []);
-
-  const removeItem = useCallback((key: string) => {
-    setItems((prev) => prev.filter((i) => i.key !== key));
-  }, []);
-
-  const updateQuantity = useCallback((key: string, quantity: number) => {
-    setItems((prev) =>
-      quantity <= 0
-        ? prev.filter((i) => i.key !== key)
-        : prev.map((i) => (i.key === key ? { ...i, quantity } : i))
-    );
-  }, []);
-
-  const clearCart = useCallback(() => {
+  const clearCart = async () => {
+    await clearCartApi();
     setItems([]);
+    setSubtotal(0);
     removeVoucher();
-  }, [removeVoucher]);
+  };
 
-  const evaluation = voucher ? evaluateVoucher(voucher, subtotal) : null;
-  const discountAmount = evaluation?.eligible ? evaluation.discountAmount : 0;
+  const applyVoucherCode = async (code: string) => {
+    setVoucherError(null);
+    setIsApplyingVoucher(true);
+    try {
+      const result = await validateVoucherApi(code);
+      if (!result.valid) {
+        setVoucherCode(null);
+        setDiscountAmount(0);
+        setVoucherError(result.reason || 'This voucher cannot be applied.');
+        return;
+      }
+      setVoucherCode(code);
+      setDiscountAmount(result.discount_amount);
+    } catch (err) {
+      setVoucherCode(null);
+      setDiscountAmount(0);
+      setVoucherError(err instanceof Error ? err.message : 'Failed to apply voucher');
+    } finally {
+      setIsApplyingVoucher(false);
+    }
+  };
 
   return {
+    cartId,
     items,
-    isLoaded,
-    addItem,
-    removeItem,
-    updateQuantity,
-    clearCart,
     subtotal,
     itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
-    voucher,
+    isLoaded,
+    error,
+    refetch: load,
+    addItem,
+    updateQuantity,
+    removeItem,
+    clearCart,
+    voucherCode,
+    discountAmount,
     voucherError,
     isApplyingVoucher,
-    discountAmount,
     applyVoucherCode,
     removeVoucher,
   };

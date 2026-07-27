@@ -33,13 +33,21 @@ export async function loginUser(data: { email: string; password: string }) {
 }
 
 export async function logoutUser() {
-  await fetch(`${BASE_URL}/auth/logout`, {
-    method: "POST",
-    credentials: "include", // required so the browser actually sends the refreshToken cookie to be cleared server-side
-  });
-  sessionStorage.removeItem("accessToken");
-  sessionStorage.removeItem("userName");
-  sessionStorage.removeItem("userRole");
+  try {
+    await fetchWithAuth(`${BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include", // required so the browser actually sends the refreshToken cookie to be cleared server-side
+    });
+  } catch {
+    // Best-effort — if the server call fails (e.g. refresh token also
+    // expired), still clear local state below so the user ends up logged
+    // out client-side either way.
+  } finally {
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("userRole");
+    window.dispatchEvent(new Event("authchange"));
+  }
 }
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
