@@ -136,25 +136,32 @@ export async function deleteVoucherApi(id: number): Promise<void> {
   }
 }
 
-// ---------- Customer-facing voucher validation (real endpoint) ----------
+// ---------- Customer-facing voucher lookup ----------
 //
-// The backend now has a real customer-facing route: POST /vouchers/validate.
-// It only needs a normal logged-in session (not admin), takes just the
-// code, computes the subtotal itself from the user's actual server-side
-// cart (never trusts a client-supplied amount), and returns whether it's
-// valid plus the exact discount. This fully replaces the old workaround
-// that hit the admin-only /admin/vouchers endpoint.
-export interface VoucherValidation {
-  valid: boolean;
-  discount_amount: number;
-  reason: string | null;
-}
-
-export async function validateVoucherApi(code: string): Promise<VoucherValidation> {
-  const res = await fetchWithAuth(`${BASE_URL}/vouchers/validate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code }),
-  });
-  return unwrap<VoucherValidation>(res, 'Failed to validate voucher');
+// There is currently NO public endpoint for looking up a voucher by code.
+// The only /vouchers route that exists is the generic admin CRUD one,
+// nested under `/admin` (authMiddleware + adminMiddleware) — a logged-in
+// customer's token will get 401/403 here, every time, by design.
+//
+// This function calls that admin endpoint anyway (using its `code` filter)
+// so the "enter a voucher" flow is fully working end-to-end for an admin
+// account testing it, and fails with an honest, specific error for regular
+// customers instead of silently doing nothing. A real fix needs a backend
+// endpoint like `GET /vouchers/validate?code=X` that's either public or
+// requires only a normal customer session, not admin.
+export async function lookupVoucherByCode(code: string): Promise<Voucher> {
+  const res = await fetchWithAuth(
+    `${BASE_URL}/admin/vouchers?code=${encodeURIComponent(code)}`
+  );
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(
+      "Voucher codes can't be checked yet for regular accounts — the backend only has an admin-only endpoint for this. Ask the backend team for a public/customer voucher-lookup route."
+    );
+  }
+  const data = await unwrap<ApiVoucher[]>(res, 'Failed to look up voucher');
+  const match = data.find((v) => v.code.toUpperCase() === code.trim().toUpperCase());
+  if (!match || isTestEntry(match.code)) {
+    throw new Error('That voucher code was not found.');
+  }
+  return toFrontendVoucher(match);
 }
