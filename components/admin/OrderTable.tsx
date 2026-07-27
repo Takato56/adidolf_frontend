@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/components/admin/OrderTable.tsx
+
 'use client';
 
 import { Order } from '@/types';
@@ -8,7 +10,7 @@ const STATUS_STYLES: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   confirmed: 'bg-blue-100 text-blue-800',
   shipping: 'bg-purple-100 text-purple-800',
-  done: 'bg-green-100 text-green-800',
+  delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
 };
 
@@ -50,54 +52,29 @@ export function OrderTable({ orders }: OrderTableProps) {
       <table className="w-full border-collapse">
         <thead className="bg-gray-100 border-b border-gray-200">
           <tr>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Order ID
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              User
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Shipment
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Payment
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Items
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Total
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Date
-            </th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
-              Actions
-            </th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Order ID</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">User</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Shipment</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Payment</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Items</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
           {orders.map((order) => (
-            <tr
-              key={order.id}
-              className="hover:bg-gray-50 transition-colors"
-            >
-              <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                #{order.id}
-              </td>
-              <td className="px-6 py-4 text-sm text-gray-600">
-                #{order.userId}
-              </td>
+            <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+              <td className="px-6 py-4 text-sm text-gray-900 font-medium">#{order.id}</td>
+              <td className="px-6 py-4 text-sm text-gray-600">#{order.userId}</td>
               <td className="px-6 py-4 text-sm">
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  className={`px-3 py-1 rounded-full text-xs uppercase font-semibold ${
                     STATUS_STYLES[order.status] || 'bg-gray-100 text-gray-600'
                   }`}
                 >
-                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  {order.status}
                 </span>
               </td>
               <td className="px-6 py-4 text-sm">

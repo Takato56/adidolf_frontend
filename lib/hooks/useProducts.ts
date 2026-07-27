@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/lib/hooks/useProducts.ts
+
 import { Product } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -7,6 +9,7 @@ import {
   deleteProductApi,
   getProductById,
   syncProductImagesApi,
+  syncProductVariantsApi,
 } from '@/lib/products';
 import { getCategories } from '@/lib/categories';
 
@@ -31,8 +34,6 @@ export function useProducts() {
     load();
   }, [load]);
 
-  // category_id is required by the backend but the frontend Product model only
-  // carries categorySlug, so resolve it against /categories before writing.
   const resolveCategoryId = async (categorySlug: string): Promise<number> => {
     const categories = await getCategories();
     const match = categories.find((c) => c.slug === categorySlug);
@@ -43,8 +44,14 @@ export function useProducts() {
   const addProduct = async (product: Omit<Product, 'id'>) => {
     const categoryId = await resolveCategoryId(product.categorySlug);
     const created = await createProductApi(product, categoryId);
-    setProducts((prev) => [...prev, created]);
-    return created;
+
+    if (product.variants?.length) {
+      await syncProductVariantsApi(created.id, product.variants);
+    }
+
+    const refreshed = await getProductById(created.id);
+    setProducts((prev) => [...prev.filter((p) => p.id !== created.id), refreshed]);
+    return refreshed;
   };
 
   const updateProduct = async (id: string, updates: Partial<Product>) => {
@@ -53,11 +60,12 @@ export function useProducts() {
       : undefined;
     await updateProductApi(id, updates, categoryId);
 
-    // PUT /products/:id only touches the product row itself — images live in
-    // a separate table with their own endpoints, so they need a separate,
-    // explicit sync pass against whatever URLs are in the form now.
     if (updates.images) {
       await syncProductImagesApi(id, updates.images);
+    }
+
+    if (updates.variants) {
+      await syncProductVariantsApi(id, updates.variants);
     }
 
     const refreshed = await getProductById(id);
@@ -72,7 +80,6 @@ export function useProducts() {
 
   const getProduct = (id: string) => products.find((p) => p.id === id);
 
-  // Fetches a single product straight from the API (bypasses local cache).
   const fetchProduct = async (id: string) => getProductById(id);
 
   return {

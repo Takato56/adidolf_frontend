@@ -19,14 +19,17 @@ export interface ApiVoucher {
   target_user_id: number | null;
 }
 
+export interface ApiVoucherEvaluation {
+  valid: boolean;
+  discount_amount: number;
+  reason: string | null;
+}
+
 interface ApiEnvelope<T> {
   status: string;
   data: T;
 }
 
-// Note the field name mismatch: the backend column is `used_count`, the
-// frontend type calls it `usage_count`. Mapped here so nothing further up
-// has to know about it.
 function toFrontendVoucher(v: ApiVoucher): Voucher {
   return {
     id: v.voucher_id,
@@ -50,7 +53,7 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
       const body = await res.json();
       message = body?.message || message;
     } catch {
-      // ignore body parse errors
+      // ignore parse errors
     }
     throw new Error(`${message} (${res.status})`);
   }
@@ -58,7 +61,18 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
   return json.data;
 }
 
-// All /admin/* routes require auth + admin role (enforced server-side).
+// ---------- Customer-facing Voucher Validation ----------
+
+export async function validateVoucherApi(code: string): Promise<ApiVoucherEvaluation> {
+  const res = await fetchWithAuth(`${BASE_URL}/vouchers/validate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  return unwrap<ApiVoucherEvaluation>(res, 'Failed to validate voucher');
+}
+
+// ---------- Admin-only Voucher Management ----------
 
 export async function getVouchersApi(): Promise<Voucher[]> {
   const res = await fetchWithAuth(`${BASE_URL}/admin/vouchers`);
@@ -134,34 +148,4 @@ export async function deleteVoucherApi(id: number): Promise<void> {
     }
     throw new Error(`${message} (${res.status})`);
   }
-}
-
-// ---------- Customer-facing voucher lookup ----------
-//
-// There is currently NO public endpoint for looking up a voucher by code.
-// The only /vouchers route that exists is the generic admin CRUD one,
-// nested under `/admin` (authMiddleware + adminMiddleware) — a logged-in
-// customer's token will get 401/403 here, every time, by design.
-//
-// This function calls that admin endpoint anyway (using its `code` filter)
-// so the "enter a voucher" flow is fully working end-to-end for an admin
-// account testing it, and fails with an honest, specific error for regular
-// customers instead of silently doing nothing. A real fix needs a backend
-// endpoint like `GET /vouchers/validate?code=X` that's either public or
-// requires only a normal customer session, not admin.
-export async function lookupVoucherByCode(code: string): Promise<Voucher> {
-  const res = await fetchWithAuth(
-    `${BASE_URL}/admin/vouchers?code=${encodeURIComponent(code)}`
-  );
-  if (res.status === 401 || res.status === 403) {
-    throw new Error(
-      "Voucher codes can't be checked yet for regular accounts — the backend only has an admin-only endpoint for this. Ask the backend team for a public/customer voucher-lookup route."
-    );
-  }
-  const data = await unwrap<ApiVoucher[]>(res, 'Failed to look up voucher');
-  const match = data.find((v) => v.code.toUpperCase() === code.trim().toUpperCase());
-  if (!match || isTestEntry(match.code)) {
-    throw new Error('That voucher code was not found.');
-  }
-  return toFrontendVoucher(match);
 }

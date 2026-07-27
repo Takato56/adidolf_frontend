@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/components/admin/VoucherForm.tsx
+
 'use client';
 
 import { Voucher, DiscountType } from '@/types';
@@ -11,12 +13,18 @@ interface VoucherFormProps {
 }
 
 function toInputDate(iso: string): string {
-  return iso.split('T')[0];
+  if (!iso) return '';
+  const date = new Date(iso);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
-function nullOrValue(value: string): number | null {
-  if (value.trim() === '') return null;
-  const parsed = parseFloat(value);
+function nullOrValue(value: string | number): number | null {
+  const str = String(value).trim();
+  if (str === '') return null;
+  const parsed = parseFloat(str);
   return isNaN(parsed) ? null : parsed;
 }
 
@@ -28,15 +36,26 @@ export function VoucherForm({
   const router = useRouter();
   const isEditing = !!voucher;
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    code: string;
+    discount_type: DiscountType;
+    discount_value: string | number;
+    max_discount: string | number;
+    min_order_amount: string | number;
+    usage_limit: string | number;
+    usage_count: number;
+    valid_from: string;
+    valid_to: string;
+    is_active: boolean;
+  }>({
     code: voucher?.code || '',
     discount_type: voucher?.discount_type || ('percent' as DiscountType),
     discount_value: voucher?.discount_value ?? '',
     max_discount: voucher?.max_discount ?? '',
-    min_order_amount: voucher?.min_order_amount ?? '',
+    min_order_amount: voucher?.min_order_amount ?? 0,
     usage_limit: voucher?.usage_limit ?? '',
     usage_count: voucher?.usage_count ?? 0,
-    valid_from: voucher?.valid_from ? toInputDate(voucher.valid_from) : '',
+    valid_from: voucher?.valid_from ? toInputDate(voucher.valid_from) : toInputDate(new Date().toISOString()),
     valid_to: voucher?.valid_to ? toInputDate(voucher.valid_to) : '',
     is_active: voucher?.is_active ?? true,
   });
@@ -51,23 +70,27 @@ export function VoucherForm({
       newErrors.code = 'Use only uppercase letters, numbers, hyphens, or underscores';
     }
 
-    if (formData.discount_value === '' || Number(formData.discount_value) <= 0) {
+    const discountValStr = String(formData.discount_value).trim();
+    if (discountValStr === '' || isNaN(Number(discountValStr)) || Number(discountValStr) <= 0) {
       newErrors.discount_value = 'Discount value must be greater than 0';
     }
 
-    if (formData.discount_type === 'percent' && Number(formData.discount_value) > 100) {
+    if (formData.discount_type === 'percent' && Number(discountValStr) > 100) {
       newErrors.discount_value = 'Percent discount cannot exceed 100%';
     }
 
-    if (formData.max_discount !== '' && Number(formData.max_discount) <= 0) {
+    const maxDiscountStr = String(formData.max_discount).trim();
+    if (maxDiscountStr !== '' && (isNaN(Number(maxDiscountStr)) || Number(maxDiscountStr) <= 0)) {
       newErrors.max_discount = 'Max discount must be positive';
     }
 
-    if (formData.min_order_amount !== '' && Number(formData.min_order_amount) <= 0) {
-      newErrors.min_order_amount = 'Min order amount must be positive';
+    const minOrderStr = String(formData.min_order_amount).trim();
+    if (minOrderStr === '' || isNaN(Number(minOrderStr)) || Number(minOrderStr) < 0) {
+      newErrors.min_order_amount = 'Min order amount is required (enter 0 for no minimum threshold)';
     }
 
-    if (formData.usage_limit !== '' && Number(formData.usage_limit) <= 0) {
+    const usageLimitStr = String(formData.usage_limit).trim();
+    if (usageLimitStr !== '' && (isNaN(Number(usageLimitStr)) || Number(usageLimitStr) <= 0)) {
       newErrors.usage_limit = 'Usage limit must be positive';
     }
 
@@ -91,16 +114,21 @@ export function VoucherForm({
     e.preventDefault();
     if (!validateForm()) return;
 
+    // Parse start date as beginning of day local time (00:00:00)
+    const startDate = new Date(`${formData.valid_from}T00:00:00`);
+    // Parse end date as end of day local time (23:59:59)
+    const endDate = new Date(`${formData.valid_to}T23:59:59.999`);
+
     const data: Omit<Voucher, 'id'> = {
       code: formData.code.trim(),
       discount_type: formData.discount_type,
       discount_value: Number(formData.discount_value),
-      max_discount: nullOrValue(String(formData.max_discount)),
-      min_order_amount: nullOrValue(String(formData.min_order_amount)),
-      usage_limit: formData.usage_limit === '' ? null : parseInt(String(formData.usage_limit)) || null,
-      usage_count: Number(formData.usage_count),
-      valid_from: new Date(formData.valid_from).toISOString(),
-      valid_to: new Date(formData.valid_to).toISOString(),
+      max_discount: nullOrValue(formData.max_discount),
+      min_order_amount: Number(formData.min_order_amount) || 0,
+      usage_limit: String(formData.usage_limit).trim() === '' ? null : parseInt(String(formData.usage_limit)) || null,
+      usage_count: Number(formData.usage_count) || 0,
+      valid_from: startDate.toISOString(),
+      valid_to: endDate.toISOString(),
       is_active: formData.is_active,
     };
 
@@ -129,45 +157,9 @@ export function VoucherForm({
     }
   };
 
-  const Field = ({
-    label,
-    name,
-    type = 'text',
-    placeholder = '',
-    required = false,
-  }: {
-    label: string;
-    name: string;
-    type?: string;
-    placeholder?: string;
-    required?: boolean;
-  }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-        {required && ' *'}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={(formData as any)[name]}
-        onChange={handleChange}
-        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-          errors[name] ? 'border-red-500' : 'border-gray-300'
-        }`}
-        placeholder={placeholder}
-      />
-      {errors[name] && (
-        <p className="text-red-600 text-sm mt-1">{errors[name]}</p>
-      )}
-    </div>
-  );
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Basic Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Code */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Voucher Code *
@@ -197,7 +189,6 @@ export function VoucherForm({
           )}
         </div>
 
-        {/* Discount Type */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Discount Type *
@@ -213,7 +204,6 @@ export function VoucherForm({
           </select>
         </div>
 
-        {/* Discount Value */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Discount Value *
@@ -242,7 +232,6 @@ export function VoucherForm({
           )}
         </div>
 
-        {/* Max Discount */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Max Discount
@@ -271,10 +260,9 @@ export function VoucherForm({
           )}
         </div>
 
-        {/* Min Order Amount */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Min Order Amount
+            Min Order Amount *
           </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
@@ -290,7 +278,7 @@ export function VoucherForm({
                   ? 'border-red-500'
                   : 'border-gray-300'
               }`}
-              placeholder="No minimum"
+              placeholder="0.00"
               min="0"
               step="0.01"
             />
@@ -302,7 +290,6 @@ export function VoucherForm({
           )}
         </div>
 
-        {/* Usage Limit */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Usage Limit
@@ -323,7 +310,6 @@ export function VoucherForm({
           )}
         </div>
 
-        {/* Usage Count (edit only) */}
         {isEditing && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -340,7 +326,6 @@ export function VoucherForm({
           </div>
         )}
 
-        {/* Valid From */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Valid From *
@@ -359,7 +344,6 @@ export function VoucherForm({
           )}
         </div>
 
-        {/* Valid To */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Valid To *
@@ -379,7 +363,6 @@ export function VoucherForm({
         </div>
       </div>
 
-      {/* Active Toggle */}
       <div className="flex items-center gap-3">
         <input
           type="checkbox"
@@ -394,12 +377,11 @@ export function VoucherForm({
         </label>
       </div>
 
-      {/* Submit */}
       <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {isLoading
             ? 'Saving...'
@@ -410,7 +392,7 @@ export function VoucherForm({
         <button
           type="button"
           onClick={() => router.push('/admin/vouchers')}
-          className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium"
+          className="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium cursor-pointer"
         >
           Cancel
         </button>

@@ -1,4 +1,20 @@
+// FILE: takato56-adidolf_frontend/lib/auth.ts
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export function getAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken");
+}
+
+export function getUserSession(): { name: string; role: string } | null {
+  if (typeof window === "undefined") return null;
+  const token = getAccessToken();
+  const name = sessionStorage.getItem("userName") || localStorage.getItem("userName");
+  const role = sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
+  if (!token || !name || !role) return null;
+  return { name, role };
+}
 
 export async function registerUser(data: {
   email: string;
@@ -11,71 +27,108 @@ export async function registerUser(data: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(`Registration Failed (${res.status})`);
-  const json = await res.json();
-  console.log(json);
+
+  if (!res.ok) {
+    let message = "Registration Failed";
+    try {
+      const json = await res.json();
+      message = json.message || message;
+    } catch {
+      // ignore
+    }
+    throw new Error(`${message}`);
+  }
 }
 
-export async function loginUser(data: { email: string; password: string }) {
+export async function loginUser(
+  data: { email: string; password: string },
+  keepSignedIn = false
+) {
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include", // required so the browser stores the httpOnly refreshToken cookie set by the backend (cross-origin)
+    credentials: "include",
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(`Login Failed (${res.status})`);
+
+  if (!res.ok) {
+    let message = "Invalid email or password";
+    try {
+      const json = await res.json();
+      message = json.message || message;
+    } catch {
+      // ignore
+    }
+    throw new Error(`${message}`);
+  }
+
   const json = await res.json();
-  sessionStorage.setItem("accessToken", json.data.accessToken);
-  sessionStorage.setItem("userName", json.data.user.full_name);
-  sessionStorage.setItem("userRole", json.data.user.role);
+
+  // Clear previous session/local storage
+  sessionStorage.removeItem("accessToken");
+  sessionStorage.removeItem("userName");
+  sessionStorage.removeItem("userRole");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("userName");
+  localStorage.removeItem("userRole");
+
+  const storage = keepSignedIn ? localStorage : sessionStorage;
+  storage.setItem("accessToken", json.data.accessToken);
+  storage.setItem("userName", json.data.user.full_name);
+  storage.setItem("userRole", json.data.user.role);
+
   window.dispatchEvent(new Event("authchange"));
-  console.log(json);
 }
 
 export async function logoutUser() {
   try {
     await fetchWithAuth(`${BASE_URL}/auth/logout`, {
       method: "POST",
-      credentials: "include", // required so the browser actually sends the refreshToken cookie to be cleared server-side
+      credentials: "include",
     });
   } catch {
-    // Best-effort — if the server call fails (e.g. refresh token also
-    // expired), still clear local state below so the user ends up logged
-    // out client-side either way.
+    // Best effort
   } finally {
     sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("userName");
     sessionStorage.removeItem("userRole");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userRole");
     window.dispatchEvent(new Event("authchange"));
   }
 }
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  const token = getAccessToken();
+
   const res = await fetch(url, {
     ...options,
     headers: {
       ...options.headers,
-      Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
   if (res.status === 401) {
-    // Access token expired (or missing) — try a silent refresh.
     const res_refresh = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",
-      credentials: "include", // required so the browser sends the refreshToken cookie
+      credentials: "include",
     });
+
     if (!res_refresh.ok) {
-      // Well nothing we can do now lol.
-      sessionStorage.removeItem("accessToken");
-      sessionStorage.removeItem("userName");
-      sessionStorage.removeItem("userRole");
+      sessionStorage.clear();
+      localStorage.clear();
+      window.dispatchEvent(new Event("authchange"));
       throw new Error(`Refresh failed ${res_refresh.status}`);
     }
 
     const json = await res_refresh.json();
-    sessionStorage.setItem("accessToken", json.data.accessToken);
-    return fetchWithAuth(url, options); // Retrying......
+    const isPersistent = !!localStorage.getItem("accessToken");
+    const storage = isPersistent ? localStorage : sessionStorage;
+
+    storage.setItem("accessToken", json.data.accessToken);
+    return fetchWithAuth(url, options);
   }
 
   return res;

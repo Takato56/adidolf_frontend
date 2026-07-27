@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/lib/cart.ts
+
 import { fetchWithAuth } from '@/lib/auth';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -43,7 +45,7 @@ async function unwrap<T>(res: Response, fallbackMessage: string): Promise<T> {
       const body = await res.json();
       message = body?.message || message;
     } catch {
-      // ignore
+      // ignore body parse errors
     }
     throw new Error(`${message} (${res.status})`);
   }
@@ -64,7 +66,11 @@ export async function addCartItemApi(
   const res = await fetchWithAuth(`${BASE_URL}/cart/items`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ product_id: productId, variant_id: variantId, quantity }),
+    body: JSON.stringify({
+      product_id: productId,
+      variant_id: variantId,
+      quantity,
+    }),
   });
   return unwrap<ApiCartSummary>(res, 'Failed to add item to cart');
 }
@@ -78,15 +84,21 @@ export async function updateCartItemQuantityApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ quantity }),
   });
-  return unwrap<ApiCartSummary>(res, 'Failed to update quantity');
+  return unwrap<ApiCartSummary>(res, 'Failed to update item quantity');
 }
 
-export async function removeCartItemApi(itemId: number): Promise<ApiCartSummary> {
-  const res = await fetchWithAuth(`${BASE_URL}/cart/items/${itemId}`, { method: 'DELETE' });
-  return unwrap<ApiCartSummary>(res, 'Failed to remove item');
+export async function removeCartItemApi(
+  itemId: number
+): Promise<ApiCartSummary> {
+  const res = await fetchWithAuth(`${BASE_URL}/cart/items/${itemId}`, {
+    method: 'DELETE',
+  });
+  return unwrap<ApiCartSummary>(res, 'Failed to remove item from cart');
 }
 
-export async function clearCartApi(): Promise<void> {
-  const res = await fetchWithAuth(`${BASE_URL}/cart`, { method: 'DELETE' });
-  if (!res.ok) throw new Error(`Failed to clear cart (${res.status})`);
+export async function clearCartApi(): Promise<ApiCartSummary> {
+  const res = await fetchWithAuth(`${BASE_URL}/cart`, {
+    method: 'DELETE',
+  });
+  return unwrap<ApiCartSummary>(res, 'Failed to clear cart');
 }

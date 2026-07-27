@@ -1,9 +1,12 @@
+// FILE: takato56-adidolf_frontend/app/admin/layout.tsx
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { getAccessToken, getUserSession } from '@/lib/auth';
 
 export default function AdminLayout({
   children,
@@ -15,10 +18,10 @@ export default function AdminLayout({
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    const accessToken = sessionStorage.getItem('accessToken');
-    const userRole = sessionStorage.getItem('userRole');
+    const accessToken = getAccessToken();
+    const session = getUserSession();
 
-    if (!accessToken || userRole !== 'admin') {
+    if (!accessToken || session?.role !== 'admin') {
       router.replace('/');
       return;
     }
@@ -27,23 +30,17 @@ export default function AdminLayout({
     setChecked(true);
   }, [router]);
 
-  // Nothing is rendered until the check passes, so admin content never
-  // flashes on screen for a logged-out or non-admin visitor.
   if (!checked || !isAllowed) {
     return null;
   }
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <AdminSidebar />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden md:ml-0">
-        {/* Header */}
         <AdminHeader />
 
-        {/* Content Area */}
         <main className="flex-1 overflow-auto">
           <div className="p-6">{children}</div>
         </main>
