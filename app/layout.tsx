@@ -26,11 +26,11 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen flex flex-col`}>
         <Header />
         <main className="flex-1">{children}</main>
+        <Footer />
         <Script src="https://cnpm-group-1.vercel.app/script.umd.cjs"
         data-workspace-id="13"
         data-widget-token="199ed0722206463a9b1f40f270a21cf5"
         data-api-url="https://cnpm-group-1.onrender.com/api/v1"></Script>
-        <Footer />
       </body>
     </html>
   );

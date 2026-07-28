@@ -1,11 +1,20 @@
-// FILE: takato56-adidolf_frontend/app/products/page.tsx
+// FILE: takato56-adidolf_frontend/app/products/[slug]/page.tsx
 
 'use client';
 
-import { useState, useRef, useEffect, Suspense } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { FiShoppingCart, FiMinus, FiPlus, FiChevronLeft, FiChevronRight, FiCheck } from "react-icons/fi";
+import { useParams } from "next/navigation";
+import {
+  FiShoppingCart,
+  FiMinus,
+  FiPlus,
+  FiChevronLeft,
+  FiChevronRight,
+  FiCheck,
+  FiX,
+  FiMaximize2,
+} from "react-icons/fi";
 import ProductCard from "@/components/ProductCard";
 import { getProductBySlug } from "@/lib/products";
 import { useProducts } from "@/lib/hooks/useProducts";
@@ -46,13 +55,27 @@ const MOCK_PRODUCT_IMAGES = [
   "https://i.pinimg.com/736x/c0/81/13/c08113b8df8e619f39049291f312504f.jpg",
 ];
 
-function ProductPageContent() {
-  const searchParams = useSearchParams();
-  const slug = searchParams.get("slug");
+export default function ProductDetailPage() {
+  const params = useParams();
+  const rawSlug = params?.slug;
+  const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug;
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(!USE_MOCK_DATA && !!slug);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const [currentActiveIndex, setActiveIndex] = useState(0);
+  const [zoomedImageIndex, setZoomedImageIndex] = useState<number | null>(null);
+
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  const { addItem, voucher, discountAmount, subtotal: cartSubtotal } = useCart();
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [addToCartError, setAddToCartError] = useState<string | null>(null);
+  const [addedToCart, setAddedToCart] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
     if (USE_MOCK_DATA || !slug) return;
@@ -61,7 +84,7 @@ function ProductPageContent() {
     setIsLoading(true);
     setFetchError(null);
 
-    getProductBySlug(slug)
+    getProductBySlug(decodeURIComponent(slug))
       .then((p) => {
         if (!cancelled) setProduct(p);
       })
@@ -97,17 +120,6 @@ function ProductPageContent() {
       ? "Premium professional McLaren racing suit 2025 edition designed for F1 drivers."
       : product.description;
 
-  const [currentActiveIndex, setActiveIndex] = useState(0);
-  const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  const { addItem, voucher, discountAmount, subtotal: cartSubtotal } = useCart();
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
-  const [addToCartError, setAddToCartError] = useState<string | null>(null);
-  const [addedToCart, setAddedToCart] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-
   useEffect(() => {
     if (product?.variants?.length) {
       const inStockVariant = product.variants.find((v) => v.stock > 0) || product.variants[0];
@@ -116,6 +128,24 @@ function ProductPageContent() {
       setSelectedVariant(null);
     }
   }, [product]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoomedImageIndex(null);
+    };
+
+    if (zoomedImageIndex !== null) {
+      window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [zoomedImageIndex]);
 
   const unitPrice =
     USE_MOCK_DATA || !product
@@ -163,14 +193,6 @@ function ProductPageContent() {
     setActiveIndex(0);
   }, [product?.id]);
 
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const timeout = setTimeout(() => {
-      setActiveIndex((prev) => (prev + 1) % images.length);
-    }, 4000);
-    return () => clearTimeout(timeout);
-  }, [currentActiveIndex, images.length]);
-
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0].clientX;
     touchEndX.current = e.targetTouches[0].clientX;
@@ -181,12 +203,12 @@ function ProductPageContent() {
   };
 
   const handleTouchEnd = () => {
-    if (touchStartX.current - touchEndX.current > 50) {
+    const diff = touchStartX.current - touchEndX.current;
+    if (diff > 50) {
       if (currentActiveIndex < images.length - 1) {
         setActiveIndex(currentActiveIndex + 1);
       }
-    }
-    if (touchStartX.current - touchEndX.current < -50) {
+    } else if (diff < -50) {
       if (currentActiveIndex > 0) {
         setActiveIndex(currentActiveIndex - 1);
       }
@@ -235,6 +257,74 @@ function ProductPageContent() {
 
   return (
     <div className="mx-auto px-4 md:px-50">
+      {/* Lightbox Modal */}
+      {zoomedImageIndex !== null && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setZoomedImageIndex(null)}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setZoomedImageIndex(null);
+            }}
+            className="absolute top-5 right-5 text-white/80 hover:text-white bg-black/50 p-3 rounded-full backdrop-blur-sm z-10 transition cursor-pointer"
+            aria-label="Close zoomed view"
+          >
+            <FiX className="text-2xl" />
+          </button>
+
+          {images.length > 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setZoomedImageIndex((prev) =>
+                  prev === null ? 0 : prev === 0 ? images.length - 1 : prev - 1
+                );
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/50 p-3 rounded-full backdrop-blur-sm z-10 transition cursor-pointer"
+            >
+              <FiChevronLeft className="text-2xl" />
+            </button>
+          )}
+
+          <div
+            className="relative max-w-4xl max-h-[85vh] w-full h-full flex items-center justify-center p-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={images[zoomedImageIndex]}
+              alt="Zoomed product view"
+              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl transition-transform duration-300"
+            />
+          </div>
+
+          {images.length > 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setZoomedImageIndex((prev) =>
+                  prev === null ? 0 : (prev + 1) % images.length
+                );
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/50 p-3 rounded-full backdrop-blur-sm z-10 transition cursor-pointer"
+            >
+              <FiChevronRight className="text-2xl" />
+            </button>
+          )}
+
+          {images.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/60 text-white/90 text-xs px-3.5 py-1.5 rounded-full backdrop-blur-sm font-semibold tracking-wide">
+              {zoomedImageIndex + 1} / {images.length}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Breadcrumbs */}
       <div className="mt-3">
         <nav className="hidden md:block">
           <ul className="flex items-center gap-2 text-sm text-gray-500">
@@ -254,10 +344,11 @@ function ProductPageContent() {
       </div>
 
       <div className="mt-10 flex flex-col lg:flex-row gap-10 items-start">
-        {/* Images Column */}
+        {/* Gallery */}
         <div className="w-full lg:w-1/2 flex flex-col md:flex-row gap-4 items-stretch md:sticky md:top-6">
           <div
-            className="flex-1 aspect-3/4 overflow-hidden rounded-lg bg-gray-100 relative touch-pan-y"
+            className="flex-1 aspect-3/4 overflow-hidden rounded-xl bg-gray-100 relative touch-pan-y cursor-zoom-in group"
+            onClick={() => setZoomedImageIndex(currentActiveIndex)}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -271,10 +362,14 @@ function ProductPageContent() {
                   <img
                     src={src}
                     className="w-full h-full object-cover object-center select-none"
-                    alt="Product"
+                    alt="Product View"
                   />
                 </div>
               ))}
+            </div>
+
+            <div className="absolute top-3 right-3 bg-black/40 text-white p-2 rounded-full backdrop-blur-sm opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <FiMaximize2 className="text-sm" />
             </div>
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 md:hidden">
@@ -301,14 +396,14 @@ function ProductPageContent() {
                 <img
                   src={src}
                   className="w-full h-full object-cover object-center"
-                  alt={`Sub ${index + 1}`}
+                  alt={`Thumbnail ${index + 1}`}
                 />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Product Details & Variant Selector Column */}
+        {/* Info Column */}
         <div className="w-full lg:w-1/2 shadow-md bg-[#f6f6f6] py-6 px-6 md:px-10 font-sans rounded-2xl border border-gray-100">
           <p className="text-[25px] pt-3 md:pt-0 md:text-[30px] font-bold text-gray-900">{displayName}</p>
 
@@ -330,7 +425,7 @@ function ProductPageContent() {
             </p>
           )}
 
-          {/* Styled Variant Selector */}
+          {/* Variant Selector */}
           <div className="mt-6 space-y-3">
             <div className="flex justify-between items-center">
               <label className="font-bold text-gray-900 text-sm uppercase tracking-wide">
@@ -421,7 +516,6 @@ function ProductPageContent() {
             </p>
           )}
 
-          {/* Add to Cart Action */}
           <div className="mt-8 mb-8">
             <button
               onClick={handleAddToCart}
@@ -431,7 +525,7 @@ function ProductPageContent() {
               <FiShoppingCart className="mr-2 text-lg" />
               {isAdding ? "Adding..." : "Add to Cart"}
             </button>
-        </div>
+          </div>
 
           <div className="mt-6 border-t border-gray-300">
             <AccordionItem title="Description">
@@ -505,13 +599,5 @@ function ProductPageContent() {
 
       <div className="mt-10"></div>
     </div>
-  );
-}
-
-export default function ProductPage() {
-  return (
-    <Suspense fallback={null}>
-      <ProductPageContent />
-    </Suspense>
   );
 }
