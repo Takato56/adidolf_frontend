@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Voucher } from '@/types';
 import { validateVoucherApi } from '@/lib/vouchers';
+import { getAccessToken } from '@/lib/auth';
 import {
   getCartApi,
   addCartItemApi,
@@ -33,8 +34,7 @@ export interface CartItem {
 }
 
 function isAuthenticated(): boolean {
-  if (typeof window === 'undefined') return false;
-  return !!sessionStorage.getItem('accessToken');
+  return !!getAccessToken();
 }
 
 function readLocalItems(): CartItem[] {

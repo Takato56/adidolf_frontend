@@ -71,11 +71,16 @@ export async function loginUser(
   localStorage.removeItem("accessToken");
   localStorage.removeItem("userName");
   localStorage.removeItem("userRole");
+  localStorage.removeItem("keepSignedIn");
 
   const storage = keepSignedIn ? localStorage : sessionStorage;
   storage.setItem("accessToken", json.data.accessToken);
   storage.setItem("userName", json.data.user.full_name);
   storage.setItem("userRole", json.data.user.role);
+
+  if (keepSignedIn) {
+    localStorage.setItem("keepSignedIn", "true");
+  }
 
   window.dispatchEvent(new Event("authchange"));
 }
@@ -95,6 +100,7 @@ export async function logoutUser() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("keepSignedIn");
     window.dispatchEvent(new Event("authchange"));
   }
 }
@@ -124,7 +130,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     }
 
     const json = await res_refresh.json();
-    const isPersistent = !!localStorage.getItem("accessToken");
+    const isPersistent = localStorage.getItem("keepSignedIn") === "true";
     const storage = isPersistent ? localStorage : sessionStorage;
 
     storage.setItem("accessToken", json.data.accessToken);
