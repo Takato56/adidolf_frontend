@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/app/admin/orders/[id]/page.tsx
+
 'use client';
 
 import { OrderForm } from '@/components/admin/OrderForm';
@@ -6,7 +8,7 @@ import { PaymentForm } from '@/components/admin/PaymentForm';
 import { useOrders } from '@/lib/hooks/useOrders';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FiTrash2, FiArrowLeft } from 'react-icons/fi';
+import { FiTrash2, FiArrowLeft, FiLock } from 'react-icons/fi';
 import { Order, Shipment, Payment } from '@/types';
 import Link from 'next/link';
 
@@ -56,7 +58,10 @@ export default function OrderDetailPage() {
     };
   }, [orderId, fetchOrder]);
 
+  const isCancelled = order?.status === 'cancelled';
+
   const handleOrderSubmit = async (data: any) => {
+    if (isCancelled) return;
     setDetailsError(null);
     setIsSubmittingDetails(true);
     try {
@@ -70,6 +75,7 @@ export default function OrderDetailPage() {
   };
 
   const handleShipmentSubmit = async (data: Partial<Shipment>) => {
+    if (isCancelled) return;
     setShipmentError(null);
     setShipmentSaved(false);
     try {
@@ -82,6 +88,7 @@ export default function OrderDetailPage() {
   };
 
   const handlePaymentSubmit = async (data: Partial<Payment>) => {
+    if (isCancelled) return;
     setPaymentError(null);
     setPaymentSaved(false);
     try {
@@ -94,7 +101,7 @@ export default function OrderDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this order?')) return;
+    if (!window.confirm('Are you sure you want to delete this order record?')) return;
 
     setDetailsError(null);
     try {
@@ -107,8 +114,8 @@ export default function OrderDetailPage() {
 
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading...</div>
+      <div className="flex items-center justify-center py-12 text-gray-500">
+        Loading order details...
       </div>
     );
   }
@@ -141,16 +148,24 @@ export default function OrderDetailPage() {
             <FiArrowLeft size={16} />
             Back to Orders
           </Link>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Edit Order #{order.id}
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Order #{order.id}
+            </h2>
+            {isCancelled && (
+              <span className="flex items-center gap-1 text-xs bg-red-100 text-red-800 font-bold px-3 py-1 rounded-full uppercase">
+                <FiLock /> Cancelled
+              </span>
+            )}
+          </div>
           <p className="text-gray-600 text-sm mt-1">
-            Update order information
+            Created on {new Date(order.createdAt).toLocaleString()}
           </p>
         </div>
+
         <button
           onClick={handleDelete}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium cursor-pointer"
         >
           <FiTrash2 size={18} />
           Delete Order
@@ -164,10 +179,10 @@ export default function OrderDetailPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                 activeTab === tab.key
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
               {tab.label}
@@ -192,6 +207,7 @@ export default function OrderDetailPage() {
             />
           </>
         )}
+
         {activeTab === 'shipment' && (
           <>
             {shipmentError && (
@@ -202,6 +218,7 @@ export default function OrderDetailPage() {
             <ShipmentForm
               shipment={order.shipment}
               orderId={order.id}
+              disabled={isCancelled}
               onSubmit={handleShipmentSubmit}
             />
             {shipmentSaved && (
@@ -209,6 +226,7 @@ export default function OrderDetailPage() {
             )}
           </>
         )}
+
         {activeTab === 'payment' && (
           <>
             {paymentError && (
@@ -219,6 +237,7 @@ export default function OrderDetailPage() {
             <PaymentForm
               payment={order.payment}
               orderId={order.id}
+              disabled={isCancelled}
               onSubmit={handlePaymentSubmit}
             />
             {paymentSaved && (
