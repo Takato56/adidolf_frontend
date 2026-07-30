@@ -1,3 +1,5 @@
+// FILE: takato56-adidolf_frontend/components/admin/PaymentForm.tsx
+
 'use client';
 
 import { Payment, PaymentMethod, PaymentStatus } from '@/types';
@@ -6,6 +8,7 @@ import { useState } from 'react';
 interface PaymentFormProps {
   payment?: Payment;
   orderId: number;
+  disabled?: boolean;
   onSubmit: (data: Partial<Payment>) => void;
   onSuccess?: () => void;
 }
@@ -27,6 +30,7 @@ const STATUS_OPTIONS: { value: PaymentStatus; label: string }[] = [
 export function PaymentForm({
   payment,
   orderId,
+  disabled = false,
   onSubmit,
   onSuccess,
 }: PaymentFormProps) {
@@ -45,6 +49,7 @@ export function PaymentForm({
   const [saved, setSaved] = useState(false);
 
   const validateForm = () => {
+    if (disabled) return false;
     const newErrors: Record<string, string> = {};
     if (!formData.amount.trim() || isNaN(Number(formData.amount)) || Number(formData.amount) < 0)
       newErrors.amount = 'Valid amount is required';
@@ -57,21 +62,15 @@ export function PaymentForm({
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
+    if (disabled) return;
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated[name];
-        return updated;
-      });
-    }
     setSaved(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (disabled || !validateForm()) return;
 
     const data: Partial<Payment> = {
       paymentId: payment?.paymentId || 0,
@@ -80,9 +79,7 @@ export function PaymentForm({
       amount: parseFloat(formData.amount) || 0,
       transactionId: formData.transactionId.trim() || null,
       gatewayResponse: formData.gatewayResponse.trim() || null,
-      paidAt: formData.paidAt
-        ? new Date(formData.paidAt).toISOString()
-        : null,
+      paidAt: formData.paidAt ? new Date(formData.paidAt).toISOString() : null,
     };
 
     onSubmit(data);
@@ -99,14 +96,11 @@ export function PaymentForm({
           Payment Information
         </h3>
         <p className="text-sm text-gray-500">
-          {hasPayment
-            ? `Payment #${payment.paymentId} — ${payment.method}`
-            : 'No payment assigned yet. Fill in the details below.'}
+          Order #{orderId} {hasPayment ? `— Payment #${payment.paymentId}` : ''}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Method */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Method *
@@ -115,7 +109,8 @@ export function PaymentForm({
             name="method"
             value={formData.method}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            disabled={disabled}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100"
           >
             {METHOD_OPTIONS.map((m) => (
               <option key={m.value} value={m.value}>
@@ -125,7 +120,6 @@ export function PaymentForm({
           </select>
         </div>
 
-        {/* Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Status *
@@ -134,7 +128,8 @@ export function PaymentForm({
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            disabled={disabled}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100"
           >
             {STATUS_OPTIONS.map((s) => (
               <option key={s.value} value={s.value}>
@@ -144,21 +139,19 @@ export function PaymentForm({
           </select>
         </div>
 
-        {/* Amount */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Amount *
+            Amount ($) *
           </label>
           <input
             type="number"
             name="amount"
             value={formData.amount}
             onChange={handleChange}
+            disabled={disabled}
             min="0"
             step="0.01"
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.amount ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100"
             placeholder="0.00"
           />
           {errors.amount && (
@@ -166,7 +159,6 @@ export function PaymentForm({
           )}
         </div>
 
-        {/* Transaction ID */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Transaction ID
@@ -176,12 +168,12 @@ export function PaymentForm({
             name="transactionId"
             value={formData.transactionId}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            disabled={disabled}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100"
             placeholder="e.g. TXN-98765"
           />
         </div>
 
-        {/* Paid At */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Paid At
@@ -191,12 +183,12 @@ export function PaymentForm({
             name="paidAt"
             value={formData.paidAt}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            disabled={disabled}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100"
           />
         </div>
       </div>
 
-      {/* Gateway Response */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Gateway Response
@@ -205,20 +197,24 @@ export function PaymentForm({
           name="gatewayResponse"
           value={formData.gatewayResponse}
           onChange={handleChange}
+          disabled={disabled}
           rows={2}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none resize-none disabled:bg-gray-100"
           placeholder="e.g. Approved, Declined, etc."
         />
       </div>
 
-      {/* Form Actions */}
       <div className="flex gap-4 pt-4 border-t border-gray-200">
-        <button
-          type="submit"
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-        >
-          {hasPayment ? 'Update Payment' : 'Save Payment'}
-        </button>
+        {!disabled ? (
+          <button
+            type="submit"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium cursor-pointer"
+          >
+            {hasPayment ? 'Update Payment' : 'Save Payment'}
+          </button>
+        ) : (
+          <p className="text-sm text-gray-500 italic">Payment editing disabled for cancelled orders.</p>
+        )}
         {saved && (
           <span className="flex items-center text-sm text-green-600 font-medium">
             ✓ Saved

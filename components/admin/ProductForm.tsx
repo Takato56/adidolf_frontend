@@ -5,7 +5,7 @@
 import { Product, ProductVariant } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { FiPlus, FiTrash2, FiUpload } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiUpload, FiRefreshCw } from 'react-icons/fi';
 import { useCategories } from '@/lib/hooks/useCategories';
 import { uploadVariantImageApi } from '@/lib/products';
 
@@ -15,9 +15,20 @@ interface ProductFormProps {
   isLoading?: boolean;
 }
 
-function emptyVariant(): ProductVariant {
+function generateSmartSku(productName: string, color?: string, size?: string): string {
+  const clean = (str: string) =>
+    str.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+
+  const base = productName ? clean(productName) : 'PROD';
+  const c = color ? clean(color) : 'VAR';
+  const s = size ? clean(size) : 'STD';
+
+  return `${base}-${c}-${s}`;
+}
+
+function emptyVariant(productName = ''): ProductVariant {
   return {
-    sku: `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    sku: generateSmartSku(productName),
     color: '',
     size: '',
     extra_price: 0,
@@ -97,14 +108,6 @@ export function ProductForm({
         ? parseFloat(value) || 0
         : value,
     }));
-
-    if (errors[name]) {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated[name];
-        return updated;
-      });
-    }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,16 +117,8 @@ export function ProductForm({
       name,
       slug: prev.slug || generateSlug(name),
     }));
-    if (errors.name) {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated.name;
-        return updated;
-      });
-    }
   };
 
-  // Variant handlers
   const handleVariantChange = (
     index: number,
     field: keyof ProductVariant,
@@ -131,10 +126,34 @@ export function ProductForm({
   ) => {
     setFormData((prev) => {
       const updated = [...prev.variants];
+      const cur = updated[index];
+
+      const newColor = field === 'color' ? String(value) : cur.color;
+      const newSize = field === 'size' ? String(value) : cur.size;
+
+      // Auto-generate smart SKU if user hasn't manually overridden it with a custom format
+      const isAutoSku = !cur.sku || cur.sku.includes('-VAR-') || cur.sku.startsWith('PROD-');
+      const autoSku = isAutoSku
+        ? generateSmartSku(prev.name, newColor, newSize)
+        : cur.sku;
+
       updated[index] = {
-        ...updated[index],
-        [field]:
-          field === 'extra_price' || field === 'stock' ? Number(value) || 0 : value,
+        ...cur,
+        [field]: field === 'extra_price' || field === 'stock' ? Number(value) || 0 : value,
+        sku: field === 'sku' ? String(value) : autoSku,
+      };
+
+      return { ...prev, variants: updated };
+    });
+  };
+
+  const regenerateSku = (index: number) => {
+    setFormData((prev) => {
+      const updated = [...prev.variants];
+      const cur = updated[index];
+      updated[index] = {
+        ...cur,
+        sku: generateSmartSku(prev.name, cur.color, cur.size),
       };
       return { ...prev, variants: updated };
     });
@@ -148,7 +167,7 @@ export function ProductForm({
     if (!file) return;
 
     if (!product?.id) {
-      alert('Please create and save the product first before uploading variant images directly.');
+      alert('Please save the product first before uploading variant images directly.');
       return;
     }
 
@@ -167,7 +186,7 @@ export function ProductForm({
   const addVariant = () => {
     setFormData((prev) => ({
       ...prev,
-      variants: [...prev.variants, emptyVariant()],
+      variants: [...prev.variants, emptyVariant(prev.name)],
     }));
   };
 
@@ -179,7 +198,6 @@ export function ProductForm({
     }));
   };
 
-  // Image handlers
   const handleImageChange = (index: number, value: string) => {
     setFormData((prev) => {
       const updated = [...prev.images];
@@ -241,7 +259,7 @@ export function ProductForm({
             value={formData.categorySlug}
             onChange={handleChange}
             disabled={!categoriesLoaded}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed ${
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
               errors.categorySlug ? 'border-red-500' : 'border-gray-300'
             }`}
           >
@@ -254,9 +272,6 @@ export function ProductForm({
               </option>
             ))}
           </select>
-          {errors.categorySlug && (
-            <p className="text-red-600 text-sm mt-1">{errors.categorySlug}</p>
-          )}
         </div>
 
         <div>
@@ -268,14 +283,9 @@ export function ProductForm({
             name="slug"
             value={formData.slug}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.slug ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             placeholder="product-slug"
           />
-          {errors.slug && (
-            <p className="text-red-600 text-sm mt-1">{errors.slug}</p>
-          )}
         </div>
 
         <div>
@@ -289,14 +299,9 @@ export function ProductForm({
             onChange={handleChange}
             step="0.01"
             min="0"
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.price ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             placeholder="0.00"
           />
-          {errors.price && (
-            <p className="text-red-600 text-sm mt-1">{errors.price}</p>
-          )}
         </div>
 
         <div>
@@ -308,14 +313,9 @@ export function ProductForm({
             name="brand"
             value={formData.brand}
             onChange={handleChange}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-              errors.brand ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             placeholder="e.g., Adidolf"
           />
-          {errors.brand && (
-            <p className="text-red-600 text-sm mt-1">{errors.brand}</p>
-          )}
         </div>
 
         <div className="flex items-center pt-6">
@@ -341,17 +341,12 @@ export function ProductForm({
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition ${
-            errors.description ? 'border-red-500' : 'border-gray-300'
-          }`}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           placeholder="Enter product description"
         />
-        {errors.description && (
-          <p className="text-red-600 text-sm mt-1">{errors.description}</p>
-        )}
       </div>
 
-      {/* Variants Section */}
+      {/* Variants Section with Auto-Generated SKU */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-gray-700">
@@ -360,7 +355,7 @@ export function ProductForm({
           <button
             type="button"
             onClick={addVariant}
-            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition"
+            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition cursor-pointer"
           >
             <FiPlus size={16} /> Add Variant
           </button>
@@ -374,9 +369,19 @@ export function ProductForm({
             >
               <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    SKU *
-                  </label>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-semibold text-gray-600">
+                      SKU (Auto-Generated) *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => regenerateSku(index)}
+                      className="text-[10px] text-blue-600 hover:underline flex items-center gap-0.5 cursor-pointer"
+                      title="Reset SKU"
+                    >
+                      <FiRefreshCw size={10} /> Auto
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={variant.sku || ''}
@@ -384,7 +389,7 @@ export function ProductForm({
                       handleVariantChange(index, 'sku', e.target.value)
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-mono"
-                    placeholder="SKU-123"
+                    placeholder="SKU-AUTO"
                   />
                 </div>
 
@@ -450,7 +455,7 @@ export function ProductForm({
                     type="button"
                     onClick={() => removeVariant(index)}
                     disabled={formData.variants.length <= 1}
-                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     title="Remove variant"
                   >
                     <FiTrash2 size={18} />
@@ -458,7 +463,6 @@ export function ProductForm({
                 </div>
               </div>
 
-              {/* Variant Image & File Upload */}
               <div className="flex flex-col sm:flex-row gap-2 items-center pt-1 border-t border-gray-200">
                 <input
                   type="url"
@@ -467,7 +471,7 @@ export function ProductForm({
                     handleVariantChange(index, 'image_url', e.target.value)
                   }
                   className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-xs"
-                  placeholder="Variant Image URL (or upload image button ->)"
+                  placeholder="Variant Image URL (or click Upload Image button ->)"
                 />
 
                 <label className="flex items-center gap-1 text-xs px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg cursor-pointer transition shrink-0">
@@ -495,7 +499,6 @@ export function ProductForm({
         </div>
       </div>
 
-      {/* Main Images */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-gray-700">
@@ -525,7 +528,7 @@ export function ProductForm({
                 <button
                   type="button"
                   onClick={() => removeImageFile(index)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
                   title="Remove"
                 >
                   <FiTrash2 size={12} />
@@ -546,15 +549,14 @@ export function ProductForm({
                   type="url"
                   value={imageUrl}
                   onChange={(e) => handleImageChange(index, e.target.value)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg outline-none"
                   placeholder="https://example.com/image.jpg"
                 />
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
                   disabled={formData.images.length <= 1}
-                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Remove image"
+                  className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition disabled:opacity-30 cursor-pointer"
                 >
                   <FiTrash2 size={18} />
                 </button>
@@ -563,7 +565,7 @@ export function ProductForm({
             <button
               type="button"
               onClick={addImage}
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition"
+              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition cursor-pointer"
             >
               <FiPlus size={16} /> Add URL
             </button>
@@ -575,7 +577,7 @@ export function ProductForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium cursor-pointer disabled:opacity-50"
         >
           {isLoading
             ? 'Saving...'
@@ -586,7 +588,7 @@ export function ProductForm({
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+          className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium cursor-pointer"
         >
           Cancel
         </button>
