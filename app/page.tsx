@@ -1,35 +1,36 @@
+// FILE: takato56-adidolf_frontend/app/page.tsx
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
-import { mockTrending } from "@/data/HomepageData"; // Import từ file data đã chia riêng
+import { mockTrending } from "@/data/HomepageData";
 import { useProducts } from "@/lib/hooks/useProducts";
 import { toProductCardData } from "@/lib/adapters/productDisplay";
 import { USE_MOCK_DATA } from "@/lib/config";
 
-// Hardcoded, not persisted anywhere (no localStorage involved), so it can't
-// go stale like lib/hooks/useCategories.ts's localStorage-backed data did.
-const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
-  lifestyle: "https://loremflickr.com/640/480/lifestyle?lock=10",
-  menswear: "https://loremflickr.com/640/480/menswear,fashion?lock=11",
-  womenswear: "https://loremflickr.com/640/480/womenswear,fashion?lock=12",
-  accessories: "https://loremflickr.com/640/480/accessories,fashion?lock=13",
-  footwear: "https://loremflickr.com/640/480/shoes,footwear?lock=14",
-};
-
 const SLIDES = [
-  { id: 1, keyword: "fashion,summer", text: "Summer Collection 2026", sub: "Up to 50% Off" },
-  { id: 2, keyword: "fashion,alternative", text: "New Arrivals Just Dropped", sub: "Explore premium streetwear" },
-  { id: 3, keyword: "fashion,minimal", text: "The Essentials Pack", sub: "Meticulously crafted basics" },
+  { id: 1, text: "Summer Collection 2026", sub: "Up to 50% Off" },
+  { id: 2, text: "New Arrivals Just Dropped", sub: "Explore premium streetwear" },
+  { id: 3, text: "The Essentials Pack", sub: "Meticulously crafted basics" },
 ];
 
-// Changes once a day (not on every page load/random reshuffle): the lock
-// seed is derived from today's date, so all visitors see the same 3 images
-// for the day, and they rotate to a new set tomorrow.
-const todaySeed = Number(new Date().toISOString().slice(0, 10).replace(/-/g, ""));
-const slideImage = (slide: (typeof SLIDES)[number]) =>
-  `https://loremflickr.com/1600/700/${slide.keyword}?lock=${todaySeed + slide.id}`;
+// Ultra-fast, global Unsplash CDN fashion & streetwear images
+const FAST_HERO_PHOTOS = [
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=1600&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1600&auto=format&fit=crop",
+];
+
+const FAST_CATEGORY_PHOTOS: Record<string, string> = {
+  lifestyle: "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=800&auto=format&fit=crop",
+  menswear: "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800&auto=format&fit=crop",
+  womenswear: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=800&auto=format&fit=crop",
+};
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,17 +41,27 @@ export default function Home() {
   const mobileTouchStartX = useRef<number>(0);
   const mobileTouchEndX = useRef<number>(0);
 
-  // Trending Now: real backend catalogue by default, or mock data if
-  // USE_MOCK_DATA is flipped on in lib/config.ts.
   const { products, isLoaded, error } = useProducts();
+
+  // Shuffle hero banner images on mount for instant randomness
+  const [slideImages, setSlideImages] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    const shuffled = [...FAST_HERO_PHOTOS].sort(() => 0.5 - Math.random());
+    const chosen: Record<number, string> = {};
+
+    SLIDES.forEach((slide, i) => {
+      chosen[slide.id] = shuffled[i % shuffled.length];
+    });
+
+    setSlideImages(chosen);
+  }, []);
+
   const trending = USE_MOCK_DATA
     ? mockTrending
     : products.filter((p) => p.isPublished).slice(0, 8).map(toProductCardData);
 
-  // Shop by Categories tiles: random image from a random published product
-  // in each category, falling back to a hardcoded (non-persisted) image.
-  // Computed in an effect (client-only, after products have loaded) to
-  // avoid any SSR/hydration timing race with Math.random().
+  // Shop by Categories tile images (use product image if available, else fast CDN fallback)
   const [categoryImages, setCategoryImages] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
@@ -68,15 +79,15 @@ export default function Home() {
       );
       const chosen = pickRandom(categoryProducts);
       const real = chosen ? pickRandom(chosen.images.filter(Boolean)) : undefined;
-      next[slug] = real ?? CATEGORY_FALLBACK_IMAGES[slug] ?? null;
+      next[slug] = real ?? FAST_CATEGORY_PHOTOS[slug] ?? FAST_HERO_PHOTOS[0];
     });
 
     setCategoryImages(next);
   }, [isLoaded, products]);
 
-  const lifestyleImage = categoryImages["lifestyle"] ?? null;
-  const menswearImage = categoryImages["menswear"] ?? null;
-  const womenswearImage = categoryImages["womenswear"] ?? null;
+  const lifestyleImage = categoryImages["lifestyle"] ?? FAST_CATEGORY_PHOTOS.lifestyle;
+  const menswearImage = categoryImages["menswear"] ?? FAST_CATEGORY_PHOTOS.menswear;
+  const womenswearImage = categoryImages["womenswear"] ?? FAST_CATEGORY_PHOTOS.womenswear;
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev === SLIDES.length - 1 ? 0 : prev + 1));
@@ -136,9 +147,9 @@ export default function Home() {
 
   return (
     <div>
-      {/* Slider Banner */}
+      {/* Fast & Random Hero Banner */}
       <div
-        className="relative mt-1 h-60 md:h-[480px] w-full overflow-hidden group"
+        className="relative mt-1 h-60 md:h-[480px] w-full overflow-hidden group bg-neutral-900"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -147,37 +158,44 @@ export default function Home() {
           className="flex h-full w-full transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
-          {SLIDES.map((slide) => (
-            <div
-              key={slide.id}
-              className="w-full h-full flex-shrink-0 relative overflow-hidden flex flex-col justify-center items-center text-white p-4 text-center"
-            >
-              <img
-                src={slideImage(slide)}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black/45" />
-              <h1 className="relative z-10 text-2xl md:text-5xl font-extrabold uppercase tracking-wider mb-2">
-                {slide.text}
-              </h1>
-              <p className="relative z-10 text-sm md:text-lg text-gray-300">
-                {slide.sub}
-              </p>
-            </div>
-          ))}
+          {SLIDES.map((slide) => {
+            const slideImg = slideImages[slide.id];
+            return (
+              <div
+                key={slide.id}
+                className="w-full h-full flex-shrink-0 relative overflow-hidden flex flex-col justify-center items-center text-white p-4 text-center"
+              >
+                {slideImg ? (
+                  <img
+                    src={slideImg}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-neutral-900" />
+                )}
+                <div className="absolute inset-0 bg-black/50" />
+                <h1 className="relative z-10 text-2xl md:text-5xl font-extrabold uppercase tracking-wider mb-2 drop-shadow-md">
+                  {slide.text}
+                </h1>
+                <p className="relative z-10 text-sm md:text-lg text-gray-200 font-medium drop-shadow">
+                  {slide.sub}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white w-10 h-10 rounded-full items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 hidden md:flex cursor-pointer"
         >
           ❮
         </button>
 
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white w-10 h-10 rounded-full items-center justify-center backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 hidden md:flex cursor-pointer"
         >
           ❯
         </button>
@@ -187,7 +205,7 @@ export default function Home() {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`h-2 transition-all rounded-full ${
+              className={`h-2 transition-all rounded-full cursor-pointer ${
                 currentIndex === index ? "w-6 bg-white" : "w-2 bg-white/50"
               }`}
             />
@@ -212,7 +230,7 @@ export default function Home() {
 
       <div className="mainmargindiv mt-7 bg-blue-20">
         <div className="hidden md:flex flex-row w-full justify-center gap-5">
-          <Link href="/shop?category=lifestyle" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 shadow-md relative overflow-hidden">
+          <Link href="/shop?category=lifestyle" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 shadow-md relative overflow-hidden bg-neutral-100">
             {lifestyleImage && (
               <img src={lifestyleImage} alt="Lifestyle" className="absolute inset-0 w-full h-full object-cover" />
             )}
@@ -220,7 +238,7 @@ export default function Home() {
               Lifestyle
             </span>
           </Link>
-          <Link href="/shop?category=menswear" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 relative overflow-hidden">
+          <Link href="/shop?category=menswear" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 relative overflow-hidden bg-neutral-100">
             {menswearImage && (
               <img src={menswearImage} alt="Menswear" className="absolute inset-0 w-full h-full object-cover" />
             )}
@@ -228,7 +246,7 @@ export default function Home() {
               Menswear
             </span>
           </Link>
-          <Link href="/shop?category=womenswear" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 relative overflow-hidden">
+          <Link href="/shop?category=womenswear" className="border rounded-lg md:w-5/6 aspect-video md:aspect-16/10 relative overflow-hidden bg-neutral-100">
             {womenswearImage && (
               <img src={womenswearImage} alt="Womenswear" className="absolute inset-0 w-full h-full object-cover" />
             )}
