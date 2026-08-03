@@ -43,7 +43,7 @@ const STATUS_STYLES: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   confirmed: "bg-blue-100 text-blue-800",
   shipping: "bg-purple-100 text-purple-800",
-  done: "bg-green-100 text-green-800",
+  delivered: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
 };
 
@@ -164,7 +164,8 @@ export default function ProfilePage() {
         prev ? { ...prev, full_name: updated.full_name, phone: updated.phone } : prev
       );
 
-      const isPersistent = !!localStorage.getItem("accessToken");
+      // Synchronize with active storage type (Keep Me Signed In vs Session)
+      const isPersistent = localStorage.getItem("keepSignedIn") === "true";
       const storage = isPersistent ? localStorage : sessionStorage;
       storage.setItem("userName", updated.full_name);
 

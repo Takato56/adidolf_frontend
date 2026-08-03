@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -30,7 +30,7 @@ function AccordionItem({ title, children }: { title: string; children: React.Rea
     <div className="border-b border-gray-300 py-4">
       <button
         type="button"
-        className="w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg transition-colors hover:text-orange-600"
+        className="w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg transition-colors hover:text-orange-600 cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{title}</span>
@@ -55,7 +55,7 @@ const MOCK_PRODUCT_IMAGES = [
   "https://i.pinimg.com/736x/c0/81/13/c08113b8df8e619f39049291f312504f.jpg",
 ];
 
-export default function ProductDetailPage() {
+function ProductPageContent() {
   const params = useParams();
   const rawSlug = params?.slug;
   const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug;
@@ -425,24 +425,26 @@ export default function ProductDetailPage() {
             </p>
           )}
 
-          {/* Variant Selector */}
+          {/* Variant Selector with LARGER, BOLD Stock Badge */}
           <div className="mt-6 space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center flex-wrap gap-2">
               <label className="font-bold text-gray-900 text-sm uppercase tracking-wide">
                 Select Option / Variant
               </label>
+
+              {/* Increased Stock Text Size */}
               {selectedVariant && (
                 <span
-                  className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                  className={`text-sm md:text-base font-bold px-3.5 py-1 rounded-full border ${
                     selectedVariant.stock > 5
-                      ? "bg-green-100 text-green-800"
+                      ? "bg-green-100 text-green-800 border-green-200"
                       : selectedVariant.stock > 0
-                      ? "bg-amber-100 text-amber-800"
-                      : "bg-red-100 text-red-800"
+                      ? "bg-amber-100 text-amber-800 border-amber-200"
+                      : "bg-red-100 text-red-800 border-red-200"
                   }`}
                 >
                   {selectedVariant.stock > 0
-                    ? `${selectedVariant.stock} available`
+                    ? `${selectedVariant.stock} In Stock`
                     : "Out of Stock"}
                 </span>
               )}
@@ -464,7 +466,7 @@ export default function ProductDetailPage() {
                         setAddToCartError(null);
                         setAddedToCart(false);
                       }}
-                      className={`relative flex items-center justify-between p-3.5 rounded-xl border text-left transition-all ${
+                      className={`relative flex items-center justify-between p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                         isSelected
                           ? "border-black bg-white shadow-sm ring-1 ring-black"
                           : "border-gray-200 bg-white/70 hover:border-gray-400"
@@ -516,6 +518,7 @@ export default function ProductDetailPage() {
             </p>
           )}
 
+          {/* Action Button */}
           <div className="mt-8 mb-8">
             <button
               onClick={handleAddToCart}
@@ -557,7 +560,7 @@ export default function ProductDetailPage() {
               <button
                 type="button"
                 onClick={() => scroll("left")}
-                className="p-2 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white transition-all shadow-sm"
+                className="p-2 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white transition-all shadow-sm cursor-pointer"
               >
                 <FiChevronLeft className="text-xl" />
               </button>
@@ -565,7 +568,7 @@ export default function ProductDetailPage() {
               <button
                 type="button"
                 onClick={() => scroll("right")}
-                className="p-2 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white transition-all shadow-sm"
+                className="p-2 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white transition-all shadow-sm cursor-pointer"
               >
                 <FiChevronRight className="text-xl" />
               </button>
@@ -599,5 +602,13 @@ export default function ProductDetailPage() {
 
       <div className="mt-10"></div>
     </div>
+  );
+}
+
+export default function ProductPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductPageContent />
+    </Suspense>
   );
 }

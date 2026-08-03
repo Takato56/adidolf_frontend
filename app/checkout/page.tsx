@@ -4,19 +4,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { MdOutlinePayment } from "react-icons/md";
 import { FaShoppingCart, FaBoxOpen } from "react-icons/fa";
 import { useCart } from "@/lib/hooks/useCart";
 import { createOrderFromCartApi } from "@/lib/orders";
 import { getMyAddressesApi, createCustomerAddressApi } from "@/lib/addresses";
-import { PaymentMethod, Address } from "@/types";
 import { getAccessToken } from "@/lib/auth";
+import { PaymentMethod, Address } from "@/types";
 
 const SHIPPING_THRESHOLD = 200;
 const SHIPPING_FEE = 15;
 
 export default function Checkout() {
+  const router = useRouter();
   const {
     items,
     isLoaded,
@@ -29,6 +31,14 @@ export default function Checkout() {
     removeVoucher,
     clearCart,
   } = useCart();
+
+  // ---------- Auth Protection ----------
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!getAccessToken()) {
+      router.replace("/login");
+    }
+  }, [isLoaded, router]);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -54,14 +64,13 @@ export default function Checkout() {
   const afterDiscount = Math.max(0, subtotal - discountAmount);
   const total = afterDiscount + shipping;
 
-  // ---------- Load Saved Addresses on Mount ----------
   useEffect(() => {
     async function loadAddresses() {
+      if (!getAccessToken()) return;
       try {
         const addrs = await getMyAddressesApi();
         setSavedAddresses(addrs);
 
-        // Auto-select default or first saved address
         const defaultAddr = addrs.find((a) => a.is_default === 1) || addrs[0];
         if (defaultAddr) {
           setSelectedAddressId(defaultAddr.id);
@@ -110,7 +119,6 @@ export default function Checkout() {
   };
 
   const handleField = (field: keyof typeof form, value: string) => {
-    // If editing recipient details, unselect the saved card
     if (selectedAddressId !== null && field !== "email") {
       setSelectedAddressId(null);
     }
@@ -147,7 +155,6 @@ export default function Checkout() {
     try {
       let targetAddressId = selectedAddressId;
 
-      // 1. If no saved address is selected, create a new address record
       if (!targetAddressId) {
         const address = await createCustomerAddressApi({
           recipient_name: form.fullName.trim(),
@@ -160,7 +167,6 @@ export default function Checkout() {
         targetAddressId = address.id;
       }
 
-      // 2. Call POST /orders with address_id to trigger database transaction
       await createOrderFromCartApi({
         address_id: targetAddressId,
         payment_method: paymentMethod,
@@ -179,6 +185,14 @@ export default function Checkout() {
       setIsPlacingOrder(false);
     }
   };
+
+  if (!isLoaded || !getAccessToken()) {
+    return (
+      <div className="min-h-screen bg-[#fbfdff] flex items-center justify-center">
+        <p className="text-slate-400 font-medium">Checking authorization...</p>
+      </div>
+    );
+  }
 
   if (orderPlaced) {
     return (
@@ -250,7 +264,6 @@ export default function Checkout() {
           </p>
 
           <div className="max-w-4xl py-5 rounded-lg bg-[#fafafa]">
-            {/* ---------- Saved Addresses Quick Selector ---------- */}
             {savedAddresses.length > 0 && (
               <div className="mb-6 pb-6 border-b border-gray-200">
                 <div className="flex justify-between items-center mb-3">
@@ -298,7 +311,6 @@ export default function Checkout() {
               </div>
             )}
 
-            {/* ---------- Address Input Form ---------- */}
             <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
