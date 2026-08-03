@@ -341,7 +341,74 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="h-10"></div>
+      <div className="mainmargindiv mt-16 mb-12">
+        <div className="border-t border-gray-200 pt-12">
+          {/* Section Title using your existing global styles */}
+          <div className="text-center mb-10">
+            <p className="texttitle">
+              <b>Why Shop With Us</b>
+            </p>
+            <p className="subtitle mt-1">
+              Experience the premium service and quality of ADIDOLF
+            </p>
+          </div>
+
+          {/* Core Values Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center font-sans">
+            {/* Value 1 */}
+            <div className="flex flex-col items-center p-4">
+              <div className="w-12 h-12 flex items-center justify-center bg-neutral-100 rounded-full mb-4">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124l-.318-5.085a2.25 2.25 0 0 0-2.247-2.114H14.25M17.25 18.75V14.25M14.25 4.5h2.25A2.25 2.25 0 0 1 18.75 6.75V12M14.25 4.5V12m0 0H12M12 9h4.5M12 12h2.25m-11.25 3h14.25" />
+                </svg>
+              </div>
+              <h3 className="text-base font-bold uppercase tracking-wider mb-2">Free Shipping</h3>
+              <p className="text-sm text-gray-500 max-w-[200px]">
+                Complimentary standard delivery on all orders over $75.
+              </p>
+            </div>
+
+            {/* Value 2 */}
+            <div className="flex flex-col items-center p-4">
+              <div className="w-12 h-12 flex items-center justify-center bg-neutral-100 rounded-full mb-4">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </div>
+              <h3 className="text-base font-bold uppercase tracking-wider mb-2">Easy Returns</h3>
+              <p className="text-sm text-gray-500 max-w-[200px]">
+                Hassle-free 14-day return and exchange policy for all items.
+              </p>
+            </div>
+
+            {/* Value 3 */}
+            <div className="flex flex-col items-center p-4">
+              <div className="w-12 h-12 flex items-center justify-center bg-neutral-100 rounded-full mb-4">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-bold uppercase tracking-wider mb-2">Premium Quality</h3>
+              <p className="text-sm text-gray-500 max-w-[200px]">
+                Crafted from meticulously selected fabrics built to last.
+              </p>
+            </div>
+
+            {/* Value 4 */}
+            <div className="flex flex-col items-center p-4">
+              <div className="w-12 h-12 flex items-center justify-center bg-neutral-100 rounded-full mb-4">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0V10.5m-2.25 10.5h13.5c.621 0 1.125-.504 1.125-1.125V11.25a1.125 1.125 0 0 0-1.125-1.125H5.25a1.125 1.125 0 0 0-1.125 1.125v7.875c0 .621.504 1.125 1.125 1.125Z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-bold uppercase tracking-wider mb-2">Secure Checkout</h3>
+              <p className="text-sm text-gray-500 max-w-[200px]">
+                100% protected and encrypted payment gateways.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

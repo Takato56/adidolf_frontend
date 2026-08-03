@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { FiShoppingCart, FiHeart, FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+// Thêm FiX vào danh sách import để làm nút đóng ảnh phóng to
+import { FiShoppingCart, FiHeart, FiMinus, FiPlus, FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import ProductCard from "@/components/ProductCard";
 
 // Định nghĩa cấu trúc cho sản phẩm khuyên dùng (Recommended)
@@ -29,10 +30,9 @@ interface ProductDetailType {
   description: string[];
   careInstructions: string[];
   deliveryPolicy: string[];
-  recommendedProducts: RecommendedProduct[]; // Mảng sản phẩm động cho phần bên dưới
+  recommendedProducts: RecommendedProduct[];
 }
 
-// Định nghĩa Props nhận vào từ trang Page gọi nó
 interface ProductDetailViewProps {
   product: ProductDetailType;
 }
@@ -66,6 +66,7 @@ function AccordionItem({ title, children }: { title: string; children: React.Rea
 
 export default function ProductDetailView({ product }: ProductDetailViewProps) {
   const [currentActiveIndex, setActiveIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false); // State quản lý phóng to ảnh
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -141,10 +142,11 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
         {/* Images Block */}
         <div className="w-full lg:w-1/2 flex flex-col md:flex-row gap-4 items-stretch md:sticky md:top-6">
           <div 
-            className="flex-1 aspect-3/4 overflow-hidden rounded-lg bg-gray-100 relative touch-pan-y"
+            className="flex-1 aspect-3/4 overflow-hidden rounded-lg bg-gray-100 relative touch-pan-y cursor-zoom-in"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            onClick={() => setIsZoomed(true)} // Kích hoạt phóng to khi click vào vùng ảnh
           >
             <div 
               className="flex w-full h-full transition-transform duration-300 ease-out"
@@ -285,7 +287,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
         </div>
       </div>
 
-      {/* Recommended Section (Động 100%) */}
+      {/* Recommended Section */}
       {product.recommendedProducts && product.recommendedProducts.length > 0 && (
         <div className="mt-16 pt-3 px-3 pb-5 rounded-2xl relative group">
           <div className="flex justify-between items-center mb-6">
@@ -317,7 +319,7 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
           <div className="font-sans relative">
             <div
               ref={sliderRef}
-              className="overflow-x-hidden gap-3 md:gap-6 pb-4 flex justify-start scroll-smooth scroll-smooth w-full snap-x snap-mandatory"
+              className="overflow-x-hidden gap-3 md:gap-6 pb-4 flex justify-start scroll-smooth w-full snap-x snap-mandatory"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {product.recommendedProducts.map((recProduct, index) => (
@@ -336,6 +338,33 @@ export default function ProductDetailView({ product }: ProductDetailViewProps) {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal phóng to ảnh */}
+      {isZoomed && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-zoom-out transition-opacity duration-300 animate-fadeIn"
+          onClick={() => setIsZoomed(false)} // Click ra ngoài hoặc click vào để đóng
+        >
+          {/* Nút đóng hình chữ X */}
+          <button 
+            type="button"
+            className="absolute top-6 right-6 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors text-2xl"
+            onClick={() => setIsZoomed(false)}
+          >
+            <FiX />
+          </button>
+          
+          {/* Ảnh phóng to */}
+          <div className="max-w-[90vw] max-h-[85vh] md:max-w-[80vw] flex items-center justify-center">
+            <img 
+              src={product.images[currentActiveIndex]} 
+              alt={`${product.name} Zoomed`} 
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl select-none"
+              onClick={(e) => e.stopPropagation()} // Ngăn chặn đóng khi click trực tiếp vào ảnh (nếu muốn click vào ảnh vẫn đóng thì xóa dòng này)
+            />
           </div>
         </div>
       )}
