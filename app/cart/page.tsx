@@ -2,24 +2,36 @@
 
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaTrash, FaMinus, FaPlus, FaArrowLeft } from "react-icons/fa";
 import { useCart, CartItem } from "@/lib/hooks/useCart";
+import { getAccessToken } from "@/lib/auth";
 
 const SHIPPING_THRESHOLD = 200;
 const SHIPPING_FEE = 15;
 
 export default function CartPage() {
+  const router = useRouter();
   const { items, isLoaded, removeItem, updateQuantity, subtotal } = useCart();
+
+  // ---------- Auth Protection ----------
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!getAccessToken()) {
+      router.replace("/login");
+    }
+  }, [isLoaded, router]);
 
   const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   const total = subtotal + shipping;
   const freeShippingLeft = SHIPPING_THRESHOLD - subtotal;
 
-  if (!isLoaded) {
+  if (!isLoaded || !getAccessToken()) {
     return (
       <div className="min-h-screen bg-[#fbfdff] flex items-center justify-center">
-        <p className="text-slate-400">Loading your cart...</p>
+        <p className="text-slate-400 font-medium">Checking authorization...</p>
       </div>
     );
   }
@@ -96,7 +108,7 @@ export default function CartPage() {
                 <span>Shipping</span>
                 <span className="font-medium text-black">
                   {shipping === 0 ? (
-                    <span className="text-green-600">Free</span>
+                    <span className="text-green-600 font-bold">Free</span>
                   ) : (
                     `$${shipping.toFixed(2)}`
                   )}
@@ -151,7 +163,7 @@ function CartRow({
         <div className="flex items-start justify-between gap-2">
           <div>
             <Link
-              href={`/products?slug=${encodeURIComponent(item.slug)}`}
+              href={`/products/${encodeURIComponent(item.slug)}`}
               className="font-semibold text-sm text-black leading-tight hover:underline"
             >
               {item.name}
@@ -179,7 +191,7 @@ function CartRow({
           <div className="flex items-center gap-2 border border-slate-200 rounded-lg px-2 py-1">
             <button
               onClick={() => onUpdateQty(item.key, -1)}
-              className="text-slate-400 hover:text-black transition-colors p-0.5"
+              className="text-slate-400 hover:text-black transition-colors p-0.5 cursor-pointer"
             >
               <FaMinus className="text-[10px]" />
             </button>
@@ -189,7 +201,7 @@ function CartRow({
             <button
               onClick={() => onUpdateQty(item.key, 1)}
               disabled={item.stock !== undefined && item.quantity >= item.stock}
-              className="text-slate-400 hover:text-black transition-colors p-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="text-slate-400 hover:text-black transition-colors p-0.5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             >
               <FaPlus className="text-[10px]" />
             </button>
