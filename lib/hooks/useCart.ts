@@ -76,17 +76,14 @@ export function useCart() {
   const [voucherError, setVoucherError] = useState<string | null>(null);
   const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
 
-  // Map to hold pending debounce timers per cartItemId
   const debounceTimers = useRef<Record<number, NodeJS.Timeout>>({});
 
-  // Clean up pending timers on unmount
   useEffect(() => {
     return () => {
       Object.values(debounceTimers.current).forEach(clearTimeout);
     };
   }, []);
 
-  // Fetch initial cart from API or localStorage
   const fetchCart = useCallback(async () => {
     if (isAuthenticated()) {
       try {
@@ -97,7 +94,7 @@ export function useCart() {
         setItems(readLocalItems());
       }
     } else {
-      setItems(readLocalItems());
+      setItems([]);
     }
     setIsLoaded(true);
   }, []);
@@ -108,12 +105,6 @@ export function useCart() {
     window.addEventListener('authchange', handleAuthChange);
     return () => window.removeEventListener('authchange', handleAuthChange);
   }, [fetchCart]);
-
-  useEffect(() => {
-    if (!isLoaded || isAuthenticated()) return;
-    localStorage.setItem(LOCAL_ITEMS_KEY, JSON.stringify(items));
-    window.dispatchEvent(new Event('cartchange'));
-  }, [items, isLoaded]);
 
   const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
 
@@ -171,30 +162,22 @@ export function useCart() {
     localStorage.removeItem(VOUCHER_KEY);
   }, []);
 
-  // ---------- Optimistic & Debounced Cart Actions ----------
+  // ---------- Authenticated Cart Actions ----------
 
   const addItem = useCallback(
     async (item: Omit<CartItem, 'key'>) => {
-      if (isAuthenticated()) {
-        const pId = Number(item.productId);
-        const vId = Number(item.variantId);
-        if (!pId || !vId) {
-          throw new Error('Valid Product and Variant IDs are required');
-        }
-        const summary = await addCartItemApi(pId, vId, item.quantity);
-        setItems(summary.items.map(mapApiCartItemToCartItem));
-      } else {
-        const key = `${item.productId}:${item.variantId ?? 'default'}`;
-        setItems((prev) => {
-          const existing = prev.find((i) => i.key === key);
-          if (existing) {
-            return prev.map((i) =>
-              i.key === key ? { ...i, quantity: i.quantity + item.quantity } : i
-            );
-          }
-          return [...prev, { ...item, key }];
-        });
+      if (!isAuthenticated()) {
+        throw new Error('Please log in to add items to your cart.');
       }
+
+      const pId = Number(item.productId);
+      const vId = Number(item.variantId);
+      if (!pId || !vId) {
+        throw new Error('Valid Product and Variant IDs are required');
+      }
+
+      const summary = await addCartItemApi(pId, vId, item.quantity);
+      setItems(summary.items.map(mapApiCartItemToCartItem));
     },
     []
   );
@@ -204,24 +187,21 @@ export function useCart() {
       const target = items.find((i) => i.key === key);
       if (!target) return;
 
-      // Cancel any pending debounced PATCH timer for this item
       if (target.cartItemId && debounceTimers.current[target.cartItemId]) {
         clearTimeout(debounceTimers.current[target.cartItemId]);
         delete debounceTimers.current[target.cartItemId];
       }
 
-      // 1. Instant Optimistic UI Removal
       const previousItems = items;
       setItems((prev) => prev.filter((i) => i.key !== key));
 
-      // 2. Async Background Sync
       if (isAuthenticated() && target.cartItemId) {
         try {
           const summary = await removeCartItemApi(target.cartItemId);
           setItems(summary.items.map(mapApiCartItemToCartItem));
         } catch (err) {
           console.error('Failed to remove item on backend:', err);
-          setItems(previousItems); // Rollback
+          setItems(previousItems);
         }
       }
     },
@@ -238,29 +218,25 @@ export function useCart() {
       const target = items.find((i) => i.key === key);
       if (!target) return;
 
-      // 1. Instant 0ms UI Update
       const previousItems = items;
       setItems((prev) =>
         prev.map((i) => (i.key === key ? { ...i, quantity: newQuantity } : i))
       );
 
-      // 2. Debounced API Call (Waits 400ms after last click before calling PATCH)
       if (isAuthenticated() && target.cartItemId) {
         const itemId = target.cartItemId;
 
-        // Cancel previous pending timer for this item
         if (debounceTimers.current[itemId]) {
           clearTimeout(debounceTimers.current[itemId]);
         }
 
-        // Send single PATCH request after 400ms of user inactivity
         debounceTimers.current[itemId] = setTimeout(async () => {
           try {
             const summary = await updateCartItemQuantityApi(itemId, newQuantity);
             setItems(summary.items.map(mapApiCartItemToCartItem));
           } catch (err) {
             console.error('Failed to update quantity on backend:', err);
-            setItems(previousItems); // Rollback on error
+            setItems(previousItems);
           } finally {
             delete debounceTimers.current[itemId];
           }

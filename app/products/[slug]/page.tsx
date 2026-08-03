@@ -4,7 +4,7 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   FiShoppingCart,
   FiMinus,
@@ -19,6 +19,7 @@ import ProductCard from "@/components/ProductCard";
 import { getProductBySlug } from "@/lib/products";
 import { useProducts } from "@/lib/hooks/useProducts";
 import { useCart } from "@/lib/hooks/useCart";
+import { getAccessToken } from "@/lib/auth";
 import { toProductCardData } from "@/lib/adapters/productDisplay";
 import { USE_MOCK_DATA } from "@/lib/config";
 import { Product, ProductVariant } from "@/types";
@@ -56,6 +57,7 @@ const MOCK_PRODUCT_IMAGES = [
 ];
 
 function ProductPageContent() {
+  const router = useRouter();
   const params = useParams();
   const rawSlug = params?.slug;
   const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug;
@@ -154,6 +156,12 @@ function ProductPageContent() {
 
   const handleAddToCart = async () => {
     setAddedToCart(false);
+
+    // Redirect to login if user is unauthenticated
+    if (!getAccessToken()) {
+      router.push("/login");
+      return;
+    }
 
     if (product && product.variants.length > 0 && !selectedVariant) {
       setAddToCartError("Please select a product variant.");
@@ -425,14 +433,13 @@ function ProductPageContent() {
             </p>
           )}
 
-          {/* Variant Selector with LARGER, BOLD Stock Badge */}
+          {/* Variant Selector with Bold Stock Badge */}
           <div className="mt-6 space-y-3">
             <div className="flex justify-between items-center flex-wrap gap-2">
               <label className="font-bold text-gray-900 text-sm uppercase tracking-wide">
                 Select Option / Variant
               </label>
 
-              {/* Increased Stock Text Size */}
               {selectedVariant && (
                 <span
                   className={`text-sm md:text-base font-bold px-3.5 py-1 rounded-full border ${
