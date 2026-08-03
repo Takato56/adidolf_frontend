@@ -1,5 +1,5 @@
 "use client";
-import { FaFilter } from "react-icons/fa";
+import { FaFilter, FaChevronDown } from "react-icons/fa"; // Thêm icon mũi tên để kiểm soát khoảng cách
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
@@ -21,6 +21,12 @@ const CATEGORY_NAMES: Record<string, string> = {
   accessories: "Accessories",
   footwear: "Footwear",
 };
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest first" },
+  { value: "lowtohigh", label: "Low to High" },
+  { value: "hightolow", label: "High to Low" },
+];
 
 const toTitleCase = (slug: string) =>
   slug
@@ -55,8 +61,6 @@ export default function ProductView({
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState("newest");
 
-  // Filter option lists, derived from the actual products passed in — only
-  // options that would actually return at least one result are shown.
   const availablePriceBuckets = useMemo(
     () => PRICE_BUCKETS.filter((bucket) => products.some((p) => bucket.test(p.price))),
     [products]
@@ -84,7 +88,6 @@ export default function ProductView({
     } else if (sortOption === "hightolow") {
       result = [...result].sort((a, b) => b.price - a.price);
     }
-    // "newest" relies on the order already returned by the API (created_at desc).
 
     return result;
   }, [products, selectedCategories, selectedPriceRanges, sortOption]);
@@ -161,121 +164,163 @@ export default function ProductView({
         </nav>
       </div>
 
-      {/* Dynamic Title */}
-      <div>
-        <p className="texttitle pt-4">{title}</p>
-        <p className="subtitle pt-1">{subtitle}</p>
-      </div>
-
-      {/* Control Bar */}
-      <div className="pt-15 flex justify-between md:justify-end">
-        <button
-          type="button"
-          onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className="block md:hidden rounded-md border px-2 md:px-4 shadow-md bg-[#fafeff] text-[12px] md:text-[16px] flex py-1 gap-1 font-semibold"
-        >
-          <div className="my-1 pointer-events-none">
-            <FaFilter />
-          </div>
-          Filters
-        </button>
-
-        <div>
-          <label htmlFor="sort" className="text-[15px] md:text-[19px]">Sort by:</label>
-          <select
-            id="sort"
-            name="sorttype"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="text-[14px] md:text-[18px] ml-2 font-bold bg-[#fafeff] border rounded-sm"
-          >
-            <option value="newest">Newest first</option>
-            <option value="lowtohigh">Low to High</option>
-            <option value="hightolow">High to Low</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Mobile Filters */}
-      {isFilterOpen && (
-        <div className="block md:hidden w-full subtitle bg-white border border-gray-300 rounded-lg mt-1 p-3 h-fit">
-          <div className="grid grid-cols-2 justify-center gap-1">
+      {/* Main Layout Grid */}
+      <div className="mt-4 md:flex md:gap-6 items-start">
+        
+        {/* DESKTOP SIDEBAR */}
+        <div className="hidden md:block w-full md:w-1/4 lg:w-1/5 min-w-[240px] bg-white border border-gray-300 shadow-md rounded-lg p-5 h-fit">
+          <div className="flex flex-col gap-6">
+            
+            {/* 1. Sort By (Đã thiết kế lại để căn chỉnh mũi tên đối xứng) */}
             <div>
-              <p className="mb-2 text-[16px]">Price Range</p>
-              {renderPriceFilter("text-[12px]")}
+              <p className="text-[20px] font-bold mb-2">Sort by</p>
+              <div className="relative w-full">
+                <select
+                  id="sort-desktop"
+                  name="sorttype"
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="w-full appearance-none text-[16px] font-medium bg-[#fafeff] border rounded-md py-2 pl-4 pr-10 text-gray-800 outline-none cursor-pointer"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {/* Icon mũi tên custom thay thế cho mặc định, cách phải chính xác bằng khoảng cách text cách trái (right-4 tương đương pl-4) */}
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-600">
+                  <FaChevronDown className="text-[12px]" />
+                </div>
+              </div>
             </div>
-            <div className="w-full mt-3">
-              <p className="text-[16px] mb-2">Category</p>
-              {renderCategoryFilter("text-[12px]", 6)}
-            </div>
-          </div>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-3 border rounded-md py-1 px-3 hover:bg-black hover:text-white transition-all text-[13px]"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-      )}
 
-      {/* Main Content Layout */}
-      <div className="rounded-lg flex flex-row items-start">
-        {/* Desktop Filters Sidebar */}
-        <div className="w-full md:w-1/4 lg:w-1/5 bg-white border shadow-md min-w-[240px] border-gray-300 h-fit rounded-lg p-5 mt-4 transition-all hidden md:block">
-          <div className="grid grid-rows-1 justify-center gap-8">
+            <hr className="border-gray-200" />
+
+            {/* 2. Price Range */}
             <div>
               <p className="mb-2 text-[20px] font-bold">Price Range</p>
               {renderPriceFilter("text-[16px]")}
             </div>
 
-            <div className="w-full">
+            {/* 3. Category */}
+            <div>
               <p className="text-[20px] font-bold mb-3">Category</p>
               {renderCategoryFilter("text-[16px]")}
-              <div className="pt-8">
+              <div className="pt-4 flex justify-end">
                 <button
                   type="button"
                   onClick={clearFilters}
                   disabled={!hasActiveFilters}
-                  className="border flex rounded-md py-1 px-3 ml-auto hover:bg-black hover:text-white transition-all disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-inherit disabled:cursor-not-allowed"
+                  className="border rounded-md py-1 px-3 hover:bg-black hover:text-white transition-all disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-inherit disabled:cursor-not-allowed text-[14px]"
                 >
                   Clear Filters
                 </button>
               </div>
             </div>
+
           </div>
         </div>
 
-        {/* Dynamic Product Grid */}
-        <div className="mt-4 md:ml-6 flex-1">
-          {isLoading && (
-            <p className="text-sm text-gray-400">Loading products...</p>
+        {/* Right Content Area */}
+        <div className="flex-1">
+          
+          {/* HEADER ROW */}
+          <div className="flex flex-row justify-between items-start w-full">
+            <div>
+              <p className="texttitle">{title}</p>
+              <p className="subtitle pt-1">{subtitle}</p>
+            </div>
+
+            {/* Nút Filter cho thiết bị Mobile */}
+            <div className="block md:hidden pt-2">
+              <button
+                type="button"
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className="rounded-md border px-3 py-1 shadow-md bg-[#fafeff] text-[14px] flex gap-2 font-semibold items-center"
+              >
+                <FaFilter className="text-[12px]" />
+                Filters & Sort
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Filters & Sort Dropdown */}
+          {isFilterOpen && (
+            <div className="block md:hidden w-full subtitle bg-white border border-gray-300 rounded-lg mt-3 p-4 h-fit">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="text-[16px] font-bold mb-2">Sort by</p>
+                  <div className="relative w-full">
+                    <select
+                      id="sort-mobile"
+                      value={sortOption}
+                      onChange={(e) => setSortOption(e.target.value)}
+                      className="w-full appearance-none text-[14px] bg-[#fafeff] border rounded-md py-1.5 pl-3 pr-8 outline-none"
+                    >
+                      {SORT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-600">
+                      <FaChevronDown className="text-[10px]" />
+                    </div>
+                  </div>
+                </div>
+                <hr />
+                <div>
+                  <p className="mb-2 text-[16px] font-bold">Price Range</p>
+                  {renderPriceFilter("text-[12px]")}
+                </div>
+                <div>
+                  <p className="text-[16px] font-bold mb-2">Category</p>
+                  {renderCategoryFilter("text-[12px]", 6)}
+                </div>
+              </div>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="mt-4 w-full border rounded-md py-1 px-3 hover:bg-black hover:text-white transition-all text-[13px]"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
           )}
-          {!isLoading && displayProducts.length === 0 && (
-            <p className="text-sm text-gray-400">
-              {products.length === 0
-                ? "No products in this category yet."
-                : "No products match the selected filters."}
-            </p>
-          )}
-          <div className="gap-3 md:gap-4 grid grid-cols-2 w-full md:grid-cols-3 lg:grid-cols-4">
-            {!isLoading &&
-              displayProducts.map((product, index) => (
-                <ProductCard
-                  key={`${categorySlug}-prod-${index}`}
-                  image={product.image}
-                  alt={product.alt || product.name}
-                  category={product.category}
-                  name={product.name}
-                  price={product.price}
-                  shopLink={product.shopLink}
-                />
-              ))}
+
+          {/* Dynamic Product Grid */}
+          <div className="mt-4">
+            {isLoading && (
+              <p className="text-sm text-gray-400">Loading products...</p>
+            )}
+            {!isLoading && displayProducts.length === 0 && (
+              <p className="text-sm text-gray-400">
+                {products.length === 0
+                  ? "No products in this category yet."
+                  : "No products match the selected filters."}
+              </p>
+            )}
+            <div className="gap-3 md:gap-4 grid grid-cols-2 w-full md:grid-cols-3 lg:grid-cols-4">
+              {!isLoading &&
+                displayProducts.map((product, index) => (
+                  <ProductCard
+                    key={`${categorySlug}-prod-${index}`}
+                    image={product.image}
+                    alt={product.alt || product.name}
+                    category={product.category}
+                    name={product.name}
+                    price={product.price}
+                    shopLink={product.shopLink}
+                  />
+                ))}
+            </div>
           </div>
         </div>
       </div>
+
       <div className="mt-24"></div>
     </div>
   );
