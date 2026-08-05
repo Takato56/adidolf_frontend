@@ -7,7 +7,7 @@ import { useProducts } from '@/lib/hooks/useProducts';
 import { useUsers } from '@/lib/hooks/useUsers';
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
-import { FiPlus, FiTrash2, FiLock, FiAlertTriangle } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiLock, FiInfo, FiCheckCircle } from 'react-icons/fi';
 
 interface OrderFormProps {
   order?: Order;
@@ -15,13 +15,22 @@ interface OrderFormProps {
   isLoading?: boolean;
 }
 
-const STATUS_OPTIONS: OrderStatus[] = [
+const ALL_STATUS_OPTIONS: OrderStatus[] = [
   'pending',
   'confirmed',
   'shipping',
   'delivered',
   'cancelled',
 ];
+
+// Forward-Only State Machine Rules
+const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  pending: ['pending', 'confirmed', 'cancelled'],
+  confirmed: ['confirmed', 'shipping', 'cancelled'],
+  shipping: ['shipping', 'delivered', 'cancelled'],
+  delivered: ['delivered'],
+  cancelled: ['cancelled'],
+};
 
 export function OrderForm({
   order,
@@ -32,13 +41,21 @@ export function OrderForm({
   const { products, isLoaded: productsLoaded } = useProducts();
   const { users, isLoaded: usersLoaded } = useUsers();
 
-  const isCancelled = order?.status === 'cancelled';
+  const currentStatus = order?.status || 'pending';
+  const isDetailsLocked = !!order && currentStatus !== 'pending';
+  const isFinalState = currentStatus === 'delivered' || currentStatus === 'cancelled';
+
+  // Filter dropdown options so administrators can only advance forward
+  const availableStatusOptions = useMemo(() => {
+    if (!order) return ALL_STATUS_OPTIONS;
+    return ALLOWED_TRANSITIONS[order.status] || [order.status];
+  }, [order]);
 
   const [formData, setFormData] = useState({
     userId: order?.userId ? String(order.userId) : '',
     addressId: order?.addressId ? String(order.addressId) : '',
     voucherId: order?.voucherId ? String(order.voucherId) : '',
-    status: order?.status || ('pending' as OrderStatus),
+    status: currentStatus,
     discountAmount: order?.discountAmount ?? 0,
     shippingFee: order?.shippingFee ?? 0,
     note: order?.note || '',
@@ -97,13 +114,8 @@ export function OrderForm({
     return p?.variants || [];
   };
 
-  const selectedUser = useMemo(
-    () => users.find((u) => String(u.id) === formData.userId),
-    [users, formData.userId]
-  );
-
   const validateForm = () => {
-    if (isCancelled) return false;
+    if (isFinalState) return false;
 
     const newErrors: Record<string, string> = {};
     if (!formData.userId.trim()) newErrors.userId = 'Please select a registered customer';
@@ -123,7 +135,7 @@ export function OrderForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isCancelled || !validateForm()) return;
+    if (isFinalState || !validateForm()) return;
 
     const itemsWithIds = items.map((item, idx) => ({
       ...item,
@@ -153,7 +165,7 @@ export function OrderForm({
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    if (isCancelled) return;
+    if (isFinalState) return;
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -165,7 +177,7 @@ export function OrderForm({
   };
 
   const handleUserSelect = (userIdStr: string) => {
-    if (isCancelled) return;
+    if (isDetailsLocked) return;
     const foundUser = users.find((u) => String(u.id) === userIdStr);
     const defaultAddrId = foundUser?.addresses?.find((a) => a.is_default === 1)?.id || foundUser?.addresses?.[0]?.id || 1;
 
@@ -177,7 +189,7 @@ export function OrderForm({
   };
 
   const handleItemProduct = (index: number, productId: string) => {
-    if (isCancelled) return;
+    if (isDetailsLocked) return;
     setItems((prev) => {
       const updated = [...prev];
       const prod = products.find((p) => p.id === productId);
@@ -198,7 +210,7 @@ export function OrderForm({
   };
 
   const handleItemVariant = (index: number, variantId: string) => {
-    if (isCancelled) return;
+    if (isDetailsLocked) return;
     setItems((prev) => {
       const updated = [...prev];
       const item = updated[index];
@@ -217,7 +229,7 @@ export function OrderForm({
   };
 
   const handleItemQuantity = (index: number, quantity: number) => {
-    if (isCancelled) return;
+    if (isDetailsLocked) return;
     setItems((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], quantity: Math.max(1, quantity) };
@@ -226,7 +238,7 @@ export function OrderForm({
   };
 
   const addItem = () => {
-    if (isCancelled) return;
+    if (isDetailsLocked) return;
     setItems((prev) => [
       ...prev,
       {
@@ -241,48 +253,71 @@ export function OrderForm({
   };
 
   const removeItem = (index: number) => {
-    if (isCancelled || items.length <= 1) return;
+    if (isDetailsLocked || items.length <= 1) return;
     setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   if (!productsLoaded || !usersLoaded) {
     return (
       <div className="flex items-center justify-center py-12 text-gray-500">
-        Loading form resources...
+        Loading order form...
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Cancelled Order Banner */}
-      {isCancelled && (
+      {/* State Lock Banners */}
+      {currentStatus === 'cancelled' && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl flex items-center gap-3 text-red-800">
           <FiLock size={20} className="shrink-0" />
           <div>
-            <p className="font-bold text-sm">Order Cancelled (Read-Only)</p>
+            <p className="font-bold text-sm">Order Cancelled (Locked)</p>
             <p className="text-xs text-red-600">
-              This order has been cancelled and its inventory released. It is locked from further modifications.
+              This order has been cancelled and its inventory released. It cannot be edited or reopened.
             </p>
           </div>
         </div>
       )}
 
-      {/* Order Header / Metadata */}
+      {currentStatus === 'delivered' && (
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-xl flex items-center gap-3 text-green-800">
+          <FiCheckCircle size={20} className="shrink-0" />
+          <div>
+            <p className="font-bold text-sm">Order Delivered (Completed)</p>
+            <p className="text-xs text-green-700">
+              This order has been delivered to the customer. All order items and status are finalized.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {isDetailsLocked && !isFinalState && (
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl flex items-center gap-3 text-blue-800">
+          <FiInfo size={20} className="shrink-0" />
+          <div>
+            <p className="font-bold text-sm">Order in Progress ({currentStatus.toUpperCase()})</p>
+            <p className="text-xs text-blue-600">
+              Order items and customer details are locked. You can only advance the order status forward.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Metadata Overview */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Order Information
         </h3>
 
-        {/* Read-Only Metadata Badges for Existing Orders */}
         {order && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <div>
-              <p className="text-xs text-gray-500 font-medium">Order ID</p>
+              <p className="text-xs text-gray-500 font-medium">Order Reference</p>
               <p className="text-sm font-bold text-gray-900">#{order.id}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 font-medium">Customer ID</p>
+              <p className="text-xs text-gray-500 font-medium">Customer</p>
               <p className="text-sm font-bold text-gray-900">User #{order.userId}</p>
             </div>
             <div>
@@ -299,7 +334,6 @@ export function OrderForm({
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Customer Selection (Only for New Orders) */}
           {!order && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -308,8 +342,8 @@ export function OrderForm({
               <select
                 value={formData.userId}
                 onChange={(e) => handleUserSelect(e.target.value)}
-                disabled={isCancelled}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                disabled={isDetailsLocked}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none text-sm disabled:bg-gray-100"
               >
                 <option value="">Select customer account...</option>
                 {users.map((u) => (
@@ -324,19 +358,19 @@ export function OrderForm({
             </div>
           )}
 
-          {/* Status Dropdown */}
+          {/* Forward-Only Status Transition Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Order Status
+              Order Status (Forward Only)
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              disabled={isCancelled}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase font-semibold text-xs disabled:bg-gray-100"
+              disabled={isFinalState}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase font-bold text-xs disabled:bg-gray-100 cursor-pointer"
             >
-              {STATUS_OPTIONS.map((s) => (
+              {availableStatusOptions.map((s) => (
                 <option key={s} value={s}>
                   {s.toUpperCase()}
                 </option>
@@ -344,7 +378,6 @@ export function OrderForm({
             </select>
           </div>
 
-          {/* Discount Amount */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Discount Amount ($)
@@ -354,14 +387,13 @@ export function OrderForm({
               name="discountAmount"
               value={formData.discountAmount}
               onChange={handleChange}
-              disabled={isCancelled}
+              disabled={isDetailsLocked}
               min="0"
               step="0.01"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100"
             />
           </div>
 
-          {/* Shipping Fee */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Shipping Fee ($)
@@ -371,14 +403,13 @@ export function OrderForm({
               name="shippingFee"
               value={formData.shippingFee}
               onChange={handleChange}
-              disabled={isCancelled}
+              disabled={isDetailsLocked}
               min="0"
               step="0.01"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none disabled:bg-gray-100"
             />
           </div>
 
-          {/* Note */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Order Note
@@ -387,7 +418,7 @@ export function OrderForm({
               name="note"
               value={formData.note}
               onChange={handleChange}
-              disabled={isCancelled}
+              disabled={isDetailsLocked}
               rows={2}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none resize-none disabled:bg-gray-100"
               placeholder="Special instructions..."
@@ -396,13 +427,13 @@ export function OrderForm({
         </div>
       </div>
 
-      {/* Order Items */}
+      {/* Order Items Section */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">
             Order Items ({items.length})
           </h3>
-          {!isCancelled && (
+          {!isDetailsLocked && (
             <button
               type="button"
               onClick={addItem}
@@ -424,7 +455,7 @@ export function OrderForm({
                 <span className="text-sm font-medium text-gray-700">
                   Item #{index + 1}
                 </span>
-                {!isCancelled && items.length > 1 && (
+                {!isDetailsLocked && items.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
@@ -443,7 +474,7 @@ export function OrderForm({
                   <select
                     value={item.productId}
                     onChange={(e) => handleItemProduct(index, e.target.value)}
-                    disabled={isCancelled}
+                    disabled={isDetailsLocked}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none disabled:bg-gray-100"
                   >
                     <option value="">Select product...</option>
@@ -462,7 +493,7 @@ export function OrderForm({
                   <select
                     value={item.variantId || ''}
                     onChange={(e) => handleItemVariant(index, e.target.value)}
-                    disabled={isCancelled || !item.productId}
+                    disabled={isDetailsLocked || !item.productId}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none disabled:bg-gray-100"
                   >
                     <option value="">Default</option>
@@ -483,7 +514,7 @@ export function OrderForm({
                     type="number"
                     value={item.quantity}
                     onChange={(e) => handleItemQuantity(index, parseInt(e.target.value) || 1)}
-                    disabled={isCancelled}
+                    disabled={isDetailsLocked}
                     min="1"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none disabled:bg-gray-100"
                   />
@@ -506,7 +537,7 @@ export function OrderForm({
         </div>
       </div>
 
-      {/* Summary Box */}
+      {/* Summary */}
       <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col sm:flex-row sm:justify-between gap-2 text-sm">
           <div className="space-y-1">
@@ -522,17 +553,17 @@ export function OrderForm({
 
       {/* Actions */}
       <div className="flex gap-3 pt-4 border-t border-gray-200">
-        {!isCancelled ? (
+        {!isFinalState ? (
           <button
             type="submit"
             disabled={isLoading}
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer"
           >
-            {isLoading ? 'Saving...' : order ? 'Update Order' : 'Create Order'}
+            {isLoading ? 'Saving...' : order ? 'Advance / Save Status' : 'Create Order'}
           </button>
         ) : (
           <p className="text-sm text-gray-500 italic py-2">
-            Order modifications are disabled for cancelled orders.
+            This order is in a final state ({currentStatus.toUpperCase()}) and cannot be edited.
           </p>
         )}
         <button

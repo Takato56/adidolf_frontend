@@ -58,10 +58,10 @@ export default function OrderDetailPage() {
     };
   }, [orderId, fetchOrder]);
 
-  const isCancelled = order?.status === 'cancelled';
+  const isFinalState = order?.status === 'delivered' || order?.status === 'cancelled';
 
   const handleOrderSubmit = async (data: any) => {
-    if (isCancelled) return;
+    if (isFinalState) return;
     setDetailsError(null);
     setIsSubmittingDetails(true);
     try {
@@ -75,7 +75,7 @@ export default function OrderDetailPage() {
   };
 
   const handleShipmentSubmit = async (data: Partial<Shipment>) => {
-    if (isCancelled) return;
+    if (isFinalState) return;
     setShipmentError(null);
     setShipmentSaved(false);
     try {
@@ -88,7 +88,7 @@ export default function OrderDetailPage() {
   };
 
   const handlePaymentSubmit = async (data: Partial<Payment>) => {
-    if (isCancelled) return;
+    if (isFinalState) return;
     setPaymentError(null);
     setPaymentSaved(false);
     try {
@@ -152,9 +152,9 @@ export default function OrderDetailPage() {
             <h2 className="text-2xl font-bold text-gray-900">
               Order #{order.id}
             </h2>
-            {isCancelled && (
-              <span className="flex items-center gap-1 text-xs bg-red-100 text-red-800 font-bold px-3 py-1 rounded-full uppercase">
-                <FiLock /> Cancelled
+            {isFinalState && (
+              <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-800 font-bold px-3 py-1 rounded-full uppercase">
+                <FiLock /> {order.status}
               </span>
             )}
           </div>
@@ -218,7 +218,7 @@ export default function OrderDetailPage() {
             <ShipmentForm
               shipment={order.shipment}
               orderId={order.id}
-              disabled={isCancelled}
+              disabled={isFinalState}
               onSubmit={handleShipmentSubmit}
             />
             {shipmentSaved && (
@@ -237,7 +237,7 @@ export default function OrderDetailPage() {
             <PaymentForm
               payment={order.payment}
               orderId={order.id}
-              disabled={isCancelled}
+              disabled={isFinalState}
               onSubmit={handlePaymentSubmit}
             />
             {paymentSaved && (

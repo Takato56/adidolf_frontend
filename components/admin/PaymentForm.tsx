@@ -213,7 +213,7 @@ export function PaymentForm({
             {hasPayment ? 'Update Payment' : 'Save Payment'}
           </button>
         ) : (
-          <p className="text-sm text-gray-500 italic">Payment editing disabled for cancelled orders.</p>
+          <p className="text-sm text-gray-500 italic">Payment editing disabled for finalized orders.</p>
         )}
         {saved && (
           <span className="flex items-center text-sm text-green-600 font-medium">

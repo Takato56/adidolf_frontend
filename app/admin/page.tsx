@@ -4,25 +4,27 @@
 
 import { useEffect, useState } from 'react';
 import { StatCard } from '@/components/admin/StatCard';
-import { FiTrendingUp, FiShoppingCart, FiUsers, FiDollarSign } from 'react-icons/fi';
-import { OverviewStats, Order } from '@/types';
-import { getAdminOverviewStatsApi } from '@/lib/adminStats';
+import { FiTrendingUp, FiShoppingCart, FiUsers, FiDollarSign, FiCalendar, FiClock } from 'react-icons/fi';
+import { Order } from '@/types';
+import { getAdminOverviewStatsApi, PreciseOverviewStats, TimeframeOption } from '@/lib/adminStats';
 import { getOrdersApi } from '@/lib/orders';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<OverviewStats | null>(null);
+  const [timeframe, setTimeframe] = useState<TimeframeOption>('12m');
+  const [stats, setStats] = useState<PreciseOverviewStats | null>(null);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
 
     async function loadDashboardData() {
       try {
         const [overviewData, ordersData] = await Promise.all([
-          getAdminOverviewStatsApi(),
+          getAdminOverviewStatsApi(timeframe),
           getOrdersApi().catch(() => []),
         ]);
 
@@ -44,9 +46,9 @@ export default function AdminDashboard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [timeframe]);
 
-  if (loading) {
+  if (loading && !stats) {
     return (
       <div className="flex items-center justify-center py-20 text-gray-500 font-medium">
         Loading overview statistics...
@@ -70,7 +72,45 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Overview Metric Cards */}
+      {/* Time Precision Header & Filter Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+            <FiCalendar size={20} />
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+              Reporting Window
+            </p>
+            <p className="text-sm font-bold text-gray-900 flex items-center gap-1.5 mt-0.5">
+              <span>{stats.startDateFormatted}</span>
+              <span className="text-gray-400">→</span>
+              <span>{stats.endDateFormatted}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Timeframe Selector Dropdown */}
+        <div className="flex items-center gap-2">
+          <FiClock className="text-gray-400 text-sm" />
+          <label htmlFor="timeframe" className="text-xs text-gray-600 font-medium">
+            Timeframe:
+          </label>
+          <select
+            id="timeframe"
+            value={timeframe}
+            onChange={(e) => setTimeframe(e.target.value as TimeframeOption)}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-xs font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          >
+            <option value="12m">Past 12 Months</option>
+            <option value="ytd">Year-to-Date ({new Date().getFullYear()})</option>
+            <option value="30d">Last 30 Days</option>
+            <option value="prev_year">Previous Calendar Year ({new Date().getFullYear() - 1})</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Sales Volume"
@@ -94,7 +134,7 @@ export default function AdminDashboard() {
           trendUp={true}
         />
         <StatCard
-          title="Current Month Revenue"
+          title="Period Revenue"
           value={`$${(currentMonthRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           icon={FiDollarSign}
           trend="+18.9%"
@@ -102,57 +142,93 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Dynamic 12-Month Trend Charts */}
+      {/* Dynamic 12-Month Trend Charts with Exact Month/Year X-Axis Labels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sales Trend */}
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Sales Trend (Last 12 Months)
-            </h3>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Monthly Sales Breakdown
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Units sold per calendar month
+              </p>
+            </div>
             <span className="text-xs text-green-700 font-bold bg-green-50 px-2.5 py-1 rounded-full">
               {stats.revenueGrowth}
             </span>
           </div>
-          <div className="h-44 flex items-end justify-between gap-1.5 pt-4">
-            {(stats.salesTrend || []).map((value, index) => (
-              <div
-                key={index}
-                className="flex-1 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t transition-all hover:opacity-80 cursor-pointer"
-                style={{ height: `${Math.max(6, (value / maxSales) * 100)}%` }}
-                title={`Month ${index + 1}: ${value} units sold`}
-              />
-            ))}
+
+          <div className="h-44 flex items-end justify-between gap-1 pt-4">
+            {(stats.salesTrend || []).map((value, index) => {
+              const label = stats.monthLabels[index] || `M${index + 1}`;
+              return (
+                <div
+                  key={index}
+                  className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer"
+                >
+                  <div
+                    className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t transition-all group-hover:from-blue-700 group-hover:to-blue-500"
+                    style={{ height: `${Math.max(6, (value / maxSales) * 100)}%` }}
+                    title={`${label}: ${value} units sold`}
+                  />
+                </div>
+              );
+            })}
           </div>
-          <div className="flex justify-between mt-4 text-xs text-gray-500 font-medium">
-            <span>12 Months Ago</span>
-            <span>Current Month</span>
+
+          {/* Exact Month/Year Labels */}
+          <div className="flex justify-between mt-3 pt-2 border-t border-gray-100 text-[10px] font-mono text-gray-500">
+            {stats.monthLabels.map((lbl, idx) => (
+              <span key={idx} className="text-center truncate px-0.5" title={lbl}>
+                {lbl}
+              </span>
+            ))}
           </div>
         </div>
 
         {/* Orders Trend */}
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Orders Trend (Last 12 Months)
-            </h3>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Monthly Orders Breakdown
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Completed orders placed per month
+              </p>
+            </div>
             <span className="text-xs text-blue-700 font-bold bg-blue-50 px-2.5 py-1 rounded-full">
               +14.2% YoY
             </span>
           </div>
-          <div className="h-44 flex items-end justify-between gap-1.5 pt-4">
-            {(stats.ordersTrend || []).map((value, index) => (
-              <div
-                key={index}
-                className="flex-1 bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t transition-all hover:opacity-80 cursor-pointer"
-                style={{ height: `${Math.max(6, (value / maxOrders) * 100)}%` }}
-                title={`Month ${index + 1}: ${value} orders`}
-              />
-            ))}
+
+          <div className="h-44 flex items-end justify-between gap-1 pt-4">
+            {(stats.ordersTrend || []).map((value, index) => {
+              const label = stats.monthLabels[index] || `M${index + 1}`;
+              return (
+                <div
+                  key={index}
+                  className="flex-1 flex flex-col items-center h-full justify-end group cursor-pointer"
+                >
+                  <div
+                    className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-t transition-all group-hover:from-emerald-700 group-hover:to-emerald-500"
+                    style={{ height: `${Math.max(6, (value / maxOrders) * 100)}%` }}
+                    title={`${label}: ${value} orders`}
+                  />
+                </div>
+              );
+            })}
           </div>
-          <div className="flex justify-between mt-4 text-xs text-gray-500 font-medium">
-            <span>12 Months Ago</span>
-            <span>Current Month</span>
+
+          {/* Exact Month/Year Labels */}
+          <div className="flex justify-between mt-3 pt-2 border-t border-gray-100 text-[10px] font-mono text-gray-500">
+            {stats.monthLabels.map((lbl, idx) => (
+              <span key={idx} className="text-center truncate px-0.5" title={lbl}>
+                {lbl}
+              </span>
+            ))}
           </div>
         </div>
       </div>

@@ -201,7 +201,7 @@ export function ShipmentForm({
             {hasShipment ? 'Update Shipment' : 'Save Shipment'}
           </button>
         ) : (
-          <p className="text-sm text-gray-500 italic">Shipment editing disabled for cancelled orders.</p>
+          <p className="text-sm text-gray-500 italic">Shipment editing disabled for finalized orders.</p>
         )}
         {saved && (
           <span className="flex items-center text-sm text-green-600 font-medium">
