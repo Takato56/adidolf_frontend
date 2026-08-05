@@ -70,9 +70,11 @@ export default function AdminDashboard() {
     ? stats.revenueTrend[stats.revenueTrend.length - 1]
     : 94500;
 
+  const isGrowthPositive = !stats.revenueGrowth?.includes('-');
+
   return (
     <div className="space-y-8">
-      {/* Time Precision Header & Filter Bar */}
+      {/* Reporting Window Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
         <div className="flex items-center gap-2.5">
           <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
@@ -90,7 +92,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Timeframe Selector Dropdown */}
         <div className="flex items-center gap-2">
           <FiClock className="text-gray-400 text-sm" />
           <label htmlFor="timeframe" className="text-xs text-gray-600 font-medium">
@@ -116,8 +117,8 @@ export default function AdminDashboard() {
           title="Total Sales Volume"
           value={(stats.totalSales ?? 0).toLocaleString()}
           icon={FiTrendingUp}
-          trend={stats.revenueGrowth || '+28.4%'}
-          trendUp={!stats.revenueGrowth?.includes('-')}
+          trend={stats.revenueGrowth}
+          trendUp={isGrowthPositive}
         />
         <StatCard
           title="Total Orders"
@@ -137,12 +138,12 @@ export default function AdminDashboard() {
           title="Period Revenue"
           value={`$${(currentMonthRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           icon={FiDollarSign}
-          trend="+18.9%"
-          trendUp={true}
+          trend={stats.revenueGrowth}
+          trendUp={isGrowthPositive}
         />
       </div>
 
-      {/* Dynamic 12-Month Trend Charts with Exact Month/Year X-Axis Labels */}
+      {/* Trend Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sales Trend */}
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
@@ -155,7 +156,11 @@ export default function AdminDashboard() {
                 Units sold per calendar month
               </p>
             </div>
-            <span className="text-xs text-green-700 font-bold bg-green-50 px-2.5 py-1 rounded-full">
+            <span
+              className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                isGrowthPositive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+              }`}
+            >
               {stats.revenueGrowth}
             </span>
           </div>
@@ -178,7 +183,6 @@ export default function AdminDashboard() {
             })}
           </div>
 
-          {/* Exact Month/Year Labels */}
           <div className="flex justify-between mt-3 pt-2 border-t border-gray-100 text-[10px] font-mono text-gray-500">
             {stats.monthLabels.map((lbl, idx) => (
               <span key={idx} className="text-center truncate px-0.5" title={lbl}>
@@ -222,7 +226,6 @@ export default function AdminDashboard() {
             })}
           </div>
 
-          {/* Exact Month/Year Labels */}
           <div className="flex justify-between mt-3 pt-2 border-t border-gray-100 text-[10px] font-mono text-gray-500">
             {stats.monthLabels.map((lbl, idx) => (
               <span key={idx} className="text-center truncate px-0.5" title={lbl}>

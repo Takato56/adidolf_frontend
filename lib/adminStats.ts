@@ -18,7 +18,6 @@ export interface PreciseOverviewStats extends OverviewStats {
   endDateFormatted: string;
 }
 
-// Generates exact Month/Year labels for the past 12 months up to the current date
 export function getPast12MonthLabels(referenceDate = new Date()): string[] {
   const labels: string[] = [];
   for (let i = 11; i >= 0; i--) {
@@ -70,24 +69,20 @@ export async function getAdminOverviewStatsApi(timeframe: TimeframeOption = '12m
 
   let monthLabels = getPast12MonthLabels();
   const now = new Date();
-  const currentMonthIdx = now.getMonth(); // 0-based month index
+  const currentMonthIdx = now.getMonth();
 
-  // Apply Timeframe filtering logic
   if (timeframe === 'ytd') {
-    // Slice from January of current year up to current month
     const count = currentMonthIdx + 1;
     monthLabels = monthLabels.slice(-count);
     salesTrend = salesTrend.slice(-count);
     ordersTrend = ordersTrend.slice(-count);
     revenueTrend = revenueTrend.slice(-count);
   } else if (timeframe === '30d') {
-    // Show last 4 weeks / current month breakdown
     monthLabels = monthLabels.slice(-4);
     salesTrend = salesTrend.slice(-4);
     ordersTrend = ordersTrend.slice(-4);
     revenueTrend = revenueTrend.slice(-4);
   } else if (timeframe === 'prev_year') {
-    // Show previous calendar year labels
     const prevYear = now.getFullYear() - 1;
     monthLabels = Array.from({ length: 12 }, (_, i) => {
       const d = new Date(prevYear, i, 1);
@@ -98,7 +93,12 @@ export async function getAdminOverviewStatsApi(timeframe: TimeframeOption = '12m
     revenueTrend = defaultRevenueTrend.map((v) => Math.round(v * 0.75));
   }
 
-  // Format exact date range boundaries
+  // Dynamically compute growth matching the trend array (Last Month vs Previous Month)
+  const lastRev = revenueTrend[revenueTrend.length - 1] || 1;
+  const prevRev = revenueTrend[revenueTrend.length - 2] || lastRev;
+  const calcGrowth = ((lastRev - prevRev) / prevRev) * 100;
+  const revenueGrowth = `${calcGrowth >= 0 ? '+' : ''}${calcGrowth.toFixed(1)}%`;
+
   const startDate = new Date();
   startDate.setMonth(now.getMonth() - (monthLabels.length - 1));
   startDate.setDate(1);
@@ -118,7 +118,7 @@ export async function getAdminOverviewStatsApi(timeframe: TimeframeOption = '12m
     totalSales,
     totalOrders,
     activeCustomers,
-    revenueGrowth: realData.revenueGrowth || '+28.4%',
+    revenueGrowth,
     salesTrend,
     ordersTrend,
     customersTrend: salesTrend.map((v) => v * 15),
