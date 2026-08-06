@@ -1,7 +1,10 @@
+// FILE: takato56-adidolf_frontend/app/admin/products/page.tsx
+
 'use client';
 
 import { ProductTable } from '@/components/admin/ProductTable';
 import { useProducts } from '@/lib/hooks/useProducts';
+import { exportToCsv } from '@/lib/utils/export';
 import { FiPlus, FiDownload } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -27,6 +30,26 @@ export default function ProductsPage() {
     0
   );
 
+  const handleExportProducts = () => {
+    const formattedData = products.map((p) => {
+      const stock = getTotalStock(p);
+      return {
+        'Product ID': p.id,
+        'Name': p.name,
+        'Category': p.categorySlug,
+        'Brand': p.brand,
+        'Price ($)': p.price,
+        'Total Stock': stock,
+        'Published Status': p.isPublished ? 'Yes' : 'No',
+        'Variants Count': p.variants?.length || 0,
+        'Slug': p.slug,
+        'Description': p.description,
+      };
+    });
+
+    exportToCsv('adidolf_products_catalog', formattedData);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with Actions */}
@@ -40,13 +63,16 @@ export default function ProductsPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={handleExportProducts}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer font-medium text-sm"
+          >
             <FiDownload size={18} />
-            Export
+            Export CSV
           </button>
           <Link
             href="/admin/products/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
           >
             <FiPlus size={18} />
             Add Product

@@ -1,7 +1,10 @@
+// FILE: takato56-adidolf_frontend/app/admin/orders/page.tsx
+
 'use client';
 
 import { OrderTable } from '@/components/admin/OrderTable';
 import { useOrders } from '@/lib/hooks/useOrders';
+import { exportToCsv } from '@/lib/utils/export';
 import { FiPlus, FiDownload } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -20,6 +23,28 @@ export default function OrdersPage() {
   const confirmedCount = orders.filter((o) => o.status === 'confirmed').length;
   const totalRevenue = orders.reduce((sum, o) => sum + o.totalPrice, 0);
 
+  const handleExportOrders = () => {
+    const formattedData = orders.map((o) => ({
+      'Order ID': o.id,
+      'Customer ID': o.userId,
+      'Address ID': o.addressId,
+      'Status': o.status.toUpperCase(),
+      'Subtotal ($)': o.subtotal,
+      'Discount ($)': o.discountAmount,
+      'Shipping Fee ($)': o.shippingFee,
+      'Total Price ($)': o.totalPrice,
+      'Items Count': o.items?.length || 0,
+      'Created Date': new Date(o.createdAt).toLocaleString(),
+      'Shipment Carrier': o.shipment?.carrier || 'N/A',
+      'Shipment Status': o.shipment?.status || 'N/A',
+      'Payment Method': o.payment?.method || 'N/A',
+      'Payment Status': o.payment?.status || 'N/A',
+      'Order Note': o.note || '',
+    }));
+
+    exportToCsv('adidolf_orders_export', formattedData);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with Actions */}
@@ -31,13 +56,16 @@ export default function OrdersPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={handleExportOrders}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer font-medium text-sm"
+          >
             <FiDownload size={18} />
-            Export
+            Export CSV
           </button>
           <Link
             href="/admin/orders/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
           >
             <FiPlus size={18} />
             Add Order
